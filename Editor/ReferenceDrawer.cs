@@ -77,8 +77,8 @@
                 if ( ! property.isExpanded || Variable == null)
                     return;
 
-                var editor = EditorDrawHelper.CreateEditor<PlayModeUnchangedEditor>(Variable);
-                editor.ShowDescription = false;
+                // TODO: create a separate editor for inline variable usage and use only previous value and value fields there. (or initial value in edit mode)
+                var editor = EditorDrawHelper.CreateEditor<VariableEditor>(Variable);
 
                 using (new EditorDrawHelper.IndentLevel(indentLevel + 2))
                 {
