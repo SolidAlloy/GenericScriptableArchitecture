@@ -1,0 +1,26 @@
+{
+  "name": "com.solidalloy.generic-scriptable-architecture",
+  "version": "1.0.0",
+  "displayName": "Generic ScriptableObject Architecture",
+  "description": "ScriptableObject architecture with small, easy-to-expand codebase, and simple UI.",
+  "dependencies": {
+    "com.solidalloy.util": "1.24.0",
+    "com.solidalloy.generic-unity-objects": "2.3.0",
+	"com.madsbangh.easybuttons": "1.2.0"
+  },
+  "keywords": [
+    "scriptable",
+    "event",
+    "ScriptableObject",
+    "architecture",
+	"tool",
+	"UnityEvent",
+	"generic"
+  ],
+  "author": {
+    "name": "SolidAlloy",
+    "url": "https://github.com/SolidAlloy/"
+  },
+  "type": "tool",
+  "unity": "2020.2"
+}
