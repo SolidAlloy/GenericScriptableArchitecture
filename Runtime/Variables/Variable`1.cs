@@ -6,6 +6,7 @@
     using JetBrains.Annotations;
     using ScriptableEvents;
     using SolidUtilities.Attributes;
+    using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
 
 #if UNITY_EDITOR
@@ -46,15 +47,13 @@
 
         private void OnEnable()
         {
-            // OnEnable is called after domain reload in edit mode too. If _initialValue is assigned to other values
-            // in edit mode, it causes all kinds of weird behaviour.
-            // For example, _initialValue and _value become impossible to edit in inspector if T is a reference type.
+            // DeepCopy() is not very performant, so execute it only in Play Mode.
 #if UNITY_EDITOR
             if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPlaying)
 #endif
             {
-                _value = _initialValue;
-                _previousValue = _initialValue;
+                _value = _initialValue.DeepCopy();
+                _previousValue = _initialValue.DeepCopy();
             }
         }
 

@@ -2,6 +2,8 @@
 {
     using System.Reflection;
     using GenericUnityObjects.UnityEditorInternals;
+    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.UnityEngineInternals;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -9,6 +11,8 @@
     [CustomEditor(typeof(VariableBase), true)]
     internal class VariableEditor : GenericHeaderEditor
     {
+        private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
+
         private SerializedProperty _initialValue;
         private SerializedProperty _value;
         private SerializedProperty _previousValue;
@@ -89,13 +93,13 @@
         {
             EditorGUI.BeginChangeCheck();
 
-            using (new EditorGUI.DisabledScope( ! Application.isPlaying))
-                EditorGUILayout.PropertyField(_value);
+            using (new EditorGUI.DisabledScope(!Application.isPlaying))
+                EditorDrawHelper.DelayedPropertyField(_value, _currentValueLabel);
 
             if ( ! EditorGUI.EndChangeCheck())
                 return;
 
-            object previousValue = _valueField.GetValue(target);
+            object previousValue = _valueField.GetValue(target).DeepCopy();
             serializedObject.ApplyModifiedProperties();
             _previousValueField.SetValue(target, previousValue);
         }

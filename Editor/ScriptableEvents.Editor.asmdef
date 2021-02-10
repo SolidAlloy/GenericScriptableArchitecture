@@ -16,7 +16,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "GenericUnityEditorInternals.dll"
+        "GenericUnityEditorInternals.dll",
+        "UnityEngineInternals.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
