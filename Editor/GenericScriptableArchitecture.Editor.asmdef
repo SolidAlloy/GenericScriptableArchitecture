@@ -17,7 +17,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "GenericUnityEditorInternals.dll",
-        "UnityEngineInternals.dll"
+        "UnityEngineInternals.dll",
+        "UnityEditorInternals2020.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
