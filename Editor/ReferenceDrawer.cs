@@ -8,7 +8,7 @@
     using UnityEditor;
     using UnityEngine;
 
-    [CustomPropertyDrawer(typeof(Reference), true)]
+    [CustomPropertyDrawer(typeof(ReferenceBase), true)]
     public class ReferenceDrawer : PropertyDrawer
     {
         private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
