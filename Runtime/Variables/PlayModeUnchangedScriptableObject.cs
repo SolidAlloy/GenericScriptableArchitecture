@@ -1,4 +1,4 @@
-﻿namespace ExtendedScriptableObjects
+﻿namespace GenericScriptableArchitecture
 {
     using GenericUnityObjects;
     using UnityEngine;

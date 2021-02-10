@@ -1,5 +1,6 @@
-﻿namespace ExtendedScriptableObjects.Editor
+﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System.Collections.Generic;
     using JetBrains.Annotations;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
@@ -10,21 +11,19 @@
     [CustomPropertyDrawer(typeof(Reference), true)]
     public class ReferenceDrawer : PropertyDrawer
     {
-        private const string UseConstantName = "_useConstant";
-        private const string ConstantValueName = "_constantValue";
-        private const string VariableName = "_variable";
+        private SerializedProperty _useConstant;
+        private SerializedProperty _constantValue;
+        private SerializedProperty _variable;
 
-        private SerializedProperty _useConstantProp;
-        private SerializedProperty _constantValueProp;
-        private SerializedProperty _variableProp;
+        private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
 
         private bool UseConstant
         {
-            get => _useConstantProp.boolValue;
-            set => _useConstantProp.boolValue = value;
+            get => _useConstant.boolValue;
+            set => _useConstant.boolValue = value;
         }
 
-        private Object Variable => _variableProp.objectReferenceValue;
+        private Object Variable => _variable.objectReferenceValue;
 
         public override void OnGUI(Rect fieldRect, SerializedProperty property, GUIContent label)
         {
@@ -46,48 +45,53 @@
                 DrawValue(property, valueRect, previousIndent);
 
                 EditorGUI.indentLevel = previousIndent;
-
-                if (property.serializedObject.hasModifiedProperties)
-                    property.serializedObject.ApplyModifiedProperties();
             }
         }
 
         private void FindProperties(SerializedProperty property)
         {
-            _useConstantProp = property.FindPropertyRelative(UseConstantName);
-            Assert.IsNotNull(_useConstantProp);
+            _useConstant = property.FindPropertyRelative("_useConstant");
+            Assert.IsNotNull(_useConstant);
 
-            _constantValueProp = property.FindPropertyRelative(ConstantValueName);
-            Assert.IsNotNull(_constantValueProp);
+            _constantValue = property.FindPropertyRelative("_constantValue");
+            Assert.IsNotNull(_constantValue);
 
-            _variableProp = property.FindPropertyRelative(VariableName);
-            Assert.IsNotNull(_variableProp);
+            _variable = property.FindPropertyRelative("_variable");
+            Assert.IsNotNull(_variable);
         }
 
         private void DrawValue(SerializedProperty property, Rect valueRect, int indentLevel)
         {
             if (UseConstant)
             {
-                EditorGUI.PropertyField(valueRect, _constantValueProp, GUIContent.none);
+                EditorGUI.PropertyField(valueRect, _constantValue, GUIContent.none);
             }
             else
             {
-                EditorGUI.PropertyField(valueRect, _variableProp, GUIContent.none);
+                EditorGUI.PropertyField(valueRect, _variable, GUIContent.none);
 
                 if ( ! property.isExpanded || Variable == null)
                     return;
 
-                // TODO: create a separate editor for inline variable usage and use only previous value and value fields there. (or initial value in edit mode)
-                var editor = EditorDrawHelper.CreateEditor<VariableEditor>(Variable);
-
                 using (new EditorDrawHelper.IndentLevel(indentLevel + 2))
                 {
-                    editor.OnInspectorGUI();
+                    GetInlineEditor(Variable).OnInspectorGUI();
                 }
             }
         }
 
-        private (Rect, Rect, Rect) GetLabelButtonValueRects(Rect totalRect)
+        private Editor GetInlineEditor(Object variable)
+        {
+            if ( ! _editorCache.TryGetValue(variable, out Editor editor))
+            {
+                editor = EditorDrawHelper.CreateEditor<VariableInlineEditor>(variable);
+                _editorCache.Add(variable, editor);
+            }
+
+            return editor;
+        }
+
+        private (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
         {
             const float indentWidth = 15f;
             const float valueLeftIndent = 2f;

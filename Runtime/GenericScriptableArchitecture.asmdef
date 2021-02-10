@@ -1,6 +1,6 @@
 {
-    "name": "ScriptableEvents",
-    "rootNamespace": "ScriptableEvents",
+    "name": "GenericScriptableArchitecture",
+    "rootNamespace": "GenericScriptableArchitecture",
     "references": [
         "GUID:9168b41b563c2d84b94cfe84212541a9",
         "GUID:f24cf67903b27ae498b3069ecc30cc11",

@@ -1,4 +1,4 @@
-﻿namespace ScriptableEvents.Editor
+﻿namespace GenericScriptableArchitecture.Editor
 {
     using EasyButtons.Editor;
     using GenericUnityObjects.Editor;

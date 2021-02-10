@@ -1,4 +1,4 @@
-﻿namespace ScriptableEvents
+﻿namespace GenericScriptableArchitecture
 {
     using GenericUnityObjects;
 

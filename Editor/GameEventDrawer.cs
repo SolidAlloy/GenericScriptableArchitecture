@@ -1,7 +1,6 @@
-﻿namespace ScriptableEvents.Editor
+﻿namespace GenericScriptableArchitecture.Editor
 {
     using System.Linq;
-    using ScriptableEvents;
     using SolidUtilities.Editor.Extensions;
     using UnityEditor;
     using UnityEditorInternal;

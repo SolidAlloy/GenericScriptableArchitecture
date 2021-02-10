@@ -1,4 +1,4 @@
-﻿namespace ScriptableEvents
+﻿namespace GenericScriptableArchitecture
 {
     using System;
     using System.Collections.Generic;

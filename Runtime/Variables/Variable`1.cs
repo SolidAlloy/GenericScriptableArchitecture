@@ -1,16 +1,15 @@
-﻿namespace ExtendedScriptableObjects
+﻿namespace GenericScriptableArchitecture
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using ScriptableEvents;
     using SolidUtilities.Attributes;
     using SolidUtilities.UnityEngineInternals;
-    using UnityEngine;
-
-#if UNITY_EDITOR
     using UnityEditor;
+    using UnityEngine;
+#if UNITY_EDITOR
+
 #endif
 
     [CreateGenericAssetMenu(FileName = "New Variable")]

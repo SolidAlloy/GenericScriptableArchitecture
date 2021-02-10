@@ -1,2 +1,2 @@
 ﻿using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("ScriptableEvents.Editor")]
+[assembly: InternalsVisibleTo("GenericScriptableArchitecture.Editor")]
