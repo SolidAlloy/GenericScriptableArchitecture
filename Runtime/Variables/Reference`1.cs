@@ -18,6 +18,12 @@
             _constantValue = value;
         }
 
+        public Reference(Variable<T> variable)
+        {
+            _useConstant = false;
+            _variable = variable;
+        }
+
         public T Value => _useConstant ? _constantValue : _variable.Value;
 
         public static implicit operator T(Reference<T> reference) => reference.Value;
