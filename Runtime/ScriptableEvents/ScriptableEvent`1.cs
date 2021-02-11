@@ -11,7 +11,7 @@
     {
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
 
-        [Button(Mode = ButtonMode.EnabledInPlayMode)]
+        [Button(Mode = ButtonMode.EnabledInPlayMode, Expanded = true)]
         public void Invoke(T arg0)
         {
             for (int i = _listeners.Count - 1; i != -1; i--)
