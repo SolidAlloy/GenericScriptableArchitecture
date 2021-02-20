@@ -45,7 +45,7 @@
 
         public bool Equals(Variable<T> other)
         {
-            return other is null ? false : Value.Equals(other.Value);
+            return other is { } && Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)

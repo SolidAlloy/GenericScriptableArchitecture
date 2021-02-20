@@ -4,7 +4,7 @@
     {
         protected override void DrawFields()
         {
-            if (InPlayMode)
+            if (ApplicationUtil.InPlayMode)
             {
                 DrawCurrentValue();
                 DrawPreviousValue();

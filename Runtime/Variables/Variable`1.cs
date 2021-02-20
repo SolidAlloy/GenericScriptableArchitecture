@@ -1,17 +1,12 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using GenericUnityObjects;
     using JetBrains.Annotations;
     using SolidUtilities.Attributes;
     using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
     using Object = UnityEngine.Object;
-
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
 
     [CreateGenericAssetMenu(FileName = "New Variable")]
     [Serializable]
@@ -20,63 +15,38 @@
         [ResizableTextArea, UsedImplicitly]
         [SerializeField] private string _description;
 
-        [SerializeField] private T _initialValue;
-        [SerializeField] private T _value;
-        [SerializeField] private T _previousValue;
+        [SerializeField] internal T _initialValue;
+        [SerializeField] internal T _value;
 
         [SerializeField] private ScriptableEvent<T> _changed;
-        [SerializeField] private ScriptableEvent<T, T> _changedWithHistory;
-
-        [SerializeField] private bool _usePreviousValue;
 
         public T Value
         {
             get => _value;
-            set
-            {
-                _previousValue = _value;
-                _value = value;
-
-                InvokeValueChangedEvents();
-            }
+            set => SetValue(value);
         }
 
-        private static bool InEditMode
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return ! (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPlaying);
-#else
-                return false;
-#endif
-            }
-        }
-
-        [PublicAPI]
-        public T PreviousValue => _previousValue;
-
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             // DeepCopy() is not very performant, so execute it only in Play Mode.
-            if (InEditMode)
+            if (ApplicationUtil.InEditMode)
                 return;
 
             _value = _initialValue.DeepCopy();
-
-            if (_usePreviousValue)
-                _previousValue = _initialValue.DeepCopy();
         }
 
-        [SuppressMessage("ReSharper", "RCS1146",
-            Justification = "Conditional access on ScriptableEvent bypasses overriden equality operator")]
+        protected virtual void SetValue(T value)
+        {
+            _value = value;
+            InvokeValueChangedEvents();
+        }
+
         internal override void InvokeValueChangedEvents()
         {
-            if (InEditMode)
+            if (ApplicationUtil.InEditMode)
                 return;
 
             if (_changed != null) _changed.Invoke(_value);
-            if (_changedWithHistory != null) _changedWithHistory.Invoke(_previousValue, _value);
         }
 
         public static implicit operator T(Variable<T> variable) => variable.Value;

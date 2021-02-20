@@ -1,6 +1,5 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
-    using System;
     using UnityEditor;
 
     [CustomEditor(typeof(VariableBase), true)]
@@ -27,7 +26,9 @@
             DrawPreviousValue();
 
             EditorGUILayout.PropertyField(_changed);
-            EditorGUILayout.PropertyField(_changedWithHistory);
+
+            if (_withHistory)
+                EditorGUILayout.PropertyField(_changedWithHistory);
         }
     }
 }

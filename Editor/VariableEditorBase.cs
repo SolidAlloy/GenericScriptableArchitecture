@@ -23,24 +23,34 @@
 
         private bool _initialValueEnabled;
 
-        protected static bool InPlayMode => EditorApplication.isPlayingOrWillChangePlaymode;
-
-        private static bool InEditMode => ! InPlayMode;
+        protected bool _withHistory;
 
         protected virtual void OnEnable()
         {
-            const string valueFieldName = "_value";
-            const string previousValueFieldName = "_previousValue";
+            _variableBase = target as VariableBase;
+            _withHistory = target.GetType().BaseType?.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
 
-            _initialValue = serializedObject.FindProperty("_initialValue");
+            _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
+            GetValueField();
+            GetPreviousValueField();
+        }
+
+        private void GetValueField()
+        {
+            const string valueFieldName = nameof(Variable<int>._value);
             _value = serializedObject.FindProperty(valueFieldName);
-            _previousValue = serializedObject.FindProperty(previousValueFieldName);
-
-            const BindingFlags privateInstanceField = BindingFlags.Instance | BindingFlags.NonPublic;
-            _valueField = target.GetType().BaseType?.GetField(valueFieldName, privateInstanceField);
-            _previousValueField = target.GetType().BaseType?.GetField(previousValueFieldName, privateInstanceField);
-
+            _valueField = target.GetType().BaseType?.GetField(valueFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(_valueField);
+        }
+
+        private void GetPreviousValueField()
+        {
+            if ( ! _withHistory)
+                return;
+
+            const string previousValueFieldName = nameof(VariableWithHistory<int>._previousValue);
+            _previousValue = serializedObject.FindProperty(previousValueFieldName);
+            _previousValueField = target.GetType().BaseType?.GetField(previousValueFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(_previousValueField);
         }
 
@@ -59,22 +69,39 @@
         {
             EditorGUI.BeginChangeCheck();
 
-            using (new EditorGUI.DisabledScope(InEditMode))
+            using (new EditorGUI.DisabledScope(ApplicationUtil.InEditMode))
                 EditorDrawHelper.DelayedPropertyField(_value, _currentValueLabel);
 
             if ( ! EditorGUI.EndChangeCheck())
                 return;
 
-            object previousValue = _valueField.GetValue(target).DeepCopy();
-            serializedObject.ApplyModifiedProperties();
-            _previousValueField.SetValue(target, previousValue);
-            serializedObject.ApplyModifiedProperties();
+            ChangePreviousValue();
+
+            // Invoke events. Both current and previous value are updated at this stage.
             _variableBase.InvokeValueChangedEvents();
+        }
+
+        private void ChangePreviousValue()
+        {
+            if ( ! _withHistory)
+                return;
+
+            // Get previous value before applying the change
+            object previousValue = _valueField.GetValue(target).DeepCopy();
+
+            // Apply the changed value so that it is not lost.
+            serializedObject.ApplyModifiedProperties();
+
+            // Set the previousValue
+            _previousValueField.SetValue(target, previousValue);
+
+            // Load the previous value to serialized object so that it is updated in the inspector
+            serializedObject.Update();
         }
 
         protected void DrawInitialValue()
         {
-            if (InEditMode)
+            if (ApplicationUtil.InEditMode)
             {
                 EditorGUILayout.PropertyField(_initialValue);
                 return;
@@ -93,6 +120,9 @@
 
         protected void DrawPreviousValue()
         {
+            if ( ! _withHistory)
+                return;
+
             using (new EditorGUI.DisabledScope(true))
                 EditorGUILayout.PropertyField(_previousValue);
         }
