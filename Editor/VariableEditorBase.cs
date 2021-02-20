@@ -12,6 +12,8 @@
     {
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
 
+        private VariableBase _variableBase;
+
         private SerializedProperty _initialValue;
         private SerializedProperty _value;
         private SerializedProperty _previousValue;
@@ -23,7 +25,7 @@
 
         protected static bool InPlayMode => EditorApplication.isPlayingOrWillChangePlaymode;
 
-        protected static bool InEditMode => ! InPlayMode;
+        private static bool InEditMode => ! InPlayMode;
 
         protected virtual void OnEnable()
         {
@@ -66,6 +68,8 @@
             object previousValue = _valueField.GetValue(target).DeepCopy();
             serializedObject.ApplyModifiedProperties();
             _previousValueField.SetValue(target, previousValue);
+            serializedObject.ApplyModifiedProperties();
+            _variableBase.InvokeValueChangedEvents();
         }
 
         protected void DrawInitialValue()

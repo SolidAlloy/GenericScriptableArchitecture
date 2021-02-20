@@ -2,5 +2,8 @@
 {
     using GenericUnityObjects;
 
-    public class VariableBase : GenericScriptableObject { }
+    public abstract class VariableBase : GenericScriptableObject
+    {
+        internal abstract void InvokeValueChangedEvents();
+    }
 }
