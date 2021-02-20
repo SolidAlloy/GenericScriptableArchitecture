@@ -18,7 +18,7 @@
     "precompiledReferences": [
         "GenericUnityEditorInternals.dll",
         "UnityEngineInternals.dll",
-        "UnityEditorInternals2020.dll"
+        "UnityEditorInternals.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
