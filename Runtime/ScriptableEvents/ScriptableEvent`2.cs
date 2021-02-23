@@ -11,6 +11,8 @@
     {
         private List<ScriptableEventListener<T1, T2>> _listeners = new List<ScriptableEventListener<T1, T2>>();
 
+        internal override List<ScriptableEventListenerBase> Listeners => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+
         [Button(Mode = ButtonMode.EnabledInPlayMode, Expanded = true)]
         public void Invoke(T1 arg0, T2 arg1)
         {

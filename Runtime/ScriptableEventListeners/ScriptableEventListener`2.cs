@@ -1,9 +1,11 @@
 ﻿namespace GenericScriptableArchitecture
 {
+    using System;
     using UnityEngine;
     using UnityEngine.Events;
 
-    public class ScriptableEventListener<T1, T2> : MonoBehaviour
+    [Serializable]
+    public class ScriptableEventListener<T1, T2> : ScriptableEventListenerBase
     {
         [SerializeField] private ScriptableEvent<T1, T2> _event;
         [SerializeField] private UnityEvent<T1, T2> _response;

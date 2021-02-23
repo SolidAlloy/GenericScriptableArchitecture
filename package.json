@@ -4,8 +4,8 @@
   "displayName": "Generic ScriptableObject Architecture",
   "description": "ScriptableObject architecture with small, easy-to-expand codebase, and simple UI.",
   "dependencies": {
-    "com.solidalloy.util": "1.26.0",
-    "com.solidalloy.generic-unity-objects": "2.4.0",
+    "com.solidalloy.util": "1.26.1",
+    "com.solidalloy.generic-unity-objects": "2.4.5",
 	"com.madsbangh.easybuttons": "1.2.0"
   },
   "keywords": [
