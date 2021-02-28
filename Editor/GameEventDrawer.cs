@@ -7,7 +7,7 @@
     using UnityEngine;
 
     [CustomPropertyDrawer(typeof(GameEventBase), true)]
-    public class GameEventDrawer : PropertyDrawer
+    internal class GameEventDrawer : PropertyDrawer
     {
         private const float TopBottomMargin = 2f;
         private const string ListFieldName = nameof(GameEvent<bool>.ScriptableEvents);

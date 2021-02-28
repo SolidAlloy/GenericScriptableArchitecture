@@ -10,6 +10,8 @@
 
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
+        protected bool WithHistory;
+
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
 
         private VariableBase _variableBase;
@@ -23,12 +25,10 @@
 
         private bool _initialValueEnabled;
 
-        protected bool _withHistory;
-
         protected virtual void OnEnable()
         {
             _variableBase = target as VariableBase;
-            _withHistory = target.GetType().BaseType?.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
+            WithHistory = target.GetType().BaseType?.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
 
             _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
             GetValueField();
@@ -45,7 +45,7 @@
 
         private void GetPreviousValueField()
         {
-            if ( ! _withHistory)
+            if ( ! WithHistory)
                 return;
 
             const string previousValueFieldName = nameof(VariableWithHistory<int>._previousValue);
@@ -56,11 +56,12 @@
 
         public override void OnInspectorGUI()
         {
-            serializedObject.UpdateIfRequiredOrScript();
+            using var guiWrapper = new InspectorGUIWrapper(this);
+
+            if (guiWrapper.HasMissingScript)
+                return;
 
             DrawFields();
-
-            serializedObject.ApplyModifiedProperties();
         }
 
         protected abstract void DrawFields();
@@ -83,7 +84,7 @@
 
         private void ChangePreviousValue()
         {
-            if ( ! _withHistory)
+            if ( ! WithHistory)
                 return;
 
             // Get previous value before applying the change
@@ -120,7 +121,7 @@
 
         protected void DrawPreviousValue()
         {
-            if ( ! _withHistory)
+            if ( ! WithHistory)
                 return;
 
             using (new EditorGUI.DisabledScope(true))

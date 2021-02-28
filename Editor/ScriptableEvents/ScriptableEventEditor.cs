@@ -5,7 +5,7 @@
     using UnityEditor;
 
     [CustomEditor(typeof(ScriptableEventBase), true)]
-    public class ScriptableEventEditor : GenericHeaderEditor
+    internal class ScriptableEventEditor : GenericHeaderEditor
     {
         private ButtonsDrawer _buttonsDrawer;
         private FoldoutList<ScriptableEventListenerBase> _listenersList;
@@ -19,31 +19,18 @@
 
         public override void OnInspectorGUI()
         {
-            if (target == null)
-            {
-                DrawMissingScript();
-                return;
-            }
+            using var guiWrapper = new InspectorGUIWrapper(this);
 
-            serializedObject.UpdateIfRequiredOrScript();
+            if (guiWrapper.HasMissingScript)
+                return;
 
             _buttonsDrawer.DrawButtons(targets);
 
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
-                _listenersList.DoLayoutList();
-            }
+            if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
 
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private void DrawMissingScript()
-        {
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
-            }
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
+            _listenersList.DoLayoutList();
         }
     }
 }

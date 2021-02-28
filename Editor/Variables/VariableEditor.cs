@@ -27,7 +27,7 @@
 
             EditorGUILayout.PropertyField(_changed);
 
-            if (_withHistory)
+            if (WithHistory)
                 EditorGUILayout.PropertyField(_changedWithHistory);
         }
     }
