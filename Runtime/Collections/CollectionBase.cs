@@ -1,6 +1,11 @@
 ﻿namespace GenericScriptableArchitecture
 {
+    using System.Collections.Generic;
     using GenericUnityObjects;
+    using UnityEngine;
 
-    public class CollectionBase : GenericScriptableObject { }
+    public abstract class CollectionBase : GenericScriptableObject
+    {
+        internal abstract List<Object> List { get; }
+    }
 }

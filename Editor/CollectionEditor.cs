@@ -8,7 +8,6 @@
     [CustomEditor(typeof(CollectionBase), true)]
     public class CollectionEditor : GenericHeaderEditor
     {
-        private SerializedProperty _list;
         private SerializedProperty _onItemAdded;
         private SerializedProperty _onItemRemoved;
 
@@ -16,10 +15,9 @@
 
         private void OnEnable()
         {
-            _list = serializedObject.FindProperty(nameof(Collection<int>._list));
-            _onItemAdded = serializedObject.FindProperty(nameof(Collection<int>._onItemAdded));
-            _onItemRemoved = serializedObject.FindProperty(nameof(Collection<int>._onItemRemoved));
-            _listDrawer = GetReorderableList(_list);
+            _onItemAdded = serializedObject.FindProperty(nameof(Collection<Object>._onItemAdded));
+            _onItemRemoved = serializedObject.FindProperty(nameof(Collection<Object>._onItemRemoved));
+            _listDrawer = GetReorderableList();
         }
 
         public override void OnInspectorGUI()
@@ -37,26 +35,18 @@
             _listDrawer.DoLayoutList();
         }
 
-        private ReorderableList GetReorderableList(SerializedProperty listProperty)
+        private ReorderableList GetReorderableList()
         {
-            return new ReorderableList(serializedObject, listProperty, false, true, false, false)
+            var elements = ((CollectionBase) target).List;
+
+            return new ReorderableList(elements, typeof(Object), false, true, false, false)
             {
                 drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Collection Items"),
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        var elementProperty = listProperty.GetArrayElementAtIndex(index);
-
-                        if (elementProperty.propertyType == SerializedPropertyType.ObjectReference)
-                        {
-                            EditorGUI.ObjectField(rect, GUIContent.none, elementProperty.objectReferenceValue,
-                                elementProperty.objectReferenceValue.GetType(), true);
-                        }
-                        else
-                        {
-                            EditorGUI.PropertyField(rect, elementProperty);
-                        }
+                        EditorGUI.ObjectField(rect, GUIContent.none, elements[index], typeof(Object), true);
                     }
                 }
             };
