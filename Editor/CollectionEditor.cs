@@ -37,6 +37,7 @@
 
         private ReorderableList GetReorderableList()
         {
+            const float spacingBetweenElements = 4f;
             var elements = ((CollectionBase) target).List;
 
             return new ReorderableList(elements, typeof(Object), false, true, false, false)
@@ -44,10 +45,17 @@
                 drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Collection Items"),
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
+                    var objectFieldRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+
                     using (new EditorGUI.DisabledScope(true))
                     {
-                        EditorGUI.ObjectField(rect, GUIContent.none, elements[index], typeof(Object), true);
+                        EditorGUI.ObjectField(objectFieldRect, GUIContent.none, elements[index], typeof(Object), true);
                     }
+                },
+                elementHeightCallback = index =>
+                {
+                    return EditorGUIUtility.singleLineHeight +
+                           (index == elements.Count - 1 ? 0f : spacingBetweenElements);
                 }
             };
         }
