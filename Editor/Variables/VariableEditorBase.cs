@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System;
     using System.Reflection;
     using GenericUnityObjects.UnityEditorInternals;
     using SolidUtilities.Editor.Helpers;
@@ -102,6 +103,9 @@
 
         protected void DrawInitialValue()
         {
+            if (_initialValue == null)
+                throw new NullReferenceException("The variable value is a non-serialized type. Make it serializable to use in a variable.");
+
             if (ApplicationUtil.InEditMode)
             {
                 EditorGUILayout.PropertyField(_initialValue);

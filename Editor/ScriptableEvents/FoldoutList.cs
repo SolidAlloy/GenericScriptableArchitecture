@@ -19,7 +19,7 @@
 
         private Type _realElementType;
 
-        public FoldoutList(List<TElement> elements, SerializedProperty expandedProperty)
+        public FoldoutList(List<TElement> elements, SerializedProperty expandedProperty, string title)
         {
             _list = new ReorderableList(elements, typeof(TElement), false, true,
                 false, false)
@@ -28,7 +28,7 @@
                 {
                     const float leftMargin = 10f;
                     var shiftedRight = new Rect(rect.x + leftMargin, rect.y, rect.width - leftMargin, rect.height);
-                    bool newValue = EditorGUI.Foldout(shiftedRight, expandedProperty.boolValue, "Listeners", true);
+                    bool newValue = EditorGUI.Foldout(shiftedRight, expandedProperty.boolValue, title, true);
 
                     if (expandedProperty.boolValue == newValue)
                         return;
