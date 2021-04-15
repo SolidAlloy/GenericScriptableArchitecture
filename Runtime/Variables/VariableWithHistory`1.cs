@@ -18,12 +18,9 @@
         [PublicAPI]
         public T PreviousValue => _previousValue;
 
-        protected override void OnEnable()
+        protected override void InitializeValues()
         {
-            if (ApplicationUtil.InEditMode)
-                return;
-
-            base.OnEnable();
+            base.InitializeValues();
             _previousValue = _initialValue.DeepCopy();
         }
 

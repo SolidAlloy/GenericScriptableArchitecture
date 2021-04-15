@@ -5,6 +5,7 @@
     using JetBrains.Annotations;
     using SolidUtilities.Attributes;
     using SolidUtilities.UnityEngineInternals;
+    using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -26,12 +27,31 @@
             set => SetValue(value);
         }
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
-            // DeepCopy() is not very performant, so execute it only in Play Mode.
-            if (ApplicationUtil.InEditMode)
-                return;
+#if UNITY_EDITOR
+            // If domain reload is disabled, OnEnable will not be called on Play Mode start, so we need to plug into
+            // the 'play mode state changed' event.
+            if (EditorSettings.enterPlayModeOptionsEnabled
+                && EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableDomainReload))
+            {
+                EditorApplication.playModeStateChanged += InitializeValues;
+            }
+#endif
 
+            // DeepCopy() is not very performant, so execute it only in Play Mode.
+            if (ApplicationUtil.InPlayMode)
+                InitializeValues();
+        }
+
+        private void InitializeValues(PlayModeStateChange stateChange)
+        {
+            if (stateChange == PlayModeStateChange.ExitingEditMode)
+                InitializeValues();
+        }
+
+        protected virtual void InitializeValues()
+        {
             _value = _initialValue.DeepCopy();
         }
 
