@@ -77,7 +77,14 @@
             if ( ! EditorGUI.EndChangeCheck())
                 return;
 
-            ChangePreviousValue();
+            if (WithHistory)
+            {
+                ChangePreviousValue();
+            }
+            else
+            {
+                ApplyCurrentValue();
+            }
 
             // Invoke events. Both current and previous value are updated at this stage.
             _variableBase.InvokeValueChangedEvents();
@@ -85,9 +92,6 @@
 
         private void ChangePreviousValue()
         {
-            if ( ! WithHistory)
-                return;
-
             // Get previous value before applying the change
             object previousValue = _valueField.GetValue(target).DeepCopy();
 
@@ -99,6 +103,12 @@
 
             // Load the previous value to serialized object so that it is updated in the inspector
             serializedObject.Update();
+        }
+
+        private void ApplyCurrentValue()
+        {
+            // Apply the change value, otherwise the event will be invoked with the old value.
+            serializedObject.ApplyModifiedProperties();
         }
 
         protected void DrawInitialValue()
