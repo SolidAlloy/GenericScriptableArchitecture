@@ -18,7 +18,7 @@
     [SuppressMessage("ReSharper", "Unity.NoNullPropagation",
         Justification = "It's ok to invoke scriptable events via null-coalescing operators because the event " +
                         "can be null only if it is not assigned in the inspector.")]
-    public class Collection<TUnityObject> : CollectionBase, IList<TUnityObject>
+    public class RuntimeSet<TUnityObject> : RuntimeSetBase, IList<TUnityObject>
         where TUnityObject : UnityEngine.Object
     {
         [SerializeField] internal ScriptableEvent<TUnityObject> _onItemAdded;

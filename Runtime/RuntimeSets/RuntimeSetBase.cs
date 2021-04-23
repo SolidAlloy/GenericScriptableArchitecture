@@ -4,7 +4,7 @@
     using GenericUnityObjects;
     using UnityEngine;
 
-    public abstract class CollectionBase : GenericScriptableObject
+    public abstract class RuntimeSetBase : GenericScriptableObject
     {
         internal abstract List<Object> List { get; }
     }

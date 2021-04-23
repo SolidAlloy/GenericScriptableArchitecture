@@ -5,8 +5,8 @@
     using UnityEditorInternal;
     using UnityEngine;
 
-    [CustomEditor(typeof(CollectionBase), true)]
-    public class CollectionEditor : GenericHeaderEditor
+    [CustomEditor(typeof(RuntimeSetBase), true)]
+    public class RuntimeSetEditor : GenericHeaderEditor
     {
         private SerializedProperty _onItemAdded;
         private SerializedProperty _onItemRemoved;
@@ -15,8 +15,8 @@
 
         private void OnEnable()
         {
-            _onItemAdded = serializedObject.FindProperty(nameof(Collection<Object>._onItemAdded));
-            _onItemRemoved = serializedObject.FindProperty(nameof(Collection<Object>._onItemRemoved));
+            _onItemAdded = serializedObject.FindProperty(nameof(RuntimeSet<Object>._onItemAdded));
+            _onItemRemoved = serializedObject.FindProperty(nameof(RuntimeSet<Object>._onItemRemoved));
             _listDrawer = GetReorderableList();
         }
 
@@ -38,7 +38,7 @@
         private ReorderableList GetReorderableList()
         {
             const float spacingBetweenElements = 4f;
-            var elements = ((CollectionBase) target).List;
+            var elements = ((RuntimeSetBase) target).List;
 
             return new ReorderableList(elements, typeof(Object), false, true, false, false)
             {
