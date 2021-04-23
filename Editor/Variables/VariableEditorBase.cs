@@ -28,7 +28,9 @@
 
         protected virtual void OnEnable()
         {
+            // Can be null because we also use the editor for drawing Constant<T>
             _variableBase = target as VariableBase;
+
             WithHistory = target.GetType().BaseType?.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
 
             _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
@@ -87,7 +89,7 @@
             }
 
             // Invoke events. Both current and previous value are updated at this stage.
-            _variableBase.InvokeValueChangedEvents();
+            _variableBase?.InvokeValueChangedEvents();
         }
 
         private void ChangePreviousValue()

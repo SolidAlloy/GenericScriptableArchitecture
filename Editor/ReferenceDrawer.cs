@@ -92,15 +92,12 @@
             switch (ValueType)
             {
                 case ReferenceBase.ValueTypes.Constant:
-                    DrawConstant(valueRect, property, indentLevel);
+                case ReferenceBase.ValueTypes.Variable:
+                    DrawObjectReference(valueRect, property, indentLevel);
                     break;
 
                 case ReferenceBase.ValueTypes.Value:
                     DrawValue(valueRect, totalRect, indentLevel);
-                    break;
-
-                case ReferenceBase.ValueTypes.Variable:
-                    DrawVariable(valueRect, property, indentLevel);
                     break;
 
                 default:
@@ -154,9 +151,9 @@
             }
         }
 
-        private void DrawVariable(Rect valueRect, SerializedProperty property, int indentLevel)
+        private void DrawObjectReference(Rect valueRect, SerializedProperty property, int indentLevel)
         {
-            EditorGUI.PropertyField(valueRect, _variable, GUIContent.none);
+            EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
 
             if ( ! property.isExpanded || ObjectReference == null)
                 return;
@@ -164,21 +161,6 @@
             using (new EditorDrawHelper.IndentLevel(indentLevel + 1))
             {
                 GetInlineEditor(ObjectReference).OnInspectorGUI();
-            }
-        }
-
-        private void DrawConstant(Rect valueRect, SerializedProperty property, int indentLevel)
-        {
-            EditorGUI.PropertyField(valueRect, _variable, GUIContent.none);
-
-            if ( ! property.isExpanded || ObjectReference == null)
-                return;
-
-            using (new EditorDrawHelper.IndentLevel(indentLevel + 1))
-            {
-                // GetInlineEditor(Variable).OnInspectorGUI();
-                // TODO: create custom constant editor
-                // perhaps unify with DrawVariable, if GetInlineEditor can be agnostic.
             }
         }
 
