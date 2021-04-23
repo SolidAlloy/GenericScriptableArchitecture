@@ -6,6 +6,8 @@
     [Serializable]
     public abstract class ReferenceBase
     {
-        [SerializeField] protected bool _useConstant = true;
+        [SerializeField] protected ValueTypes ValueType = ValueTypes.Value;
+
+        public enum ValueTypes { Value, Constant, Variable }
     }
 }
