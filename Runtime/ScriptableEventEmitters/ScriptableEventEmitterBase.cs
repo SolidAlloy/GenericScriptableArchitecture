@@ -3,7 +3,7 @@
     using UnityEngine;
     using UnityEngine.Playables;
 
-#if ENABLE_TIMELINE
+#if USE_TIMELINE
     using UnityEngine.Timeline;
 #endif
 
@@ -12,11 +12,11 @@
     /// also have a <see cref="ScriptableSignalRelayer"/> component for events to be triggered.
     /// </summary>
     public abstract class ScriptableEventEmitterBase :
-#if ENABLE_TIMELINE
+#if USE_TIMELINE
         Marker,
 #endif
         INotification
-#if ENABLE_TIMELINE
+#if USE_TIMELINE
         , INotificationOptionProvider
 #endif
     {
@@ -29,7 +29,7 @@
 
         PropertyName INotification.id => EventBase == null ? new PropertyName(string.Empty) : new PropertyName(EventBase.name);
 
-#if ENABLE_TIMELINE
+#if USE_TIMELINE
         NotificationFlags INotificationOptionProvider.flags =>
             (_retroactive ? NotificationFlags.Retroactive : default)
             | (_emitOnce ? NotificationFlags.TriggerOnce : default);
