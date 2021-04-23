@@ -14,7 +14,7 @@
 #endif
 
     [Serializable]
-    [CreateGenericAssetMenu]
+    [CreateGenericAssetMenu(FileName = "New Runtime Set", MenuName = Config.PackageName + "Runtime Set")]
     [SuppressMessage("ReSharper", "Unity.NoNullPropagation",
         Justification = "It's ok to invoke scriptable events via null-coalescing operators because the event " +
                         "can be null only if it is not assigned in the inspector.")]

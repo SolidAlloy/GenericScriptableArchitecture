@@ -7,7 +7,7 @@
     using UnityEngine;
 
     [Serializable]
-    [CreateAssetMenu(menuName = "Events/ScriptableEvent")]
+    [CreateAssetMenu(menuName = Config.PackageName + Config.Events + "ScriptableEvent")]
     public class ScriptableEvent : ScriptableEventBase
     {
         private List<ScriptableEventListener> _listeners = new List<ScriptableEventListener>();

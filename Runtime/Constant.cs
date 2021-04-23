@@ -8,9 +8,9 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    [CreateGenericAssetMenu(FileName = "New Constant", MenuName = Config.PackageName + "Constant")]
     [Serializable]
-    [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
-    public class Variable<T> : VariableBase, IEquatable<Variable<T>>, IEquatable<T>
+    public class Constant<T> : ValueBase, IEquatable<Constant<T>>, IEquatable<T>
     {
         [ResizableTextArea, UsedImplicitly]
         [SerializeField] private string _description;
@@ -18,38 +18,15 @@
         [SerializeField] internal T _initialValue;
         [SerializeField] internal T _value;
 
-        [SerializeField] private ScriptableEvent<T> _changed;
+        public T Value => _value;
 
-        public T Value
-        {
-            get => _value;
-            set => SetValue(value);
-        }
+        protected override void InitializeValues() => _value = _initialValue.DeepCopy();
 
-        protected override void InitializeValues()
-        {
-            _value = _initialValue.DeepCopy();
-        }
+        public static implicit operator T(Constant<T> variable) => variable.Value;
 
-        protected virtual void SetValue(T value)
-        {
-            _value = value;
-            InvokeValueChangedEvents();
-        }
+        public override string ToString() => $"Constant{{{Value}}}";
 
-        internal override void InvokeValueChangedEvents()
-        {
-            if (ApplicationUtil.InEditMode)
-                return;
-
-            if (_changed != null) _changed.Invoke(_value);
-        }
-
-        public static implicit operator T(Variable<T> variable) => variable.Value;
-
-        public override string ToString() => $"Variable{{{Value}}}";
-
-        public bool Equals(Variable<T> other)
+        public bool Equals(Constant<T> other)
         {
             if (ReferenceEquals(other, null))
                 return false;
@@ -73,7 +50,7 @@
             if (ReferenceEquals(this, obj))
                 return true;
 
-            if (obj is Variable<T> typedObj)
+            if (obj is Constant<T> typedObj)
                 return Equals(typedObj);
 
             if (obj is T tObj)
@@ -83,7 +60,7 @@
         }
 
         /// <summary>
-        /// Use with caution. The value contained by a Variable instance can be changed through inspector.
+        /// Use with caution. The value contained by a Constant instance can be changed through inspector.
         /// </summary>
         /// <returns>Hash code of the instance.</returns>
         public override int GetHashCode()
@@ -96,7 +73,7 @@
             }
         }
 
-        public static bool operator ==(Variable<T> lhs, Variable<T> rhs)
+        public static bool operator ==(Constant<T> lhs, Constant<T> rhs)
         {
             if ((Object)lhs == null)
             {
@@ -106,12 +83,12 @@
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Variable<T> lhs, Variable<T> rhs)
+        public static bool operator !=(Constant<T> lhs, Constant<T> rhs)
         {
             return ! (lhs == rhs);
         }
 
-        public static bool operator ==(Variable<T> lhs, T rhs)
+        public static bool operator ==(Constant<T> lhs, T rhs)
         {
             if ((Object)lhs == null)
             {
@@ -121,7 +98,7 @@
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Variable<T> lhs, T rhs)
+        public static bool operator !=(Constant<T> lhs, T rhs)
         {
             return ! (lhs == rhs);
         }

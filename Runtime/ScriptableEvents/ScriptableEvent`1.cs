@@ -7,7 +7,7 @@
     using GenericUnityObjects;
 
     [Serializable]
-    [CreateGenericAssetMenu(MenuName = "Events/ScriptableEvent<T>")]
+    [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T>")]
     public class ScriptableEvent<T> : ScriptableEventBase
     {
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();

@@ -6,8 +6,8 @@
     using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
 
-    [CreateGenericAssetMenu(FileName = "New Variable With History")]
     [Serializable]
+    [CreateGenericAssetMenu(FileName = "New Variable With History", MenuName = Config.PackageName + "Variable With History")]
     public class VariableWithHistory<T> : Variable<T>
     {
 

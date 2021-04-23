@@ -2,10 +2,9 @@
 {
     using System;
     using UnityEngine;
-    using Object = UnityEngine.Object;
 
     [Serializable]
-    public class Reference<T> : ReferenceBase, IEquatable<Reference<T>>, IEquatable<Variable<T>>
+    public class Reference<T> : ReferenceBase, IEquatable<Reference<T>>, IEquatable<T>
     {
         [SerializeField] private T _constantValue;
         [SerializeField] private Variable<T> _variable;
@@ -43,9 +42,9 @@
             return Value.Equals(other.Value);
         }
 
-        public bool Equals(Variable<T> other)
+        public bool Equals(T other)
         {
-            return other is { } && Value.Equals(other.Value);
+            return other is { } && Value.Equals(other);
         }
 
         public override bool Equals(object obj)
@@ -56,10 +55,13 @@
             if (ReferenceEquals(this, obj))
                 return true;
 
-            if (this.GetType() != obj.GetType())
-                return false;
+            if (obj is Reference<T> typedObj)
+                return Equals(typedObj);
 
-            return Equals((Reference<T>) obj);
+            if (obj is T tObj)
+                return Equals(tObj);
+
+            return false;
         }
 
         public override int GetHashCode()
@@ -82,17 +84,17 @@
             return ! (lhs == rhs);
         }
 
-        public static bool operator ==(Reference<T> lhs, Variable<T> rhs)
+        public static bool operator ==(Reference<T> lhs, T rhs)
         {
             if (lhs is null)
             {
-                return (Object)rhs == null;
+                return rhs is null;
             }
 
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Reference<T> lhs, Variable<T> rhs)
+        public static bool operator !=(Reference<T> lhs, T rhs)
         {
             return ! (lhs == rhs);
         }
