@@ -31,11 +31,30 @@
             // Can be null because we also use the editor for drawing Constant<T>
             _variableBase = target as VariableBase;
 
-            WithHistory = target.GetType().BaseType?.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
+            WithHistory = IsTargetWithHistory();
 
-            _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
+            try
+            {
+                _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
+            }
+            catch // SerializedObjectNotCreatableException can be thrown but it is internal, so we can't catch it directly.
+            {
+                return;
+            }
+
+
             GetValueField();
             GetPreviousValueField();
+        }
+
+        private bool IsTargetWithHistory()
+        {
+            var baseType = target.GetType().BaseType;
+
+            if (baseType != null && baseType.IsGenericType)
+                return baseType.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
+
+            return false;
         }
 
         private void GetValueField()
@@ -88,6 +107,7 @@
                 ApplyCurrentValue();
             }
 
+            // ReSharper disable once Unity.NoNullPropagation
             // Invoke events. Both current and previous value are updated at this stage.
             _variableBase?.InvokeValueChangedEvents();
         }
