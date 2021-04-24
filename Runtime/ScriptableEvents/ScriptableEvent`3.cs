@@ -36,9 +36,9 @@
             }
         }
 
-        public void RegisterListener(ScriptableEventListener<T1, T2, T3> listener) => _listeners.Add(listener);
+        public void AddListener(ScriptableEventListener<T1, T2, T3> listener) => _listeners.Add(listener);
 
-        public void UnregisterListener(ScriptableEventListener<T1, T2, T3> listener) => _listeners.Remove(listener);
+        public void RemoveListener(ScriptableEventListener<T1, T2, T3> listener) => _listeners.Remove(listener);
 
         public void AddResponse(Action<T1, T2, T3> response) => _responses.Add(response);
 
