@@ -12,9 +12,6 @@
     [Serializable]
     public class Constant<T> : ValueBase, IEquatable<Constant<T>>, IEquatable<T>
     {
-        [ResizableTextArea, UsedImplicitly]
-        [SerializeField] private string _description;
-
         [SerializeField] internal T _initialValue;
         [SerializeField] internal T _value;
 

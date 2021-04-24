@@ -1,6 +1,9 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using GenericUnityObjects;
+    using JetBrains.Annotations;
+    using SolidUtilities.Attributes;
+    using UnityEngine;
 
 #if UNITY_EDITOR
     using UnityEditor;
@@ -8,6 +11,8 @@
 
     public abstract class ValueBase : GenericScriptableObject
     {
+        [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
+
         protected virtual void OnEnable()
         {
 #if UNITY_EDITOR

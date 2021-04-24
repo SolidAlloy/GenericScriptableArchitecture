@@ -1,9 +1,8 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using System.Collections.Generic;
     using GenericUnityObjects;
-    using JetBrains.Annotations;
-    using SolidUtilities.Attributes;
     using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
     using Object = UnityEngine.Object;
@@ -12,19 +11,27 @@
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
     public class Variable<T> : VariableBase, IEquatable<Variable<T>>, IEquatable<T>
     {
-        [ResizableTextArea, UsedImplicitly]
-        [SerializeField] private string _description;
-
         [SerializeField] internal T _initialValue;
         [SerializeField] internal T _value;
+        [SerializeField] internal bool ListenersExpanded;
 
         [SerializeField] private ScriptableEvent<T> _changed;
+
+        private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
 
         public T Value
         {
             get => _value;
             set => SetValue(value);
         }
+
+        internal override List<ScriptableEventListenerBase> Listeners => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+
+        internal override List<ScriptableEventListenerBase> ListenersWithHistory => EmptyList;
+
+        public void AddListenerOnChange(ScriptableEventListener<T> listener) => _listeners.Add(listener);
+
+        public void RemoveListenerOnChange(ScriptableEventListener<T> listener) => _listeners.Remove(listener);
 
         protected override void InitializeValues()
         {
@@ -42,7 +49,12 @@
             if (ApplicationUtil.InEditMode)
                 return;
 
-            if (_changed != null) _changed.Invoke(_value);
+            _changed?.Invoke(_value);
+
+            for (int i = _listeners.Count - 1; i != -1; i--)
+            {
+                _listeners[i].OnEventRaised(_value);
+            }
         }
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
