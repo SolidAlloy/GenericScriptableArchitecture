@@ -12,10 +12,9 @@
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
         protected bool WithHistory;
+        protected VariableBase VariableBase;
 
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
-
-        private VariableBase _variableBase;
 
         private SerializedProperty _initialValue;
         private SerializedProperty _value;
@@ -29,7 +28,7 @@
         protected virtual void OnEnable()
         {
             // Can be null because we also use the editor for drawing Constant<T>
-            _variableBase = target as VariableBase;
+            VariableBase = target as VariableBase;
 
             WithHistory = IsTargetWithHistory();
 
@@ -109,7 +108,7 @@
 
             // ReSharper disable once Unity.NoNullPropagation
             // Invoke events. Both current and previous value are updated at this stage.
-            _variableBase?.InvokeValueChangedEvents();
+            VariableBase?.InvokeValueChangedEvents();
         }
 
         private void ChangePreviousValue()

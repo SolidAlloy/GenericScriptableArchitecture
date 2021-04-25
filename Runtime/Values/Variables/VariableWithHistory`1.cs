@@ -12,20 +12,23 @@
     public class VariableWithHistory<T> : Variable<T>
     {
         [SerializeField] internal T _previousValue;
+        [SerializeField] internal bool ListenersWithHistoryExpanded;
 
         [SerializeField] private ScriptableEvent<T, T> _changedWithHistory;
 
-        private List<ScriptableEventListener<T, T>> _listeners = new List<ScriptableEventListener<T, T>>();
+        private List<ScriptableEventListener<T, T>> _listenersWithHistory = new List<ScriptableEventListener<T, T>>();
 
         [PublicAPI]
         public T PreviousValue => _previousValue;
 
         internal override List<ScriptableEventListenerBase> ListenersWithHistory
-            => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+            => _listenersWithHistory.ConvertAll(item => (ScriptableEventListenerBase) item);
 
-        public void AddListenerOnChangeWithHistory(ScriptableEventListener<T, T> listener) => _listeners.Add(listener);
+        public void AddListenerOnChangeWithHistory(ScriptableEventListener<T, T> listener)
+            => _listenersWithHistory.Add(listener);
 
-        public void RemoveListenerOnChangeWithHistory(ScriptableEventListener<T, T> listener) => _listeners.Remove(listener);
+        public void RemoveListenerOnChangeWithHistory(ScriptableEventListener<T, T> listener)
+            => _listenersWithHistory.Remove(listener);
 
         protected override void InitializeValues()
         {
@@ -48,9 +51,9 @@
             base.InvokeValueChangedEvents();
             _changedWithHistory?.Invoke(_previousValue, _value);
 
-            for (int i = _listeners.Count - 1; i != -1; i--)
+            for (int i = _listenersWithHistory.Count - 1; i != -1; i--)
             {
-                _listeners[i].OnEventRaised(_previousValue, _value);
+                _listenersWithHistory[i].OnEventRaised(_previousValue, _value);
             }
         }
 

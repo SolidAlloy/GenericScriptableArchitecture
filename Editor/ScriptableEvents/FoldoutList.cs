@@ -28,6 +28,7 @@
                 {
                     const float leftMargin = 10f;
                     var shiftedRight = new Rect(rect.x + leftMargin, rect.y, rect.width - leftMargin, rect.height);
+
                     bool newValue = EditorGUI.Foldout(shiftedRight, expandedProperty.boolValue, title, true);
 
                     if (expandedProperty.boolValue == newValue)
@@ -39,10 +40,7 @@
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     if ( ! expandedProperty.boolValue)
-                    {
-                        GUI.enabled = index == elements.Count;
                         return;
-                    }
 
                     var element = elements[index];
 

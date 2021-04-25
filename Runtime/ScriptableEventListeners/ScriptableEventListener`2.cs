@@ -7,7 +7,7 @@
     [Serializable]
     public class ScriptableEventListener<T1, T2> : ScriptableEventListenerBase
     {
-        [SerializeField] private ScriptableEvent<T1, T2> _event;
+        [SerializeField] private EventHolder<T1, T2> _event;
         [SerializeField] private UnityEvent<T1, T2> _response;
 
         protected virtual void OnEnable()

@@ -3,8 +3,10 @@
     using System;
     using UnityEngine;
 
+    internal class EventHolderBaseTwo { }
+
     [Serializable]
-    internal class EventHolder<T1, T2>
+    internal class EventHolder<T1, T2> : EventHolderBaseTwo
     {
         [SerializeField] private ScriptableEvent<T1, T2> _event;
         [SerializeField] private VariableWithHistory<T1> _variable;
