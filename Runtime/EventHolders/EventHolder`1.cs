@@ -3,16 +3,14 @@
     using System;
     using UnityEngine;
 
-    internal class EventHolderBaseTwo { }
-
     [Serializable]
-    internal class EventHolder<T1, T2> : EventHolderBaseTwo
+    internal class EventHolder<T> : EventHolderBaseOne
     {
-        [SerializeField] private ScriptableEvent<T1, T2> _event;
-        [SerializeField] private VariableWithHistory<T1> _variable;
+        [SerializeField] private ScriptableEvent<T> _event;
+        [SerializeField] private Variable<T> _variable;
         [SerializeField] private EventTypes _type = EventTypes.ScriptableEvent;
 
-        public void AddListener(ScriptableEventListener<T1, T2> listener)
+        public void AddListener(ScriptableEventListener<T> listener)
         {
             switch (_type)
             {
@@ -21,7 +19,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.AddListenerOnChangeWithHistory(listener as ScriptableEventListener<T1, T1>);
+                    _variable?.AddListenerOnChange(listener);
                     break;
 
                 default:
@@ -30,7 +28,7 @@
             }
         }
 
-        public void RemoveListener(ScriptableEventListener<T1, T2> listener)
+        public void RemoveListener(ScriptableEventListener<T> listener)
         {
             switch (_type)
             {
@@ -39,7 +37,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.RemoveListenerOnChangeWithHistory(listener as ScriptableEventListener<T1, T1>);
+                    _variable?.RemoveListenerOnChange(listener);
                     break;
 
                 default:

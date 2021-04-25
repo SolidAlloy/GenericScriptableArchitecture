@@ -72,7 +72,7 @@
                 int previousIndent = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = 0;
 
-                ValueType = ChoiceButton.DrawAndCheckConstant(buttonRect, ValueType);
+                ValueType = ChoiceButton.DrawAndCheckType(buttonRect, ValueType);
                 DrawValue(property, valueRect, fieldRect, previousIndent);
 
                 EditorGUI.indentLevel = previousIndent;
@@ -226,7 +226,7 @@
             public static float Width => _buttonStyle.fixedWidth;
 
             [Pure]
-            public static ReferenceBase.ValueTypes DrawAndCheckConstant(Rect buttonRect, ReferenceBase.ValueTypes currentType)
+            public static ReferenceBase.ValueTypes DrawAndCheckType(Rect buttonRect, ReferenceBase.ValueTypes currentType)
             {
                 int result = EditorGUI.Popup(buttonRect, (int) currentType, _popupOptions, _buttonStyle);
                 return (ReferenceBase.ValueTypes) result;
