@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using JetBrains.Annotations;
+    using SolidUtilities.Editor.Extensions;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.UnityEditorInternals;
@@ -15,6 +16,7 @@
     {
         private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
 
+        private SerializedProperty _mainProperty;
         private SerializedProperty _valueType;
         private SerializedProperty _value;
         private SerializedProperty _variable;
@@ -46,7 +48,7 @@
         {
             FindProperties(property);
 
-            if ( ValueType != ReferenceBase.ValueTypes.Value || ! _value.isExpanded)
+            if ( ValueType != ReferenceBase.ValueTypes.Value || ! property.isExpanded)
                 return EditorGUIUtility.singleLineHeight;
 
             // If a property has a custom property drawer, it will be drown inside a foldout anyway, so we account for
@@ -81,10 +83,11 @@
 
         private void FindProperties(SerializedProperty property)
         {
-            _valueType = property.FindPropertyRelative("ValueType");
-            _value = property.FindPropertyRelative("_value");
-            _variable = property.FindPropertyRelative("_variable");
-            _constant = property.FindPropertyRelative("_constant");
+            _mainProperty = property;
+            _valueType = _mainProperty.FindPropertyRelative("ValueType");
+            _value = _mainProperty.FindPropertyRelative("_value");
+            _variable = _mainProperty.FindPropertyRelative("_variable");
+            _constant = _mainProperty.FindPropertyRelative("_constant");
         }
 
         private void DrawValue(SerializedProperty property, Rect valueRect, Rect totalRect, int indentLevel)
@@ -108,7 +111,7 @@
 
         private void DrawValue(Rect valueRect, Rect totalRect, int indentLevel)
         {
-            if (_value.propertyType == SerializedPropertyType.Generic)
+            if (_value.propertyType == SerializedPropertyType.Generic && ! _value.HasCustomPropertyDrawer())
             {
                 DrawValueInFoldout(totalRect, indentLevel);
             }
@@ -120,19 +123,14 @@
 
         private void DrawValueInFoldout(Rect totalRect, int indentLevel)
         {
-            if ( ! _value.isExpanded)
+            if ( ! _mainProperty.isExpanded)
                 return;
 
-            const float paddingBetweenFields = 2f;
-            const float indentPerLevel = 15f;
-
-            totalRect.xMin += (indentLevel + 1) * indentPerLevel;
-            totalRect.y += EditorGUIUtility.singleLineHeight + paddingBetweenFields;
+            var shiftedRect = totalRect.ShiftLinesDown(indentLevel + 1);
 
             if (_value.HasCustomPropertyDrawer())
             {
-                float height = EditorGUI.GetPropertyHeight(_value);
-                totalRect.height = height;
+                shiftedRect.height = EditorGUI.GetPropertyHeight(_value);
                 EditorGUI.PropertyField(totalRect, _value, GUIContent.none);
                 return;
             }
@@ -141,6 +139,8 @@
             SerializedProperty iterator = _value.Copy();
             var nextProp = _value.Copy();
             nextProp.NextVisible(false);
+
+            const float paddingBetweenFields = 2f;
 
             while (iterator.NextVisible(true) && ! SerializedProperty.EqualContents(iterator, nextProp))
             {
@@ -182,6 +182,7 @@
 
             totalRect.height = EditorGUIUtility.singleLineHeight;
 
+            // TODO: Check PrefixLabel method and change the calculation.
             (Rect labelAndButtonRect, Rect valueRect) = totalRect.CutVertically(EditorGUIUtility.labelWidth);
 
             labelAndButtonRect.xMin += EditorGUI.indentLevel * indentWidth;
@@ -197,20 +198,13 @@
 
         private void DrawLabel(SerializedProperty property, Rect totalRect, Rect labelRect, GUIContent label)
         {
-            if (ValueType == ReferenceBase.ValueTypes.Value || ObjectReference == null)
+            if (ValueType != ReferenceBase.ValueTypes.Value && ObjectReference != null || _value.propertyType == SerializedPropertyType.Generic)
             {
-                if (_value.propertyType == SerializedPropertyType.Generic)
-                {
-                    _value.isExpanded = EditorGUI.Foldout(labelRect, _value.isExpanded, label, true);
-                }
-                else
-                {
-                    EditorGUI.HandlePrefixLabel(totalRect, labelRect, label);
-                }
+                property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
             }
             else
             {
-                property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
+                EditorGUI.HandlePrefixLabel(totalRect, labelRect, label);
             }
         }
 
