@@ -49,6 +49,11 @@
             return _value;
         }
 
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
+
         public static bool operator ==(ClampedInt lhs, ClampedInt rhs) => lhs.Equals(rhs);
 
         public static bool operator !=(ClampedInt lhs, ClampedInt rhs) => ! (lhs == rhs);

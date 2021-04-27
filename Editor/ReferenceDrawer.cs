@@ -111,7 +111,7 @@
 
         private void DrawValue(Rect valueRect, Rect totalRect, int indentLevel)
         {
-            if (_value.propertyType == SerializedPropertyType.Generic && ! _value.HasCustomPropertyDrawer())
+            if (_value.propertyType == SerializedPropertyType.Generic)
             {
                 DrawValueInFoldout(totalRect, indentLevel);
             }
@@ -126,12 +126,12 @@
             if ( ! _mainProperty.isExpanded)
                 return;
 
-            var shiftedRect = totalRect.ShiftLinesDown(indentLevel + 1);
+            var shiftedRect = totalRect.ShiftOneLineDown(indentLevel + 1);
 
             if (_value.HasCustomPropertyDrawer())
             {
                 shiftedRect.height = EditorGUI.GetPropertyHeight(_value);
-                EditorGUI.PropertyField(totalRect, _value, GUIContent.none);
+                EditorGUI.PropertyField(shiftedRect, _value, GUIContent.none);
                 return;
             }
 
@@ -140,14 +140,11 @@
             var nextProp = _value.Copy();
             nextProp.NextVisible(false);
 
-            const float paddingBetweenFields = 2f;
-
             while (iterator.NextVisible(true) && ! SerializedProperty.EqualContents(iterator, nextProp))
             {
-                float height = EditorGUI.GetPropertyHeight(iterator, false);
-                totalRect.height = height;
+                shiftedRect.height = EditorGUI.GetPropertyHeight(iterator, false);
                 EditorGUI.PropertyField(totalRect, iterator, true);
-                totalRect.y += height + paddingBetweenFields;
+                shiftedRect.ShiftOneLineDown(lineHeight: shiftedRect.height);
             }
         }
 
@@ -182,7 +179,6 @@
 
             totalRect.height = EditorGUIUtility.singleLineHeight;
 
-            // TODO: Check PrefixLabel method and change the calculation.
             (Rect labelAndButtonRect, Rect valueRect) = totalRect.CutVertically(EditorGUIUtility.labelWidth);
 
             labelAndButtonRect.xMin += EditorGUI.indentLevel * indentWidth;
