@@ -7,7 +7,9 @@
     public struct ClampedInt : IEquatable<int>
     {
         [SerializeField] private int _min;
+
         [SerializeField] private int _max;
+
         [SerializeField] private int _value;
 
         public int Value

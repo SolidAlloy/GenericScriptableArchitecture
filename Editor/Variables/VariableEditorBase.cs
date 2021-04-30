@@ -8,6 +8,8 @@
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using EditorGUIHelper = SolidUtilities.Editor.Helpers.EditorGUIHelper;
+    using EditorGUILayoutHelper = SolidUtilities.UnityEditorInternals.EditorGUILayoutHelper;
 
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
@@ -15,6 +17,7 @@
         protected VariableBase VariableBase;
 
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
+        private static readonly int _delayedFieldHash = "DelayedEditorField".GetHashCode();
 
         private SerializedProperty _initialValue;
         private SerializedProperty _value;
@@ -89,13 +92,22 @@
 
         protected void DrawCurrentValue()
         {
-            EditorGUI.BeginChangeCheck();
+            using (var changeCheck = new EditorGUI.ChangeCheckScope())
+            {
+                using (new EditorGUI.DisabledScope(ApplicationUtil.InEditMode))
+                {
+                    // ReSharper disable once Unity.NoNullPropagation
+                    // Invoke events. Both current and previous value are updated at this stage.
+                    if (DelayedPropertyField(_value, _currentValueLabel))
+                    {
+                        Debug.Log($"delayed value changed, change check (must be false): {changeCheck.changed}");
+                        VariableBase?.InvokeValueChangedEvents();
+                    }
+                }
 
-            using (new EditorGUI.DisabledScope(ApplicationUtil.InEditMode))
-                EditorDrawHelper.DelayedPropertyField(_value, _currentValueLabel);
-
-            if ( ! EditorGUI.EndChangeCheck())
-                return;
+                if ( ! changeCheck.changed)
+                    return;
+            }
 
             if (WithHistory)
             {
@@ -105,11 +117,41 @@
             {
                 ApplyCurrentValue();
             }
-
-            // ReSharper disable once Unity.NoNullPropagation
-            // Invoke events. Both current and previous value are updated at this stage.
-            VariableBase?.InvokeValueChangedEvents();
         }
+
+        private void CheckEnter()
+        {
+            Debug.Log(GUI.GetNameOfFocusedControl());
+
+            var e = Event.current;
+
+            if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
+                Debug.Log("enter pressed");
+        }
+
+        private bool DelayedPropertyField(SerializedProperty property, GUIContent label)
+        {
+            bool changeApplied = false;
+
+            if (GUI.GetNameOfFocusedControl() == GetInstanceID().ToString())
+            {
+                Debug.Log("in focus");
+                _delayedFieldInFocus = true;
+            }
+            else if (_delayedFieldInFocus)
+            {
+                Debug.Log("lost focus");
+                _delayedFieldInFocus = false;
+                changeApplied = true;
+            }
+
+            GUI.SetNextControlName(GetInstanceID().ToString());
+            EditorGUILayout.PropertyField(property, label);
+
+            return changeApplied;
+        }
+
+        private bool _delayedFieldInFocus;
 
         private void ChangePreviousValue()
         {

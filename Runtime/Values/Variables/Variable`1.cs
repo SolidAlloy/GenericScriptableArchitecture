@@ -12,7 +12,9 @@
     public class Variable<T> : VariableBase, IEquatable<Variable<T>>, IEquatable<T>
     {
         [SerializeField] internal T _initialValue;
+
         [SerializeField] internal T _value;
+
         [SerializeField] internal bool ListenersExpanded;
 
         [SerializeField] private ScriptableEvent<T> _changed;
