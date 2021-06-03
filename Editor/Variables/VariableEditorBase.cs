@@ -3,13 +3,10 @@
     using System;
     using System.Reflection;
     using GenericUnityObjects.UnityEditorInternals;
-    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.UnityEngineInternals;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
-    using EditorGUIHelper = SolidUtilities.Editor.Helpers.EditorGUIHelper;
-    using EditorGUILayoutHelper = SolidUtilities.UnityEditorInternals.EditorGUILayoutHelper;
 
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
@@ -17,7 +14,6 @@
         protected VariableBase VariableBase;
 
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
-        private static readonly int _delayedFieldHash = "DelayedEditorField".GetHashCode();
 
         private SerializedProperty _initialValue;
         private SerializedProperty _value;
@@ -27,6 +23,11 @@
         private FieldInfo _previousValueField;
 
         private bool _initialValueEnabled;
+
+        private bool _changeCheckPassedPreviously;
+        private int _previousHotControl;
+        private int _previousKeyboardControl;
+        private object _previousValueObject;
 
         protected virtual void OnEnable()
         {
@@ -43,7 +44,6 @@
             {
                 return;
             }
-
 
             GetValueField();
             GetPreviousValueField();
@@ -92,23 +92,37 @@
 
         protected void DrawCurrentValue()
         {
+            ExitGUIOnEnterPress();
+
+            bool changeAppliedToProperty;
+
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
                 using (new EditorGUI.DisabledScope(ApplicationUtil.InEditMode))
                 {
-                    // ReSharper disable once Unity.NoNullPropagation
-                    // Invoke events. Both current and previous value are updated at this stage.
-                    if (DelayedPropertyField(_value, _currentValueLabel))
-                    {
-                        Debug.Log($"delayed value changed, change check (must be false): {changeCheck.changed}");
-                        VariableBase?.InvokeValueChangedEvents();
-                    }
+                    EditorGUILayout.PropertyField(_value, _currentValueLabel);
                 }
 
-                if ( ! changeCheck.changed)
-                    return;
+                // Must be called after PropertyField and before changeCheck.changed
+                changeAppliedToProperty = IsChangeAppliedToProperty();
+
+                if (changeCheck.changed)
+                {
+                    if ( ! _changeCheckPassedPreviously && WithHistory)
+                    {
+                        _previousValueObject = _valueField.GetValue(target).DeepCopy();
+                    }
+
+                    _changeCheckPassedPreviously = true;
+                }
             }
 
+            if (changeAppliedToProperty)
+                ApplyChangeToVariable();
+        }
+
+        private void ApplyChangeToVariable()
+        {
             if (WithHistory)
             {
                 ChangePreviousValue();
@@ -117,52 +131,47 @@
             {
                 ApplyCurrentValue();
             }
+
+            // ReSharper disable once Unity.NoNullPropagation
+            VariableBase?.InvokeValueChangedEvents();
         }
 
-        private void CheckEnter()
+        private bool IsChangeAppliedToProperty()
         {
-            Debug.Log(GUI.GetNameOfFocusedControl());
+            bool focusChanged = GUIUtility.hotControl != _previousHotControl || GUIUtility.keyboardControl != _previousKeyboardControl;
+            _previousHotControl = GUIUtility.hotControl;
+            _previousKeyboardControl = GUIUtility.keyboardControl;
 
+            if (focusChanged && _changeCheckPassedPreviously)
+            {
+                _changeCheckPassedPreviously = false;
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ExitGUIOnEnterPress()
+        {
             var e = Event.current;
 
             if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
-                Debug.Log("enter pressed");
-        }
-
-        private bool DelayedPropertyField(SerializedProperty property, GUIContent label)
-        {
-            bool changeApplied = false;
-
-            if (GUI.GetNameOfFocusedControl() == GetInstanceID().ToString())
             {
-                Debug.Log("in focus");
-                _delayedFieldInFocus = true;
+                GUIUtility.keyboardControl = 0;
+                e.Use();
             }
-            else if (_delayedFieldInFocus)
-            {
-                Debug.Log("lost focus");
-                _delayedFieldInFocus = false;
-                changeApplied = true;
-            }
-
-            GUI.SetNextControlName(GetInstanceID().ToString());
-            EditorGUILayout.PropertyField(property, label);
-
-            return changeApplied;
         }
-
-        private bool _delayedFieldInFocus;
 
         private void ChangePreviousValue()
         {
             // Get previous value before applying the change
-            object previousValue = _valueField.GetValue(target).DeepCopy();
+            // object previousValue = _valueField.GetValue(target).DeepCopy();
 
             // Apply the changed value so that it is not lost.
             serializedObject.ApplyModifiedProperties();
 
             // Set the previousValue
-            _previousValueField.SetValue(target, previousValue);
+            _previousValueField.SetValue(target, _previousValueObject);
 
             // Load the previous value to serialized object so that it is updated in the inspector
             serializedObject.Update();
