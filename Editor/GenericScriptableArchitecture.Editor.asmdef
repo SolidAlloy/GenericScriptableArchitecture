@@ -18,7 +18,8 @@
     "precompiledReferences": [
         "GenericUnityEditorInternals.dll",
         "UnityEngineInternals.dll",
-        "UnityEditorInternals.dll"
+        "UnityEditorInternals.dll",
+        "Sirenix.OdinInspector.Editor.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

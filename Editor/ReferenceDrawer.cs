@@ -186,7 +186,7 @@
             float buttonWidth = ChoiceButton.Width;
 
             (Rect labelRect, Rect buttonRect) =
-                labelAndButtonRect.CutVertically(buttonWidth, fromRightBorder: true);
+                labelAndButtonRect.CutVertically(buttonWidth, fromRightSide: true);
 
             valueRect.xMin += valueLeftIndent;
             return (labelRect, buttonRect, valueRect);
