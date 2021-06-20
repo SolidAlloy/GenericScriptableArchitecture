@@ -24,6 +24,8 @@
         [Button(Mode = ButtonMode.EnabledInPlayMode, Expanded = true)]
         public void Invoke(T arg0)
         {
+            AddStackTrace(arg0);
+
             for (int i = _listeners.Count - 1; i != -1; i--)
             {
                 _listeners[i].OnEventRaised(arg0);

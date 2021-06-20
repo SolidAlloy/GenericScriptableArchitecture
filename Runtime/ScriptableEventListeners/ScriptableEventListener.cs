@@ -24,6 +24,7 @@
 
         public void OnEventRaised()
         {
+            AddStackTrace();
             _response.Invoke();
         }
     }

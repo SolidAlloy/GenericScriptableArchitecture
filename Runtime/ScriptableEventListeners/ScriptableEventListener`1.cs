@@ -14,6 +14,10 @@
 
         protected virtual void OnDisable() => _event?.RemoveListener(this);
 
-        public void OnEventRaised(T arg0) => _response.Invoke(arg0);
+        public void OnEventRaised(T arg0)
+        {
+            AddStackTrace(arg0);
+            _response.Invoke(arg0);
+        }
     }
 }
