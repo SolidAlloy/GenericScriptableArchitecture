@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
 
     [Serializable]
@@ -33,7 +32,7 @@
         protected override void InitializeValues()
         {
             base.InitializeValues();
-            _previousValue = _initialValue.DeepCopy();
+            _previousValue = _initialValue.DeepCopyInEditor();
         }
 
         protected override void SetValue(T value)

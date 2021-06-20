@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using GenericUnityObjects;
-    using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -37,7 +36,7 @@
 
         protected override void InitializeValues()
         {
-            _value = _initialValue.DeepCopy();
+            _value = _initialValue.DeepCopyInEditor();
         }
 
         protected virtual void SetValue(T value)

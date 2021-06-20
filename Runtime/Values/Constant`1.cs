@@ -2,9 +2,6 @@
 {
     using System;
     using GenericUnityObjects;
-    using JetBrains.Annotations;
-    using SolidUtilities.Attributes;
-    using SolidUtilities.UnityEngineInternals;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -17,7 +14,10 @@
 
         public T Value => _value;
 
-        protected override void InitializeValues() => _value = _initialValue.DeepCopy();
+        protected override void InitializeValues()
+        {
+            _value = _initialValue.DeepCopyInEditor();
+        }
 
         public static implicit operator T(Constant<T> variable) => variable.Value;
 

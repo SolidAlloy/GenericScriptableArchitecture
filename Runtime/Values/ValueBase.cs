@@ -13,6 +13,8 @@
     {
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
+        private bool _subscribedToPlayMode;
+
         protected virtual void OnEnable()
         {
 #if UNITY_EDITOR
@@ -21,6 +23,7 @@
             if (EditorSettings.enterPlayModeOptionsEnabled
                 && EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableDomainReload))
             {
+                _subscribedToPlayMode = true;
                 EditorApplication.playModeStateChanged += InitializeValues;
             }
 #endif
@@ -28,6 +31,15 @@
             // DeepCopy() is not very performant, so execute it only in Play Mode.
             if (ApplicationUtil.InPlayMode)
                 InitializeValues();
+        }
+
+        private void OnDisable()
+        {
+            if ( ! _subscribedToPlayMode)
+                return;
+
+            _subscribedToPlayMode = false;
+            EditorApplication.playModeStateChanged -= InitializeValues;
         }
 
         private void InitializeValues(PlayModeStateChange stateChange)
