@@ -1,10 +1,11 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using System.Globalization;
     using UnityEngine;
 
     [Serializable]
-    public struct ClampedFloat : IEquatable<float>
+    public struct ClampedFloat : IEquatable<float>, IEquatable<ClampedFloat>
     {
         [SerializeField] private float _min;
         [SerializeField] private float _max;
@@ -29,30 +30,18 @@
 
         public static implicit operator float(ClampedFloat clampedFloat) => clampedFloat.Value;
 
-        public bool Equals(ClampedFloat other)
-        {
-            return _value == other._value;
-        }
+        public bool Equals(ClampedFloat other) => _value == other._value;
 
-        public bool Equals(float other)
-        {
-            return _value == other;
-        }
+        public bool Equals(float other) => _value == other;
 
         public override bool Equals(object obj)
         {
             return obj is ClampedFloat other && Equals(other);
         }
 
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
+        public override int GetHashCode() => _value.GetHashCode();
 
-        public override string ToString()
-        {
-            return _value.ToString();
-        }
+        public override string ToString() => _value.ToString(CultureInfo.InvariantCulture);
 
         public static bool operator ==(ClampedFloat lhs, ClampedFloat rhs) => lhs.Equals(rhs);
 

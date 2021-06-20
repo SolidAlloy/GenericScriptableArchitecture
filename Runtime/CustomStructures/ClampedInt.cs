@@ -4,7 +4,7 @@
     using UnityEngine;
 
     [Serializable]
-    public struct ClampedInt : IEquatable<int>
+    public struct ClampedInt : IEquatable<int>, IEquatable<ClampedInt>
     {
         [SerializeField] private int _min;
 
@@ -31,30 +31,18 @@
 
         public static implicit operator int(ClampedInt clampedInt) => clampedInt.Value;
 
-        public bool Equals(ClampedInt other)
-        {
-            return _value == other._value;
-        }
+        public bool Equals(ClampedInt other) => _value == other._value;
 
-        public bool Equals(int other)
-        {
-            return _value == other;
-        }
+        public bool Equals(int other) => _value == other;
 
         public override bool Equals(object obj)
         {
             return obj is ClampedInt other && Equals(other);
         }
 
-        public override int GetHashCode()
-        {
-            return _value;
-        }
+        public override int GetHashCode() => _value;
 
-        public override string ToString()
-        {
-            return _value.ToString();
-        }
+        public override string ToString() => _value.ToString();
 
         public static bool operator ==(ClampedInt lhs, ClampedInt rhs) => lhs.Equals(rhs);
 
