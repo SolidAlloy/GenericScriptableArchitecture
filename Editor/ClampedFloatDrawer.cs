@@ -8,7 +8,7 @@
     {
         private const float InspectorMinFloat = 0.00001f;
 
-        protected override void DrawSlider(Rect valueRect, bool delayed)
+        protected override void DrawSlider(Rect valueRect)
         {
             EditorGUI.Slider(valueRect, ValueProperty, MinProperty.floatValue, MaxProperty.floatValue, GUIContent.none);
         }

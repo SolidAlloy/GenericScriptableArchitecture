@@ -6,7 +6,7 @@
     [CustomPropertyDrawer(typeof(ClampedInt))]
     internal class ClampedIntDrawer : ClampedStructDrawer
     {
-        protected override void DrawSlider(Rect valueRect, bool delayed)
+        protected override void DrawSlider(Rect valueRect)
         {
             EditorGUI.IntSlider(valueRect, ValueProperty, MinProperty.intValue, MaxProperty.intValue, GUIContent.none);
         }

@@ -17,10 +17,9 @@
             => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
 
         internal override List<UnityEngine.Object> ResponseTargets
-            => _responses
-                .Select(response => response.Target)
-                .OfType<UnityEngine.Object>()
-                .ToList();
+            => _responses.Select(response => response.Target)
+                            .OfType<UnityEngine.Object>()
+                            .ToList();
 
         [Button(Mode = ButtonMode.EnabledInPlayMode)]
         public void Invoke()

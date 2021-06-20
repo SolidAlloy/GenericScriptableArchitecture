@@ -7,7 +7,7 @@
     using UnityEditor;
     using UnityEngine;
 
-    internal abstract class ClampedStructDrawer : PropertyDrawer, IDelayable
+    internal abstract class ClampedStructDrawer : PropertyDrawer
     {
         protected SerializedProperty ValueProperty;
         protected SerializedProperty MinProperty;
@@ -24,28 +24,18 @@
 
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
-            OnGUI(rect, property, label, false);
+            InitializeProperties(property);
+            DrawFoldoutSlider(rect, property, label);
+
+            if (property.isExpanded)
+                DrawMinMax(rect);
         }
 
-        public void OnGUIDelayed(Rect rect, SerializedProperty property, GUIContent label)
-        {
-            OnGUI(rect, property, label, true);
-        }
-
-        protected abstract void DrawSlider(Rect valueRect, bool delayed);
+        protected abstract void DrawSlider(Rect valueRect);
 
         protected abstract void LimitMinValueIfNeeded();
 
         protected abstract void LimitMaxValueIfNeeded();
-
-        private void OnGUI(Rect rect, SerializedProperty property, GUIContent label, bool delayed)
-        {
-            InitializeProperties(property);
-            DrawFoldoutSlider(rect, property, label, delayed);
-
-            if (property.isExpanded)
-                DrawMinMax(rect, delayed);
-        }
 
         private void InitializeProperties(SerializedProperty mainProperty)
         {
@@ -54,7 +44,7 @@
             MaxProperty = mainProperty.FindPropertyRelative("_max");
         }
 
-        private void DrawFoldoutSlider(Rect rect, SerializedProperty property, GUIContent label, bool delayed)
+        private void DrawFoldoutSlider(Rect rect, SerializedProperty property, GUIContent label)
         {
             var firstLineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
 
@@ -66,10 +56,10 @@
 
             var valueRect = GetRectWithoutLabel(firstLineRect);
 
-            DrawSlider(valueRect, delayed);
+            DrawSlider(valueRect);
         }
 
-        private void DrawMinMax(Rect totalRect, bool delayed)
+        private void DrawMinMax(Rect totalRect)
         {
             var secondLineRect = totalRect.ShiftOneLineDown();
             secondLineRect.height = EditorGUIUtility.singleLineHeight;
@@ -78,15 +68,15 @@
             AddPadding(ref left, ref right, 20f);
 
             using var _ = new EditorDrawHelper.LabelWidth(50f);
-            DrawAndLimitMinValue(left, delayed);
-            DrawAndLimitMaxValue(right, delayed);
+            DrawAndLimitMinValue(left);
+            DrawAndLimitMaxValue(right);
         }
 
-        private void DrawAndLimitMinValue(Rect rect, bool delayed)
+        private void DrawAndLimitMinValue(Rect rect)
         {
             using var changeCheck = new EditorGUI.ChangeCheckScope();
 
-            DrawPropertyField(rect, MinProperty, delayed);
+            EditorGUI.PropertyField(rect, MinProperty);
 
             if ( ! changeCheck.changed)
                 return;
@@ -94,28 +84,16 @@
             LimitMinValueIfNeeded();
         }
 
-        private void DrawAndLimitMaxValue(Rect rect, bool delayed)
+        private void DrawAndLimitMaxValue(Rect rect)
         {
             using var changeCheck = new EditorGUI.ChangeCheckScope();
 
-            DrawPropertyField(rect, MaxProperty, delayed);
+            EditorGUI.PropertyField(rect, MaxProperty);
 
             if ( ! changeCheck.changed)
                 return;
 
             LimitMaxValueIfNeeded();
-        }
-
-        private static void DrawPropertyField(Rect rect, SerializedProperty property, bool delayed)
-        {
-            if (delayed)
-            {
-                EditorDrawHelper.DelayedPropertyField(rect, property);
-            }
-            else
-            {
-                EditorGUI.PropertyField(rect, property);
-            }
         }
 
         private void AddPadding(ref Rect left, ref Rect right, float padding)
