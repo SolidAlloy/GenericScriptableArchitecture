@@ -13,8 +13,6 @@
         [SerializeField] internal T _previousValue;
         [SerializeField] internal bool ListenersWithHistoryExpanded;
 
-        [SerializeField] private ScriptableEvent<T, T> _changedWithHistory;
-
         private List<ScriptableEventListener<T, T>> _listenersWithHistory = new List<ScriptableEventListener<T, T>>();
 
         [PublicAPI]
@@ -48,7 +46,6 @@
                 return;
 
             base.InvokeValueChangedEvents();
-            _changedWithHistory?.Invoke(_previousValue, _value);
 
             for (int i = _listenersWithHistory.Count - 1; i != -1; i--)
             {

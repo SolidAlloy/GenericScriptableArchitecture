@@ -21,13 +21,13 @@
 #if ODIN_INSPECTOR
     [DrawerPriority(0, 0, 3)]
 #endif
-    public class VariableDrawer : PropertyDrawer
+    public class CreatableObjectDrawer : PropertyDrawer
     {
         private static readonly string _projectPath;
         private static readonly string _assetsPath;
         private static readonly string _packagesPath;
 
-        static VariableDrawer()
+        static CreatableObjectDrawer()
         {
             _projectPath = Directory.GetCurrentDirectory();
             _assetsPath = $"{_projectPath}/Assets";

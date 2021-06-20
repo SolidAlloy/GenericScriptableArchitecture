@@ -6,8 +6,6 @@
     internal class VariableEditor : VariableEditorBase
     {
         private SerializedProperty _description;
-        private SerializedProperty _changed;
-        private SerializedProperty _changedWithHistory;
         private FoldoutList<ScriptableEventListenerBase> _listenersOnChanged;
         private FoldoutList<ScriptableEventListenerBase> _listenersOnChangedWithHistory;
 
@@ -15,8 +13,6 @@
         {
             base.OnEnable();
             _description = serializedObject.FindProperty("_description");
-            _changed = serializedObject.FindProperty("_changed");
-            _changedWithHistory = serializedObject.FindProperty("_changedWithHistory");
 
             InitializeListeners();
 
@@ -48,11 +44,6 @@
             DrawInitialValue();
             DrawCurrentValue();
             DrawPreviousValue();
-
-            EditorGUILayout.PropertyField(_changed);
-
-            if (WithHistory)
-                EditorGUILayout.PropertyField(_changedWithHistory);
 
             if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
                 return;

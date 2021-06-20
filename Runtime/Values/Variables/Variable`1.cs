@@ -16,8 +16,6 @@
 
         [SerializeField] internal bool ListenersExpanded;
 
-        [SerializeField] private ScriptableEvent<T> _changed;
-
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
 
         public T Value
@@ -49,8 +47,6 @@
         {
             if (ApplicationUtil.InEditMode)
                 return;
-
-            _changed?.Invoke(_value);
 
             for (int i = _listeners.Count - 1; i != -1; i--)
             {
