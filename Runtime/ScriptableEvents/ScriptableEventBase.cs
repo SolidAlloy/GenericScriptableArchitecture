@@ -7,7 +7,7 @@
     using SolidUtilities.Attributes;
     using UnityEngine;
 
-    public abstract class ScriptableEventBase : GenericScriptableObject
+    public abstract class ScriptableEventBase : GenericScriptableObject, IStackTraceProvider
     {
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] internal bool ResponseTargetsExpanded;
@@ -15,7 +15,7 @@
 
         private readonly Stack<StackTraceEntry> _stackTraceEntries = new Stack<StackTraceEntry>();
 
-        internal IEnumerable<StackTraceEntry> StackTraceEntries => _stackTraceEntries;
+        IEnumerable<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
 
         internal abstract List<ScriptableEventListenerBase> Listeners { get; }
 

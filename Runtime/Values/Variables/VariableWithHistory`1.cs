@@ -37,6 +37,7 @@
         {
             _previousValue = _value;
             _value = value;
+            AddStackTrace(_previousValue, _value);
             InvokeValueChangedEvents();
         }
 

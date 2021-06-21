@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using GenericUnityObjects;
     using UnityEngine;
     using Object = UnityEngine.Object;
@@ -40,6 +41,7 @@
         protected virtual void SetValue(T value)
         {
             _value = value;
+            AddStackTrace(_value);
             InvokeValueChangedEvents();
         }
 
@@ -133,6 +135,12 @@
         public static bool operator !=(Variable<T> lhs, T rhs)
         {
             return ! (lhs == rhs);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void AddToStackTrace()
+        {
+
         }
     }
 }

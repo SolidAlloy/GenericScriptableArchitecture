@@ -53,7 +53,7 @@
         {
             var baseType = target.GetType().BaseType;
 
-            if (baseType != null && baseType.IsGenericType)
+            if (baseType is {IsGenericType: true})
                 return baseType.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
 
             return false;
