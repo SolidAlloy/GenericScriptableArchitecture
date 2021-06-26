@@ -23,15 +23,35 @@
             }
         }
 
-        public override bool Equals(object obj) => obj is StackTraceEntry entry && Equals(entry);
+        public override bool Equals(object obj) => Equals(obj as StackTraceEntry);
 
         public bool Equals(StackTraceEntry other)
         {
             if (other == null)
                 return false;
 
+            if (ReferenceEquals(this, other))
+                return true;
+
             return _id == other._id;
         }
+
+        public static bool operator ==(StackTraceEntry first, StackTraceEntry second)
+        {
+            if (first is null)
+            {
+                if (second is null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            return first.Equals(second);
+        }
+
+        public static bool operator !=(StackTraceEntry first, StackTraceEntry second) => !(first == second);
 
         public override int GetHashCode() => _id;
 
