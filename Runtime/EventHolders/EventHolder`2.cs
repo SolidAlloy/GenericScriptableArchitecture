@@ -3,6 +3,8 @@
     using System;
     using UnityEngine;
 
+    internal class EventHolderBaseTwo { }
+
     [Serializable]
     internal class EventHolder<T1, T2> : EventHolderBaseTwo
     {

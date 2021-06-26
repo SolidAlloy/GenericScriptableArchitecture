@@ -8,13 +8,13 @@
 
     [Serializable]
     [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T1,T2,T3>")]
-    public class ScriptableEvent<T1, T2, T3> : ScriptableEventBase
+    public class ScriptableEvent<T1, T2, T3> : BaseScriptableEvent
     {
         private List<ScriptableEventListener<T1, T2, T3>> _listeners = new List<ScriptableEventListener<T1, T2, T3>>();
         private List<Action<T1, T2, T3>> _responses = new List<Action<T1, T2, T3>>();
 
-        internal override List<ScriptableEventListenerBase> Listeners
-            => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+        internal override List<BaseScriptableEventListener> Listeners
+            => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
 
         internal override List<UnityEngine.Object> ResponseTargets
             => _responses

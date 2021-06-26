@@ -6,8 +6,8 @@
     internal class VariableEditor : VariableEditorBase
     {
         private SerializedProperty _description;
-        private FoldoutList<ScriptableEventListenerBase> _listenersOnChanged;
-        private FoldoutList<ScriptableEventListenerBase> _listenersOnChangedWithHistory;
+        private FoldoutList<BaseScriptableEventListener> _listenersOnChanged;
+        private FoldoutList<BaseScriptableEventListener> _listenersOnChangedWithHistory;
 
         protected override void OnEnable()
         {
@@ -24,7 +24,7 @@
         {
             var expanded = serializedObject.FindProperty(nameof(Variable<bool>.ListenersExpanded));
 
-            _listenersOnChanged = new FoldoutList<ScriptableEventListenerBase>(VariableBase.Listeners,
+            _listenersOnChanged = new FoldoutList<BaseScriptableEventListener>(VariableBase.Listeners,
                 expanded, "Listeners For Value Change");
         }
 
@@ -33,7 +33,7 @@
             var expanded = serializedObject.FindProperty(
                 nameof(VariableWithHistory<bool>.ListenersWithHistoryExpanded));
 
-            _listenersOnChangedWithHistory = new FoldoutList<ScriptableEventListenerBase>(VariableBase.ListenersWithHistory,
+            _listenersOnChangedWithHistory = new FoldoutList<BaseScriptableEventListener>(VariableBase.ListenersWithHistory,
                 expanded, "Listeners For Value Change With History");
         }
 

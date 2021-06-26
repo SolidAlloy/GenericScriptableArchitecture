@@ -4,6 +4,6 @@
 
     internal interface IStackTraceProvider
     {
-        IEnumerable<StackTraceEntry> StackTraceEntries { get; }
+        ICollection<StackTraceEntry> StackTraceEntries { get; }
     }
 }

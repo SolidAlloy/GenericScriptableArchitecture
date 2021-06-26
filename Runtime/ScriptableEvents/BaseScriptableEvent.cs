@@ -7,17 +7,17 @@
     using SolidUtilities.Attributes;
     using UnityEngine;
 
-    public abstract class ScriptableEventBase : GenericScriptableObject, IStackTraceProvider
+    public abstract class BaseScriptableEvent : GenericScriptableObject, IStackTraceProvider
     {
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] internal bool ResponseTargetsExpanded;
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
-        private readonly Stack<StackTraceEntry> _stackTraceEntries = new Stack<StackTraceEntry>();
+        private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 
-        IEnumerable<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
+        ICollection<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
 
-        internal abstract List<ScriptableEventListenerBase> Listeners { get; }
+        internal abstract List<BaseScriptableEventListener> Listeners { get; }
 
         internal abstract List<Object> ResponseTargets { get; }
 

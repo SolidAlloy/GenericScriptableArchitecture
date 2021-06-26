@@ -8,13 +8,13 @@
 
     [Serializable]
     [CreateAssetMenu(menuName = Config.PackageName + Config.Events + "ScriptableEvent")]
-    public class ScriptableEvent : ScriptableEventBase
+    public class ScriptableEvent : BaseScriptableEvent
     {
         private List<ScriptableEventListener> _listeners = new List<ScriptableEventListener>();
         private List<Action> _responses = new List<Action>();
 
-        internal override List<ScriptableEventListenerBase> Listeners
-            => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+        internal override List<BaseScriptableEventListener> Listeners
+            => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
 
         internal override List<UnityEngine.Object> ResponseTargets
             => _responses.Select(response => response.Target)

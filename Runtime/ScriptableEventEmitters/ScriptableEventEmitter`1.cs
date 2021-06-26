@@ -11,7 +11,7 @@
         [SerializeField] private ScriptableEvent<T> _event;
         [SerializeField] private T _arg0;
 
-        protected override ScriptableEventBase EventBase => _event;
+        protected override BaseScriptableEvent BaseEvent => _event;
 
         public override void InvokeEvent()
         {

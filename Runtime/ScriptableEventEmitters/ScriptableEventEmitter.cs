@@ -8,7 +8,7 @@
     {
         [SerializeField] private ScriptableEvent _event;
 
-        protected override ScriptableEventBase EventBase => _event;
+        protected override BaseScriptableEvent BaseEvent => _event;
 
         public override void InvokeEvent()
         {

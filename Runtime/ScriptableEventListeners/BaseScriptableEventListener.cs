@@ -4,11 +4,11 @@
     using System.Diagnostics;
     using UnityEngine;
 
-    public abstract class ScriptableEventListenerBase : MonoBehaviour, IStackTraceProvider
+    public abstract class BaseScriptableEventListener : MonoBehaviour, IStackTraceProvider
     {
-        private readonly Stack<StackTraceEntry> _stackTraceEntries = new Stack<StackTraceEntry>();
+        private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 
-        IEnumerable<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
+        ICollection<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
 
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)

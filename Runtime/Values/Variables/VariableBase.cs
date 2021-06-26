@@ -5,17 +5,17 @@
 
     public abstract class VariableBase : ValueBase, IStackTraceProvider
     {
-        protected static readonly List<ScriptableEventListenerBase> EmptyList = new List<ScriptableEventListenerBase>();
+        protected static readonly List<BaseScriptableEventListener> EmptyList = new List<BaseScriptableEventListener>();
 
         internal abstract void InvokeValueChangedEvents();
 
-        internal abstract List<ScriptableEventListenerBase> Listeners { get; }
+        internal abstract List<BaseScriptableEventListener> Listeners { get; }
 
-        internal abstract List<ScriptableEventListenerBase> ListenersWithHistory { get; }
+        internal abstract List<BaseScriptableEventListener> ListenersWithHistory { get; }
 
-        private readonly Stack<StackTraceEntry> _stackTraceEntries = new Stack<StackTraceEntry>();
+        private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 
-        IEnumerable<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
+        ICollection<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
 
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)

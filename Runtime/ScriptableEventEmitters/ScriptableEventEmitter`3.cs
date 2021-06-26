@@ -12,7 +12,7 @@
         [SerializeField] private T2 _arg1;
         [SerializeField] private T3 _arg2;
 
-        protected override ScriptableEventBase EventBase => _event;
+        protected override BaseScriptableEvent BaseEvent => _event;
 
         public override void InvokeEvent()
         {

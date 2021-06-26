@@ -23,11 +23,11 @@
         [SerializeField] private bool _retroactive;
         [SerializeField] private bool _emitOnce;
 
-        protected abstract ScriptableEventBase EventBase { get; }
+        protected abstract BaseScriptableEvent BaseEvent { get; }
 
         public abstract void InvokeEvent();
 
-        PropertyName INotification.id => EventBase == null ? new PropertyName(string.Empty) : new PropertyName(EventBase.name);
+        PropertyName INotification.id => BaseEvent == null ? new PropertyName(string.Empty) : new PropertyName(BaseEvent.name);
 
 #if USE_TIMELINE
         NotificationFlags INotificationOptionProvider.flags =>

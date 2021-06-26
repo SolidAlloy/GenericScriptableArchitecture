@@ -18,8 +18,8 @@
         [PublicAPI]
         public T PreviousValue => _previousValue;
 
-        internal override List<ScriptableEventListenerBase> ListenersWithHistory
-            => _listenersWithHistory.ConvertAll(item => (ScriptableEventListenerBase) item);
+        internal override List<BaseScriptableEventListener> ListenersWithHistory
+            => _listenersWithHistory.ConvertAll(item => (BaseScriptableEventListener) item);
 
         public void AddListenerOnChangeWithHistory(ScriptableEventListener<T, T> listener)
             => _listenersWithHistory.Add(listener);

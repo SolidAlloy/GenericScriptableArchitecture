@@ -25,9 +25,9 @@
             set => SetValue(value);
         }
 
-        internal override List<ScriptableEventListenerBase> Listeners => _listeners.ConvertAll(item => (ScriptableEventListenerBase) item);
+        internal override List<BaseScriptableEventListener> Listeners => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
 
-        internal override List<ScriptableEventListenerBase> ListenersWithHistory => EmptyList;
+        internal override List<BaseScriptableEventListener> ListenersWithHistory => EmptyList;
 
         public void AddListenerOnChange(ScriptableEventListener<T> listener) => _listeners.Add(listener);
 
