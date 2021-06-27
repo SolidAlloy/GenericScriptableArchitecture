@@ -11,11 +11,19 @@
     {
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] internal bool ResponseTargetsExpanded;
+        [SerializeField] private bool _stackTraceExpanded;
+
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
         private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 
-        ICollection<StackTraceEntry> IStackTraceProvider.StackTraceEntries => _stackTraceEntries;
+        ICollection<StackTraceEntry> IStackTraceProvider.Entries => _stackTraceEntries;
+
+        bool IStackTraceProvider.Expanded
+        {
+            get => _stackTraceExpanded;
+            set => _stackTraceExpanded = value;
+        }
 
         internal abstract List<BaseScriptableEventListener> Listeners { get; }
 

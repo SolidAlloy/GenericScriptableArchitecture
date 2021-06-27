@@ -4,6 +4,8 @@
 
     internal interface IStackTraceProvider
     {
-        ICollection<StackTraceEntry> StackTraceEntries { get; }
+        bool Expanded { get; set; }
+
+        ICollection<StackTraceEntry> Entries { get; }
     }
 }

@@ -6,7 +6,7 @@
     /// Stack that implements the <see cref="ICollection{T}"/> interface so that Clear() can be used on it.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class StackCollection<T> : Stack<T>, ICollection<T>
+    internal class StackCollection<T> : Stack<T>, ICollection<T>
     {
         public void Add(T item) => Push(item);
 
