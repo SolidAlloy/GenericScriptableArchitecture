@@ -5,7 +5,7 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
-    internal class ScriptableEventEditor : GenericHeaderEditor
+    internal class ScriptableEventEditor : GenericHeaderEditor, IRepaintable
     {
         private ButtonsDrawer _buttonsDrawer;
         private FoldoutList<BaseScriptableEventListener> _listenersList;
@@ -26,8 +26,7 @@
 
             _description = serializedObject.FindProperty("_description");
 
-            _stackTrace = new StackTraceDrawer(typedTarget);
-            _stackTrace.OnRepaint.AddListener(Repaint);
+            _stackTrace = new StackTraceDrawer(typedTarget, this);
         }
 
         public override void OnInspectorGUI()
@@ -41,14 +40,15 @@
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _buttonsDrawer.DrawButtons(targets);
 
+            // TODO: move to the end of the method
+            _stackTrace.Draw();
+
             if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _listenersList.DoLayoutList();
             _responseTargetsList.DoLayoutList();
-
-            _stackTrace.Draw();
         }
     }
 }
