@@ -11,7 +11,7 @@
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
         protected bool WithHistory;
-        protected VariableBase VariableBase;
+        protected BaseVariable VariableBase;
 
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
 
@@ -32,7 +32,7 @@
         protected virtual void OnEnable()
         {
             // Can be null because we also use the editor for drawing Constant<T>
-            VariableBase = target as VariableBase;
+            VariableBase = target as BaseVariable;
 
             WithHistory = IsTargetWithHistory();
 

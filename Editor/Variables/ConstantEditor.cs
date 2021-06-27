@@ -2,7 +2,7 @@
 {
     using UnityEditor;
 
-    [CustomEditor(typeof(ValueBase), true)]
+    [CustomEditor(typeof(BaseValue), true)]
     internal class ConstantEditor : VariableEditorBase
     {
         private SerializedProperty _description;

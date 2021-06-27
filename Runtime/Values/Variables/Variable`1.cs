@@ -9,7 +9,7 @@
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
-    public class Variable<T> : VariableBase, IEquatable<Variable<T>>, IEquatable<T>
+    public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>
     {
         [SerializeField] internal T _initialValue;
 

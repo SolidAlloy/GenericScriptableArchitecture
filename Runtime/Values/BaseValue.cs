@@ -9,7 +9,7 @@
     using UnityEditor;
 #endif
 
-    public abstract class ValueBase : GenericScriptableObject
+    public abstract class BaseValue : GenericScriptableObject
     {
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 

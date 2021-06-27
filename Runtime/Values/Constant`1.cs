@@ -7,7 +7,7 @@
 
     [CreateGenericAssetMenu(FileName = "New Constant", MenuName = Config.PackageName + "Constant")]
     [Serializable]
-    public class Constant<T> : ValueBase, IEquatable<Constant<T>>, IEquatable<T>
+    public class Constant<T> : BaseValue, IEquatable<Constant<T>>, IEquatable<T>
     {
         [SerializeField] internal T _initialValue;
         [SerializeField] internal T _value;

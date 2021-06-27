@@ -16,7 +16,7 @@
     using Sirenix.OdinInspector.Editor;
 #endif
 
-    [CustomPropertyDrawer(typeof(ValueBase), true)]
+    [CustomPropertyDrawer(typeof(BaseValue), true)]
     [CustomPropertyDrawer(typeof(BaseScriptableEvent), true)]
 #if ODIN_INSPECTOR
     [DrawerPriority(0, 0, 3)]
