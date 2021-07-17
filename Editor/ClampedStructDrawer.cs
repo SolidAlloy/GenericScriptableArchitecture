@@ -49,7 +49,7 @@
             var firstLineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
 
             float labelWidth = label == GUIContent.none ? 5f : EditorGUIUtility.labelWidth;
-            using var _ = new EditorDrawHelper.LabelWidth(labelWidth);
+            using var _ = EditorGUIUtilityHelper.LabelWidthBlock(labelWidth);
 
             var labelRect = GetLabelRect(firstLineRect);
             property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
@@ -67,7 +67,7 @@
             (Rect left, Rect right) = secondLineRect.CutVertically(secondLineRect.width / 2f);
             AddPadding(ref left, ref right, 20f);
 
-            using var _ = new EditorDrawHelper.LabelWidth(50f);
+            using var _ = EditorGUIUtilityHelper.LabelWidthBlock(50f);
             DrawAndLimitMinValue(left);
             DrawAndLimitMaxValue(right);
         }

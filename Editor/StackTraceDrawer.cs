@@ -11,8 +11,6 @@
 
     internal class StackTraceDrawer
     {
-        private static readonly ContentCache _contentCache = new ContentCache();
-
         private readonly IStackTraceProvider _target;
         private readonly IRepaintable _editor;
 
@@ -32,15 +30,29 @@
 
         public void Draw()
         {
-            const float contentRectHeight = 400;
-            const float headerHeight = 18;
-
             EditorGUILayout.Space();
-            using var verticalBlock = new DrawHelper.VerticalBlock(null);
-            Rect headerRect = GUILayoutUtility.GetRect(0f, headerHeight, GUILayout.ExpandWidth(true));
-            Rect contentRect = GUILayoutUtility.GetRect(10f, _target.Expanded ? contentRectHeight : 0f, GUILayout.ExpandWidth(true));
+
+            using var verticalBlock = new GUILayoutHelper.Vertical(null);
+
+            var headerRect = GetHeaderRect();
             DrawHeader(headerRect);
+
+            var contentRect = GetContentRect();
             DrawContent(contentRect);
+        }
+
+        private Rect GetHeaderRect()
+        {
+            const float headerWidth = 0f;
+            const float headerHeight = 18;
+            return GUILayoutUtility.GetRect(headerWidth, headerHeight, GUILayout.ExpandWidth(true));
+        }
+
+        private Rect GetContentRect()
+        {
+            const float contentRectWidth = 10f;
+            const float contentRectHeight = 400f;
+            return GUILayoutUtility.GetRect(contentRectWidth, _target.Expanded ? contentRectHeight : 0f, GUILayout.ExpandWidth(true));
         }
 
         private void DrawHeader(Rect headerRect)
@@ -48,12 +60,14 @@
             if (Event.current.type == EventType.Repaint)
                 ReorderableList.defaultBehaviours.DrawHeaderBackground(headerRect);
 
-            const float padding = 6f;
+            const float sidePadding = 6f;
+            const float topPadding = 1f;
+            const float bottomPadding = 2f;
 
-            headerRect.xMin += padding;
-            headerRect.xMax -= padding;
-            headerRect.height -= 2f;
-            headerRect.y += 1;
+            headerRect.xMin += sidePadding;
+            headerRect.xMax -= sidePadding;
+            headerRect.height -= bottomPadding;
+            headerRect.y += topPadding;
 
             DrawFoldout(headerRect);
         }
@@ -66,6 +80,7 @@
 
             var buttonRect = new Rect(
                 shiftedRightHeaderRect.xMax - buttonWidth,
+                // The button does not appear in the middle because of top and bottom padding in header rect. That's why shift it down by 1 pixel.
                 shiftedRightHeaderRect.y + 1f,
                 buttonWidth,
                 shiftedRightHeaderRect.height);
@@ -90,10 +105,9 @@
                 Styles.BoxBackground.Draw(_lastContentRect, false, false, false, false);
             }
 
-            GUILayout.BeginArea(_lastContentRect);
+            using var area = GUILayoutHelper.AreaBlock(contentRect);
 
             const float resizeMargin = 0.2f;
-
             _windowsHeightRatio = Mathf.Clamp(_windowsHeightRatio, resizeMargin, 1 - resizeMargin);
 
             var splitHeight = _lastContentRect.height * _windowsHeightRatio;
@@ -102,34 +116,17 @@
             DrawList(contentRect);
             HandleSelectedPartResize(splitHeight);
             DrawSelectedContent(contentRect);
-
-            GUILayout.EndArea();
         }
 
         private void DrawList(Rect contentRect)
         {
             const float lineHeight = 18f;
+            const float scrollWidth = 20f;
 
-            var listRect = new Rect
-            {
-                height = _lastContentRect.height - contentRect.height,
-                width = _lastContentRect.width
-            };
+            var scrollRect = new Rect(0f, 0f, _lastContentRect.width, _lastContentRect.height - contentRect.height);
+            var listRect = new Rect(0f, 0f, scrollRect.width - scrollWidth, _target.Entries.Count * lineHeight);
 
-            var scrollViewRect = new Rect
-            {
-                y = listRect.y,
-                height = listRect.height,
-                width = listRect.width,
-            };
-
-            var position = new Rect
-            {
-                height = _target.Entries.Count * lineHeight,
-                width = scrollViewRect.width - 20,
-            };
-
-            _listScrollPos = GUI.BeginScrollView(scrollViewRect, _listScrollPos, position);
+            using var scrollViewBlock = GUIHelper.ScrollViewBlock(scrollRect, ref _listScrollPos, listRect);
 
             int i = 0;
 
@@ -139,10 +136,10 @@
 
                 var elementRect = new Rect
                 {
-                    width = listRect.width,
+                    width = scrollRect.width,
                     height = lineHeight,
                     y = i * lineHeight,
-                    x = listRect.x
+                    x = scrollRect.x
                 };
 
                 if (Event.current.type == EventType.MouseDown && elementRect.Contains(Event.current.mousePosition))
@@ -160,8 +157,6 @@
 
                 i++;
             }
-
-            GUI.EndScrollView();
         }
 
         private void DrawSeparator(Rect rect)
@@ -187,10 +182,10 @@
             var textWidth = scrollViewRect.width - 14;
 
             var lines = _selectedTrace.ToString().Split('\n');
-            var lineHeights = lines.Select(line => Styles.MessageStyle.CalcHeight(_contentCache.GetItem(line), textWidth)).ToList();
+            var lineHeights = lines.Select(line => Styles.MessageStyle.CalcHeight(GUIContentHelper.Temp(line), textWidth)).ToList();
 
             var listRect = new Rect(0f, 0f, textWidth, lineHeights.Sum());
-            _selectedContentScrollPos = GUI.BeginScrollView(scrollViewRect, _selectedContentScrollPos, listRect);
+            using var scrollView = GUIHelper.ScrollViewBlock(scrollViewRect, ref _selectedContentScrollPos, listRect);
 
             var currentYPos = 0f;
 
@@ -203,8 +198,6 @@
                 EditorGUI.SelectableLabel(lineRect, lines[i], Styles.MessageStyle);
                 DrawSeparator(lineRect);
             }
-
-            GUI.EndScrollView();
         }
 
         private void HandleSelectedPartResize(float splitHeight)

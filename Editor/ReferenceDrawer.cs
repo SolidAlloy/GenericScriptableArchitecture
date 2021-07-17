@@ -155,7 +155,7 @@
             if ( ! property.isExpanded || ObjectReference == null)
                 return;
 
-            using (new EditorDrawHelper.IndentLevel(indentLevel + 1))
+            using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
             {
                 GetInlineEditor(ObjectReference).OnInspectorGUI();
             }
@@ -165,7 +165,7 @@
         {
             if ( ! _editorCache.TryGetValue(variable, out Editor editor))
             {
-                editor = EditorDrawHelper.CreateEditor<VariableInlineEditor>(variable);
+                editor = EditorHelper.CreateEditor<VariableInlineEditor>(variable);
                 _editorCache.Add(variable, editor);
             }
 
