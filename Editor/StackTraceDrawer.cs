@@ -105,7 +105,7 @@
                 Styles.BoxBackground.Draw(_lastContentRect, false, false, false, false);
             }
 
-            using var area = GUILayoutHelper.AreaBlock(contentRect);
+            using var area = GUILayoutHelper.AreaBlock(_lastContentRect);
 
             const float resizeMargin = 0.2f;
             _windowsHeightRatio = Mathf.Clamp(_windowsHeightRatio, resizeMargin, 1 - resizeMargin);
