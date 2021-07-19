@@ -134,13 +134,7 @@
             {
                 string currentText = GetFirstLine(stackTraceEntry);
 
-                var elementRect = new Rect
-                {
-                    width = scrollRect.width,
-                    height = lineHeight,
-                    y = i * lineHeight,
-                    x = scrollRect.x
-                };
+                var elementRect = new Rect(scrollRect.x, i * lineHeight, scrollRect.width, lineHeight);
 
                 if (Event.current.type == EventType.MouseDown && elementRect.Contains(Event.current.mousePosition))
                 {

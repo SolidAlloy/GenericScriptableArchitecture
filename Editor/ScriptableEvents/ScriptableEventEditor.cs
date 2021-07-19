@@ -40,15 +40,13 @@
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _buttonsDrawer.DrawButtons(targets);
 
-            // TODO: move to the end of the method
-            _stackTrace.Draw();
-
             if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _listenersList.DoLayoutList();
             _responseTargetsList.DoLayoutList();
+            _stackTrace.Draw();
         }
     }
 }
