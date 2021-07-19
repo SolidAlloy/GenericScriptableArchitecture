@@ -3,11 +3,12 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseVariable), true)]
-    internal class VariableEditor : VariableEditorBase
+    internal class VariableEditor : VariableEditorBase, IRepaintable
     {
         private SerializedProperty _description;
         private FoldoutList<BaseScriptableEventListener> _listenersOnChanged;
         private FoldoutList<BaseScriptableEventListener> _listenersOnChangedWithHistory;
+        private StackTraceDrawer _stackTrace;
 
         protected override void OnEnable()
         {
@@ -18,6 +19,8 @@
 
             if (WithHistory)
                 InitializeListenersWithHistory();
+
+            _stackTrace = new StackTraceDrawer(VariableBase, this);
         }
 
         private void InitializeListeners()
@@ -51,6 +54,7 @@
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _listenersOnChanged.DoLayoutList();
             _listenersOnChangedWithHistory?.DoLayoutList();
+            _stackTrace.Draw();
         }
     }
 }

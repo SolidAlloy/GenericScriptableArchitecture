@@ -40,7 +40,7 @@
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _buttonsDrawer.DrawButtons(targets);
 
-            if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
+            if (ApplicationUtil.InEditMode)
                 return;
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);

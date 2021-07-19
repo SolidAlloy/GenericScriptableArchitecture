@@ -7,8 +7,8 @@
     [Serializable]
     public class ScriptableEventListener : BaseScriptableEventListener
     {
-        [SerializeField] private ScriptableEvent _event;
-        [SerializeField] private UnityEvent _response;
+        [SerializeField] internal ScriptableEvent _event;
+        [SerializeField] internal UnityEvent _response;
 
         private void OnEnable()
         {
