@@ -22,6 +22,9 @@
 
         public void OnEventRaised(T1 arg0, T2 arg1)
         {
+            if ( ! CanBeInvoked())
+                return;
+
             _response.Invoke(arg0, arg1);
         }
     }

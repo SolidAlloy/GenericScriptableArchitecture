@@ -43,7 +43,7 @@
 
         internal override void InvokeValueChangedEvents()
         {
-            if (ApplicationUtil.InEditMode)
+            if ( ! CanBeInvoked())
                 return;
 
             base.InvokeValueChangedEvents();

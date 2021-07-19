@@ -24,6 +24,9 @@
         [Button(Mode = ButtonMode.EnabledInPlayMode)]
         public void Invoke()
         {
+            if ( ! CanBeInvoked())
+                return;
+
             AddStackTrace();
 
             for (int i = _listeners.Count - 1; i != -1; i--)

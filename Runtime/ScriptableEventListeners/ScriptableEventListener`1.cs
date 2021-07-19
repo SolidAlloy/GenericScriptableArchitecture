@@ -16,6 +16,9 @@
 
         public void OnEventRaised(T arg0)
         {
+            if ( ! CanBeInvoked())
+                return;
+
             AddStackTrace(arg0);
             _response.Invoke(arg0);
         }

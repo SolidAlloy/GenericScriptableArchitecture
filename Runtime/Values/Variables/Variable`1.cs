@@ -47,7 +47,7 @@
 
         internal override void InvokeValueChangedEvents()
         {
-            if (ApplicationUtil.InEditMode)
+            if ( ! CanBeInvoked())
                 return;
 
             for (int i = _listeners.Count - 1; i != -1; i--)
