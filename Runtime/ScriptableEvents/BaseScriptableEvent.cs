@@ -16,6 +16,7 @@
     {
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] internal bool ResponseTargetsExpanded;
+        [SerializeField] private bool _stackTraceEnabled;
         [SerializeField] private bool _stackTraceExpanded;
 
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
@@ -23,6 +24,12 @@
         private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 
         ICollection<StackTraceEntry> IStackTraceProvider.Entries => _stackTraceEntries;
+
+        bool IStackTraceProvider.Enabled
+        {
+            get => _stackTraceEnabled;
+            set => _stackTraceEnabled = value;
+        }
 
         bool IStackTraceProvider.Expanded
         {
@@ -37,7 +44,8 @@
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)
         {
-            _stackTraceEntries.Push(new StackTraceEntry(args));
+            if (_stackTraceEnabled)
+                _stackTraceEntries.Push(new StackTraceEntry(args));
         }
 
         protected bool CanBeInvoked()

@@ -32,6 +32,14 @@
         {
             EditorGUILayout.Space();
 
+            if ( ! _target.Enabled)
+            {
+                if (GUILayout.Button("Enable stack trace"))
+                    _target.Enabled = true;
+
+                return;
+            }
+
             using var verticalBlock = new GUILayoutHelper.Vertical(null);
 
             var headerRect = GetHeaderRect();
@@ -75,23 +83,37 @@
         private void DrawFoldout(Rect headerRect)
         {
             const float buttonWidth = 60f;
+            const float betweenButtons = 10f;
             const float leftMargin = 10f;
+            
             var shiftedRightHeaderRect = new Rect(headerRect.x + leftMargin, headerRect.y, headerRect.width - leftMargin, headerRect.height);
 
-            var buttonRect = new Rect(
-                shiftedRightHeaderRect.xMax - buttonWidth,
-                // The button does not appear in the middle because of top and bottom padding in header rect. That's why shift it down by 1 pixel.
-                shiftedRightHeaderRect.y + 1f,
-                buttonWidth,
-                shiftedRightHeaderRect.height);
+            var disableButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth * 2f + betweenButtons);
 
-            if (GUI.Button(buttonRect, "Clear"))
+            if (GUI.Button(disableButton, "Disable"))
+            {
+                _target.Enabled = false;
+            }
+
+            var clearButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth);
+
+            if (GUI.Button(clearButton, "Clear"))
             {
                 _target.Entries.Clear();
                 _selectedTrace = null;
             }
 
             _target.Expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _target.Expanded, "Stack Trace", true);
+        }
+
+        private Rect GetButtonRect(Rect foldoutRect, float buttonWidth, float distanceFromRight)
+        {
+            return new Rect(
+                foldoutRect.xMax - distanceFromRight,
+                // The button does not appear in the middle because of top and bottom padding in header rect. That's why shift it down by 1 pixel.
+                foldoutRect.y + 1f,
+                buttonWidth,
+                foldoutRect.height);
         }
 
         private void DrawContent(Rect contentRect)
