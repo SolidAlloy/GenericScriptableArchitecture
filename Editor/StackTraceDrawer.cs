@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System;
     using System.Linq;
     using System.Text.RegularExpressions;
     using JetBrains.Annotations;
@@ -8,6 +9,7 @@
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     internal class StackTraceDrawer
     {
@@ -35,7 +37,9 @@
             if ( ! _target.Enabled)
             {
                 if (GUILayout.Button("Enable stack trace"))
-                    _target.Enabled = true;
+                {
+                    SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider) target).Enabled = true);
+                }
 
                 return;
             }
@@ -47,6 +51,18 @@
 
             var contentRect = GetContentRect();
             DrawContent(contentRect);
+        }
+
+        private void SaveChange(string fieldName, Action<Object> action)
+        {
+            if (_target is Component component)
+            {
+                PlayModeSaver.SaveChange(component, fieldName, action);
+            }
+            else
+            {
+                action((Object) _target);
+            }
         }
 
         private Rect GetHeaderRect()
@@ -85,14 +101,14 @@
             const float buttonWidth = 60f;
             const float betweenButtons = 10f;
             const float leftMargin = 10f;
-            
+
             var shiftedRightHeaderRect = new Rect(headerRect.x + leftMargin, headerRect.y, headerRect.width - leftMargin, headerRect.height);
 
             var disableButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth * 2f + betweenButtons);
 
             if (GUI.Button(disableButton, "Disable"))
             {
-                _target.Enabled = false;
+                SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider)target).Enabled = false);
             }
 
             var clearButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth);
@@ -103,7 +119,12 @@
                 _selectedTrace = null;
             }
 
-            _target.Expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _target.Expanded, "Stack Trace", true);
+            bool expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _target.Expanded, "Stack Trace", true);
+
+            if (_target.Expanded != expanded)
+            {
+                SaveChange(nameof(_target.Expanded), target => ((IStackTraceProvider)target).Expanded = expanded);
+            }
         }
 
         private Rect GetButtonRect(Rect foldoutRect, float buttonWidth, float distanceFromRight)
