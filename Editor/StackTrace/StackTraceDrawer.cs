@@ -34,14 +34,35 @@
         {
             EditorGUILayout.Space();
 
-            if ( ! _target.Enabled)
+            if (StackTraceSettings.EnabledInProject)
             {
-                if (GUILayout.Button("Enable stack trace"))
+                if (ApplicationUtil.InEditMode)
                 {
-                    SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider) target).Enabled = true);
+                    EditorGUILayoutHelper.DrawInfoMessage("Stack traces are enabled for all assets in Project Settings.");
+                    return;
+                }
+            }
+            else
+            {
+                if ( ! _target.Enabled)
+                {
+                    if (GUILayout.Button("Enable stack trace"))
+                    {
+                        SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider) target).Enabled = true);
+                    }
+
+                    return;
                 }
 
-                return;
+                if (ApplicationUtil.InEditMode)
+                {
+                    if (GUILayout.Button("Disable stack trace"))
+                    {
+                        _target.Enabled = false;
+                    }
+
+                    return;
+                }
             }
 
             using var verticalBlock = new GUILayoutHelper.Vertical(null);
@@ -99,31 +120,44 @@
         private void DrawFoldout(Rect headerRect)
         {
             const float buttonWidth = 60f;
-            const float betweenButtons = 10f;
             const float leftMargin = 10f;
 
             var shiftedRightHeaderRect = new Rect(headerRect.x + leftMargin, headerRect.y, headerRect.width - leftMargin, headerRect.height);
 
-            var disableButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth * 2f + betweenButtons);
-
-            if (GUI.Button(disableButton, "Disable"))
-            {
-                SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider)target).Enabled = false);
-            }
-
-            var clearButton = GetButtonRect(shiftedRightHeaderRect, buttonWidth, buttonWidth);
-
-            if (GUI.Button(clearButton, "Clear"))
-            {
-                _target.Entries.Clear();
-                _selectedTrace = null;
-            }
+            DrawDisableButton(shiftedRightHeaderRect, buttonWidth);
+            DrawClearButton(shiftedRightHeaderRect, buttonWidth);
 
             bool expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _target.Expanded, "Stack Trace", true);
 
             if (_target.Expanded != expanded)
             {
                 SaveChange(nameof(_target.Expanded), target => ((IStackTraceProvider)target).Expanded = expanded);
+            }
+        }
+
+        private void DrawDisableButton(Rect foldoutRect, float buttonWidth)
+        {
+            const float betweenButtons = 10f;
+
+            if (StackTraceSettings.EnabledInProject)
+                return;
+
+            var disableButton = GetButtonRect(foldoutRect, buttonWidth, buttonWidth * 2f + betweenButtons);
+
+            if (GUI.Button(disableButton, "Disable"))
+            {
+                SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider)target).Enabled = false);
+            }
+        }
+
+        private void DrawClearButton(Rect foldoutRect, float buttonWidth)
+        {
+            var clearButton = GetButtonRect(foldoutRect, buttonWidth, buttonWidth);
+
+            if (GUI.Button(clearButton, "Clear"))
+            {
+                _target.Entries.Clear();
+                _selectedTrace = null;
             }
         }
 
