@@ -11,13 +11,17 @@
     public class ScriptableEvent<T> : BaseScriptableEvent
     {
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
+        private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
+        private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
         private List<Action<T>> _responses = new List<Action<T>>();
 
-        internal override List<BaseScriptableEventListener> Listeners => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
+        internal override List<BaseScriptableEventListener> ScriptableListeners => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
 
-        internal override List<UnityEngine.Object> ResponseTargets
+        internal override List<UnityEngine.Object> OtherListeners
             => _responses
                 .Select(response => response.Target)
+                .Concat(_singleEventListeners)
+                .Concat(_multipleEventsListeners)
                 .OfType<UnityEngine.Object>()
                 .ToList();
 
@@ -38,6 +42,16 @@
             {
                 _responses[i].Invoke(arg0);
             }
+
+            for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
+            {
+                _multipleEventsListeners[i].OnEventRaised(this, arg0);
+            }
+
+            for (int i = _singleEventListeners.Count - 1; i != -1; i--)
+            {
+                _singleEventListeners[i].OnEventRaised(arg0);
+            }
         }
 
         public void AddListener(ScriptableEventListener<T> listener) => _listeners.Add(listener);
@@ -47,5 +61,13 @@
         public void AddResponse(Action<T> response) => _responses.Add(response);
 
         public void RemoveResponse(Action<T> response) => _responses.Remove(response);
+
+        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Add(listener);
+
+        public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
+
+        public void AddListener(IEventListener<T> listener) => _singleEventListeners.Add(listener);
+
+        public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
     }
 }

@@ -19,10 +19,10 @@
             var typedTarget = (BaseScriptableEvent) target;
 
             var listenersExpanded = serializedObject.FindProperty(nameof(BaseScriptableEvent.ListenersExpanded));
-            _listenersList = new FoldoutList<BaseScriptableEventListener>(typedTarget.Listeners, listenersExpanded, "Listeners");
+            _listenersList = new FoldoutList<BaseScriptableEventListener>(typedTarget.ScriptableListeners, listenersExpanded, "Scriptable Listeners");
 
             var responseTargetsExpanded = serializedObject.FindProperty(nameof(BaseScriptableEvent.ResponseTargetsExpanded));
-            _responseTargetsList = new FoldoutList<UnityEngine.Object>(typedTarget.ResponseTargets, responseTargetsExpanded, "Response Targets");
+            _responseTargetsList = new FoldoutList<UnityEngine.Object>(typedTarget.OtherListeners, responseTargetsExpanded, "Other Listeners");
 
             _description = serializedObject.FindProperty("_description");
 

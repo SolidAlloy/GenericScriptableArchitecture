@@ -37,9 +37,9 @@
             set => _stackTraceExpanded = value;
         }
 
-        internal abstract List<BaseScriptableEventListener> Listeners { get; }
+        internal abstract List<BaseScriptableEventListener> ScriptableListeners { get; }
 
-        internal abstract List<Object> ResponseTargets { get; }
+        internal abstract List<Object> OtherListeners { get; }
 
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)
