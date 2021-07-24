@@ -74,7 +74,7 @@
                 return null;
 
             string relativePath = PathHelper.MakeRelative(path, _projectPath);
-            return GenericSOCreator.CreateAssetAtPath(type, relativePath);
+            return GenericSOCreator.CreateAssetAtPath(property, type, relativePath);
         }
 
         private bool IsValidPath(string path)
