@@ -29,9 +29,7 @@
             EditorGUILayout.PropertyField(_eventProperty);
             EditorGUILayout.PropertyField(_responseProperty);
 
-            if (ApplicationUtil.InEditMode)
-                return;
-
+            Undo.RecordObject(target, "Changed stack trace settings");
             _stackTrace.Draw();
         }
     }
