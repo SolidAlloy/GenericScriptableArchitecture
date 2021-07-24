@@ -48,13 +48,14 @@
             DrawCurrentValue();
             DrawPreviousValue();
 
+            _stackTrace.Draw();
+
             if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
-            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
             _listenersOnChanged.DoLayoutList();
             _listenersOnChangedWithHistory?.DoLayoutList();
-            _stackTrace.Draw();
         }
     }
 }

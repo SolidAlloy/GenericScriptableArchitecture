@@ -40,13 +40,14 @@
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _buttonsDrawer.DrawButtons(targets);
 
+            _stackTrace.Draw();
+
             if (ApplicationUtil.InEditMode)
                 return;
 
-            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
             _listenersList.DoLayoutList();
             _responseTargetsList.DoLayoutList();
-            _stackTrace.Draw();
         }
     }
 }
