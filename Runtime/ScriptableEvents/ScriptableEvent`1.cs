@@ -8,20 +8,19 @@
 
     [Serializable]
     [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T>")]
-    public class ScriptableEvent<T> : BaseScriptableEvent
+    public class ScriptableEvent<T> : BaseScriptableEvent, IEvent<T>
     {
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
         private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
         private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
         private List<Action<T>> _responses = new List<Action<T>>();
 
-        internal override List<BaseScriptableEventListener> ScriptableListeners => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
-
-        internal override List<UnityEngine.Object> OtherListeners
+        internal override List<UnityEngine.Object> Listeners
             => _responses
                 .Select(response => response.Target)
                 .Concat(_singleEventListeners)
                 .Concat(_multipleEventsListeners)
+                .Concat(_listeners)
                 .OfType<UnityEngine.Object>()
                 .ToList();
 
@@ -58,10 +57,6 @@
 
         public void RemoveListener(ScriptableEventListener<T> listener) => _listeners.Remove(listener);
 
-        public void AddResponse(Action<T> response) => _responses.Add(response);
-
-        public void RemoveResponse(Action<T> response) => _responses.Remove(response);
-
         public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Add(listener);
 
         public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
@@ -69,5 +64,9 @@
         public void AddListener(IEventListener<T> listener) => _singleEventListeners.Add(listener);
 
         public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
+
+        public void AddResponse(Action<T> response) => _responses.Add(response);
+
+        public void RemoveResponse(Action<T> response) => _responses.Remove(response);
     }
 }

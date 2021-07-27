@@ -21,7 +21,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.AddListenerOnChange(listener);
+                    _variable?.AddListener(listener);
                     break;
 
                 default:
@@ -39,7 +39,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.RemoveListenerOnChange(listener);
+                    _variable?.RemoveListener(listener);
                     break;
 
                 default:

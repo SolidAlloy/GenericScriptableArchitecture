@@ -21,7 +21,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.AddListenerOnChangeWithHistory(listener as ScriptableEventListener<T1, T1>);
+                    _variable?.AddListener(listener as ScriptableEventListener<T1, T1>);
                     break;
 
                 default:
@@ -39,7 +39,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.RemoveListenerOnChangeWithHistory(listener as ScriptableEventListener<T1, T1>);
+                    _variable?.RemoveListener(listener as ScriptableEventListener<T1, T1>);
                     break;
 
                 default:

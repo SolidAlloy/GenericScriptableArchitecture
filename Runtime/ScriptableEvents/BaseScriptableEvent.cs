@@ -15,7 +15,6 @@
     public abstract class BaseScriptableEvent : GenericScriptableObject, IStackTraceProvider
     {
         [SerializeField] internal bool ListenersExpanded;
-        [SerializeField] internal bool ResponseTargetsExpanded;
         [SerializeField] private bool _stackTraceEnabled;
         [SerializeField] private bool _stackTraceExpanded;
 
@@ -37,9 +36,7 @@
             set => _stackTraceExpanded = value;
         }
 
-        internal abstract List<BaseScriptableEventListener> ScriptableListeners { get; }
-
-        internal abstract List<Object> OtherListeners { get; }
+        internal abstract List<Object> Listeners { get; }
 
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)

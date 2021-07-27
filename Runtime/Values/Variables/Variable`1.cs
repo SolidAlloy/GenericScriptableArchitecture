@@ -3,13 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using GenericUnityObjects;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
-    public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>
+    public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>, IEvent<T>
     {
         [SerializeField] internal T _initialValue;
 
@@ -18,6 +19,9 @@
         [SerializeField] internal bool ListenersExpanded;
 
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
+        private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
+        private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
+        private List<Action<T>> _responses = new List<Action<T>>();
 
         public T Value
         {
@@ -25,13 +29,30 @@
             set => SetValue(value);
         }
 
-        internal override List<BaseScriptableEventListener> Listeners => _listeners.ConvertAll(item => (BaseScriptableEventListener) item);
+        internal override List<Object> Listeners
+            => _responses
+                .Select(response => response.Target)
+                .Concat(_singleEventListeners)
+                .Concat(_multipleEventsListeners)
+                .Concat(_listeners)
+                .OfType<Object>()
+                .ToList();
 
-        internal override List<BaseScriptableEventListener> ListenersWithHistory => EmptyList;
+        public void AddListener(ScriptableEventListener<T> listener) => _listeners.Add(listener);
 
-        public void AddListenerOnChange(ScriptableEventListener<T> listener) => _listeners.Add(listener);
+        public void RemoveListener(ScriptableEventListener<T> listener) => _listeners.Remove(listener);
 
-        public void RemoveListenerOnChange(ScriptableEventListener<T> listener) => _listeners.Remove(listener);
+        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Add(listener);
+
+        public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
+
+        public void AddListener(IEventListener<T> listener) => _singleEventListeners.Add(listener);
+
+        public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
+
+        public void AddResponse(Action<T> response) => _responses.Add(response);
+
+        public void RemoveResponse(Action<T> response) => _responses.Remove(response);
 
         protected override void InitializeValues()
         {
@@ -53,6 +74,21 @@
             for (int i = _listeners.Count - 1; i != -1; i--)
             {
                 _listeners[i].OnEventRaised(_value);
+            }
+
+            for (int i = _responses.Count - 1; i != -1; i--)
+            {
+                _responses[i].Invoke(_value);
+            }
+
+            for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
+            {
+                _multipleEventsListeners[i].OnEventRaised(this, _value);
+            }
+
+            for (int i = _singleEventListeners.Count - 1; i != -1; i--)
+            {
+                _singleEventListeners[i].OnEventRaised(_value);
             }
         }
 
@@ -135,12 +171,6 @@
         public static bool operator !=(Variable<T> lhs, T rhs)
         {
             return ! (lhs == rhs);
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void AddToStackTrace()
-        {
-
         }
     }
 }

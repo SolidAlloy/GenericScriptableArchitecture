@@ -14,6 +14,8 @@
         [SerializeField] private bool _stackTraceEnabled;
         [SerializeField] private bool _stackTraceExpanded;
 
+        private static readonly List<Object> _emptyObjectList = new List<Object>();
+
         bool IStackTraceProvider.Enabled
         {
             get => _stackTraceEnabled;
@@ -26,13 +28,11 @@
             set => _stackTraceExpanded = value;
         }
 
-        protected static readonly List<BaseScriptableEventListener> EmptyList = new List<BaseScriptableEventListener>();
-
         internal abstract void InvokeValueChangedEvents();
 
-        internal abstract List<BaseScriptableEventListener> Listeners { get; }
+        internal abstract List<Object> Listeners { get; }
 
-        internal abstract List<BaseScriptableEventListener> ListenersWithHistory { get; }
+        internal virtual List<Object> ListenersWithHistory => _emptyObjectList;
 
         private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
 

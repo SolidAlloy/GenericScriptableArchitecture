@@ -1,13 +1,14 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using UnityEditor;
+    using UnityEngine;
 
     [CustomEditor(typeof(BaseVariable), true)]
     internal class VariableEditor : VariableEditorBase, IRepaintable
     {
         private SerializedProperty _description;
-        private FoldoutList<BaseScriptableEventListener> _listenersOnChanged;
-        private FoldoutList<BaseScriptableEventListener> _listenersOnChangedWithHistory;
+        private FoldoutList<Object> _listeners;
+        private FoldoutList<Object> _listenersWithHistory;
         private StackTraceDrawer _stackTrace;
 
         protected override void OnEnable()
@@ -27,7 +28,7 @@
         {
             var expanded = serializedObject.FindProperty(nameof(Variable<bool>.ListenersExpanded));
 
-            _listenersOnChanged = new FoldoutList<BaseScriptableEventListener>(VariableBase.Listeners,
+            _listeners = new FoldoutList<Object>(VariableBase.Listeners,
                 expanded, "Listeners For Value Change");
         }
 
@@ -36,7 +37,7 @@
             var expanded = serializedObject.FindProperty(
                 nameof(VariableWithHistory<bool>.ListenersWithHistoryExpanded));
 
-            _listenersOnChangedWithHistory = new FoldoutList<BaseScriptableEventListener>(VariableBase.ListenersWithHistory,
+            _listenersWithHistory = new FoldoutList<Object>(VariableBase.ListenersWithHistory,
                 expanded, "Listeners For Value Change With History");
         }
 
@@ -54,8 +55,8 @@
                 return;
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
-            _listenersOnChanged.DoLayoutList();
-            _listenersOnChangedWithHistory?.DoLayoutList();
+            _listeners.DoLayoutList();
+            _listenersWithHistory?.DoLayoutList();
         }
     }
 }
