@@ -5,17 +5,19 @@
     using System.Diagnostics;
     using System.Linq;
     using GenericUnityObjects;
+    using UniRx;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
     public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>, IEvent<T>
+#if UNIRX
+        , IReactiveProperty<T>, IDisposable, IObserverLinkedList<T>
+#endif
     {
         [SerializeField] internal T _initialValue;
-
         [SerializeField] internal T _value;
-
         [SerializeField] internal bool ListenersExpanded;
 
         private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
@@ -26,7 +28,11 @@
         public T Value
         {
             get => _value;
-            set => SetValue(value);
+            set
+            {
+                if (!EqualityComparer.Equals(_value, value))
+                    SetValue(value);
+            }
         }
 
         internal override List<Object> Listeners
@@ -90,6 +96,10 @@
             {
                 _singleEventListeners[i].OnEventRaised(_value);
             }
+
+#if UNIRX
+            RaiseOnNext();
+#endif
         }
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
@@ -172,5 +182,93 @@
         {
             return ! (lhs == rhs);
         }
+
+        #region UniRx
+#if UNIRX
+        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
+        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
+
+        private bool _isDisposed;
+        private ObserverNode<T> _root;
+        private ObserverNode<T> _last;
+
+        bool IReadOnlyReactiveProperty<T>.HasValue => true;
+
+        public IDisposable Subscribe(IObserver<T> observer)
+        {
+            if (_isDisposed)
+            {
+                observer.OnCompleted();
+                return Disposable.Empty;
+            }
+
+            // raise latest value on subscribe
+            observer.OnNext(_value);
+
+            // subscribe node, node as subscription.
+            var next = new ObserverNode<T>(this, observer);
+
+            if (_root == null)
+            {
+                _root = _last = next;
+            }
+            else
+            {
+                _last.Next = next;
+                next.Previous = _last;
+                _last = next;
+            }
+
+            return next;
+        }
+
+        public void SetValueAndForceNotify(T value) => SetValue(value);
+
+        void IObserverLinkedList<T>.UnsubscribeNode(ObserverNode<T> node)
+        {
+            if (node == _root)
+                _root = node.Next;
+
+            if (node == _last)
+                _last = node.Previous;
+
+            if (node.Previous != null)
+                node.Previous.Next = node.Next;
+
+            if (node.Next != null)
+                node.Next.Previous = node.Previous;
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+
+            _isDisposed = true;
+
+            var node = _root;
+            _root = _last = null;
+
+            while (node != null)
+            {
+                node.OnCompleted();
+                node = node.Next;
+            }
+        }
+
+        protected void RaiseOnNext()
+        {
+            if (_isDisposed)
+                return;
+
+            var node = _root;
+            while (node != null)
+            {
+                node.OnNext(_value);
+                node = node.Next;
+            }
+        }
+#endif
+        #endregion
     }
 }
