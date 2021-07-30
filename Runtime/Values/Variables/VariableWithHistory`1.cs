@@ -22,7 +22,8 @@
         [SerializeField] internal T _previousValue;
         [SerializeField] internal bool ListenersWithHistoryExpanded;
 
-        private List<ScriptableEventListener<T, T>> _listeners = new List<ScriptableEventListener<T, T>>();
+        // It can be named _listeners, but Unity falsely claims it is serialized multiple times
+        private List<ScriptableEventListener<T, T>> _listenersWithHistory = new List<ScriptableEventListener<T, T>>();
         private List<IMultipleEventsListener<T, T>> _multipleEventsListeners = new List<IMultipleEventsListener<T, T>>();
         private List<IEventListener<T, T>> _singleEventListeners = new List<IEventListener<T, T>>();
         private List<Action<T, T>> _responses = new List<Action<T, T>>();
@@ -35,13 +36,13 @@
                 .Select(response => response.Target)
                 .Concat(_singleEventListeners)
                 .Concat(_multipleEventsListeners)
-                .Concat(_listeners)
+                .Concat(_listenersWithHistory)
                 .OfType<Object>()
                 .ToList();
 
-        public void AddListener(ScriptableEventListener<T, T> listener) => _listeners.Add(listener);
+        public void AddListener(ScriptableEventListener<T, T> listener) => _listenersWithHistory.Add(listener);
 
-        public void RemoveListener(ScriptableEventListener<T, T> listener) => _listeners.Remove(listener);
+        public void RemoveListener(ScriptableEventListener<T, T> listener) => _listenersWithHistory.Remove(listener);
 
         public void AddListener(IMultipleEventsListener<T, T> listener) => _multipleEventsListeners.Add(listener);
 
@@ -76,9 +77,9 @@
 
             base.InvokeValueChangedEvents();
 
-            for (int i = _listeners.Count - 1; i != -1; i--)
+            for (int i = _listenersWithHistory.Count - 1; i != -1; i--)
             {
-                _listeners[i].OnEventRaised(_previousValue, _value);
+                _listenersWithHistory[i].OnEventRaised(_previousValue, _value);
             }
 
             for (int i = _responses.Count - 1; i != -1; i--)
@@ -101,7 +102,8 @@
 
         #region UNIRX
 #if UNIRX
-        private bool _disposed;
+        // It can be named _disposed, but Unity falsely claims it is serialized multiple times.
+        private bool _disposedWithHistory;
         private ObserverNode<(T, T)> _root;
         private ObserverNode<(T, T)> _last;
 
@@ -129,7 +131,7 @@
 
         public IDisposable Subscribe(IObserver<(T Previous, T Current)> observer)
         {
-            if (_disposed)
+            if (_disposedWithHistory)
             {
                 observer.OnCompleted();
                 return Disposable.Empty;
@@ -174,10 +176,10 @@
         {
             base.Dispose();
 
-            if (_disposed)
+            if (_disposedWithHistory)
                 return;
 
-            _disposed = true;
+            _disposedWithHistory = true;
 
             var node = _root;
             _root = _last = null;
@@ -193,7 +195,7 @@
         {
             base.RaiseOnNext();
 
-            if (_disposed)
+            if (_disposedWithHistory)
                 return;
 
             var node = _root;
