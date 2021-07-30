@@ -3,12 +3,12 @@ namespace GenericScriptableArchitecture
 {
     using System;
 
-    public interface IReactivePropertyWithHistory<T> : IReadonlyReactivePropertyWithHistory<T>
+    public interface IReactivePropertyWithHistory<T> : IReadOnlyReactivePropertyWithHistory<T>
     {
         new T Value { get; set; }
     }
 
-    public interface IReadonlyReactivePropertyWithHistory<T> : IObservableWithHistory<T>
+    public interface IReadOnlyReactivePropertyWithHistory<T> : IObservableWithHistory<T>
     {
         T Value { get; }
 

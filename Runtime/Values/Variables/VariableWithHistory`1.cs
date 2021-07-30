@@ -107,7 +107,7 @@
         private ObserverNode<(T, T)> _root;
         private ObserverNode<(T, T)> _last;
 
-        bool IReadonlyReactivePropertyWithHistory<T>.HasValue => true;
+        bool IReadOnlyReactivePropertyWithHistory<T>.HasValue => true;
 
         public IDisposable Subscribe(Action<T, T> onNext)
         {

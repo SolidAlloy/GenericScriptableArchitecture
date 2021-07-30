@@ -9,6 +9,9 @@
     [Serializable]
     [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T1,T2>")]
     public class ScriptableEvent<T1, T2> : BaseScriptableEvent, IEvent<T1, T2>
+#if UNIRX
+        , IObservable<(T1, T2)>, IDisposable
+#endif
     {
         private List<ScriptableEventListener<T1, T2>> _listeners = new List<ScriptableEventListener<T1, T2>>();
         private List<Action<T1, T2>> _responses = new List<Action<T1, T2>>();
@@ -51,6 +54,10 @@
             {
                 _singleEventListeners[i].OnEventRaised(arg0, arg1);
             }
+
+#if UNIRX
+            _observableHelper?.RaiseOnNext((arg0, arg1));
+#endif
         }
 
         public void AddListener(ScriptableEventListener<T1, T2> listener) => _listeners.Add(listener);
@@ -68,5 +75,19 @@
         public void AddListener(IEventListener<T1, T2> listener) => _singleEventListeners.Add(listener);
 
         public void RemoveListener(IEventListener<T1, T2> listener) => _singleEventListeners.Remove(listener);
+
+        #region UniRx
+#if UNIRX
+        private ObservableHelper<(T1, T2)> _observableHelper;
+
+        public IDisposable Subscribe(IObserver<(T1, T2)> observer)
+        {
+            _observableHelper ??= new ObservableHelper<(T1, T2)>();
+            return _observableHelper.Subscribe(observer);
+        }
+
+        public void Dispose() => _observableHelper?.Dispose();
+#endif
+        #endregion
     }
 }

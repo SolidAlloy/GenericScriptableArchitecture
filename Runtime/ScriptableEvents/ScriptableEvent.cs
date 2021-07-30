@@ -5,10 +5,16 @@
     using System.Linq;
     using EasyButtons;
     using UnityEngine;
+#if UNIRX
+    using UniRx;
+#endif
 
     [Serializable]
     [CreateAssetMenu(menuName = Config.PackageName + Config.Events + "ScriptableEvent")]
     public class ScriptableEvent : BaseScriptableEvent, IEvent
+#if UNIRX
+        , IObservable<Unit>, IDisposable
+#endif
     {
         private List<ScriptableEventListener> _listeners = new List<ScriptableEventListener>();
         private List<IMultipleEventsListener> _multipleEventsListeners = new List<IMultipleEventsListener>();
@@ -51,6 +57,10 @@
             {
                 _singleEventListeners[i].OnEventRaised();
             }
+
+#if UNIRX
+            _observableHelper?.RaiseOnNext(Unit.Default);
+#endif
         }
 
         public void AddListener(ScriptableEventListener listener) => _listeners.Add(listener);
@@ -68,5 +78,19 @@
         public void AddListener(IEventListener listener) => _singleEventListeners.Add(listener);
 
         public void RemoveListener(IEventListener listener) => _singleEventListeners.Remove(listener);
+
+        #region UniRx
+#if UNIRX
+        private ObservableHelper<Unit> _observableHelper;
+
+        public IDisposable Subscribe(IObserver<Unit> observer)
+        {
+            _observableHelper ??= new ObservableHelper<Unit>();
+            return _observableHelper.Subscribe(observer);
+        }
+
+        public void Dispose() => _observableHelper?.Dispose();
+#endif
+        #endregion
     }
 }
