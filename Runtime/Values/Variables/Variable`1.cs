@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using GenericUnityObjects;
-    using UniRx;
     using UnityEngine;
     using Object = UnityEngine.Object;
+
+#if UNIRX
+    using UniRx;
+#endif
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
@@ -24,6 +26,9 @@
         private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
         private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
         private List<Action<T>> _responses = new List<Action<T>>();
+
+        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
+        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
 
         public T Value
         {
@@ -43,6 +48,8 @@
                 .Concat(_listeners)
                 .OfType<Object>()
                 .ToList();
+
+        public void SetValueAndForceNotify(T value) => SetValue(value);
 
         public void AddListener(ScriptableEventListener<T> listener) => _listeners.Add(listener);
 
@@ -185,10 +192,7 @@
 
         #region UniRx
 #if UNIRX
-        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
-        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
-
-        private bool _isDisposed;
+        private bool _disposed;
         private ObserverNode<T> _root;
         private ObserverNode<T> _last;
 
@@ -196,7 +200,7 @@
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            if (_isDisposed)
+            if (_disposed)
             {
                 observer.OnCompleted();
                 return Disposable.Empty;
@@ -222,8 +226,6 @@
             return next;
         }
 
-        public void SetValueAndForceNotify(T value) => SetValue(value);
-
         void IObserverLinkedList<T>.UnsubscribeNode(ObserverNode<T> node)
         {
             if (node == _root)
@@ -239,12 +241,12 @@
                 node.Next.Previous = node.Previous;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            if (_isDisposed)
+            if (_disposed)
                 return;
 
-            _isDisposed = true;
+            _disposed = true;
 
             var node = _root;
             _root = _last = null;
@@ -256,9 +258,9 @@
             }
         }
 
-        protected void RaiseOnNext()
+        protected virtual void RaiseOnNext()
         {
-            if (_isDisposed)
+            if (_disposed)
                 return;
 
             var node = _root;

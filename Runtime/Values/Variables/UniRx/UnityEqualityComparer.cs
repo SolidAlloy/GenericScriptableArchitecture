@@ -1,5 +1,4 @@
-﻿#if UNIRX
-namespace GenericScriptableArchitecture
+﻿namespace GenericScriptableArchitecture
 {
     using System;
     using System.Collections.Generic;
@@ -7,41 +6,63 @@ namespace GenericScriptableArchitecture
 
     internal static class UnityEqualityComparer
     {
-        public static readonly IEqualityComparer<Vector2> Vector2 = new Vector2EqualityComparer();
-        public static readonly IEqualityComparer<Vector3> Vector3 = new Vector3EqualityComparer();
-        public static readonly IEqualityComparer<Vector4> Vector4 = new Vector4EqualityComparer();
-        public static readonly IEqualityComparer<Color> Color = new ColorEqualityComparer();
-        public static readonly IEqualityComparer<Color32> Color32 = new Color32EqualityComparer();
-        public static readonly IEqualityComparer<Rect> Rect = new RectEqualityComparer();
-        public static readonly IEqualityComparer<Bounds> Bounds = new BoundsEqualityComparer();
-        public static readonly IEqualityComparer<Quaternion> Quaternion = new QuaternionEqualityComparer();
+        private static readonly IEqualityComparer<Vector2> _vector2 = new Vector2EqualityComparer();
+        private static readonly IEqualityComparer<Vector3> _vector3 = new Vector3EqualityComparer();
+        private static readonly IEqualityComparer<Vector4> _vector4 = new Vector4EqualityComparer();
+        private static readonly IEqualityComparer<Color> _color = new ColorEqualityComparer();
+        private static readonly IEqualityComparer<Color32> _color32 = new Color32EqualityComparer();
+        private static readonly IEqualityComparer<Rect> _rect = new RectEqualityComparer();
+        private static readonly IEqualityComparer<Bounds> _bounds = new BoundsEqualityComparer();
+        private static readonly IEqualityComparer<Quaternion> _quaternion = new QuaternionEqualityComparer();
 
-        static readonly RuntimeTypeHandle vector2Type = typeof(Vector2).TypeHandle;
-        static readonly RuntimeTypeHandle vector3Type = typeof(Vector3).TypeHandle;
-        static readonly RuntimeTypeHandle vector4Type = typeof(Vector4).TypeHandle;
-        static readonly RuntimeTypeHandle colorType = typeof(Color).TypeHandle;
-        static readonly RuntimeTypeHandle color32Type = typeof(Color32).TypeHandle;
-        static readonly RuntimeTypeHandle rectType = typeof(Rect).TypeHandle;
-        static readonly RuntimeTypeHandle boundsType = typeof(Bounds).TypeHandle;
-        static readonly RuntimeTypeHandle quaternionType = typeof(Quaternion).TypeHandle;
+        private static readonly RuntimeTypeHandle _vector2Type = typeof(Vector2).TypeHandle;
+        private static readonly RuntimeTypeHandle _vector3Type = typeof(Vector3).TypeHandle;
+        private static readonly RuntimeTypeHandle _vector4Type = typeof(Vector4).TypeHandle;
+        private static readonly RuntimeTypeHandle _colorType = typeof(Color).TypeHandle;
+        private static readonly RuntimeTypeHandle _color32Type = typeof(Color32).TypeHandle;
+        private static readonly RuntimeTypeHandle _rectType = typeof(Rect).TypeHandle;
+        private static readonly RuntimeTypeHandle _boundsType = typeof(Bounds).TypeHandle;
+        private static readonly RuntimeTypeHandle _quaternionType = typeof(Quaternion).TypeHandle;
 
-#if UNITY_2017_2_OR_NEWER
+        private static readonly IEqualityComparer<Vector2Int> _vector2Int = new Vector2IntEqualityComparer();
+        private static readonly IEqualityComparer<Vector3Int> _vector3Int = new Vector3IntEqualityComparer();
+        private static readonly IEqualityComparer<RangeInt> _rangeInt = new RangeIntEqualityComparer();
+        private static readonly IEqualityComparer<RectInt> _rectInt = new RectIntEqualityComparer();
+        private static readonly IEqualityComparer<BoundsInt> _boundsInt = new BoundsIntEqualityComparer();
 
-        public static readonly IEqualityComparer<Vector2Int> Vector2Int = new Vector2IntEqualityComparer();
-        public static readonly IEqualityComparer<Vector3Int> Vector3Int = new Vector3IntEqualityComparer();
-        public static readonly IEqualityComparer<RangeInt> RangeInt = new RangeIntEqualityComparer();
-        public static readonly IEqualityComparer<RectInt> RectInt = new RectIntEqualityComparer();
-        public static readonly IEqualityComparer<BoundsInt> BoundsInt = new BoundsIntEqualityComparer();
+        private static readonly RuntimeTypeHandle _vector2IntType = typeof(Vector2Int).TypeHandle;
+        private static readonly RuntimeTypeHandle _vector3IntType = typeof(Vector3Int).TypeHandle;
+        private static readonly RuntimeTypeHandle _rangeIntType = typeof(RangeInt).TypeHandle;
+        private static readonly RuntimeTypeHandle _rectIntType = typeof(RectInt).TypeHandle;
+        private static readonly RuntimeTypeHandle _boundsIntType = typeof(BoundsInt).TypeHandle;
 
-        static readonly RuntimeTypeHandle vector2IntType = typeof(Vector2Int).TypeHandle;
-        static readonly RuntimeTypeHandle vector3IntType = typeof(Vector3Int).TypeHandle;
-        static readonly RuntimeTypeHandle rangeIntType = typeof(RangeInt).TypeHandle;
-        static readonly RuntimeTypeHandle rectIntType = typeof(RectInt).TypeHandle;
-        static readonly RuntimeTypeHandle boundsIntType = typeof(BoundsInt).TypeHandle;
+        public static IEqualityComparer<T> GetDefault<T>()
+        {
+            return Cache<T>.Comparer;
+        }
 
-#endif
+        private static object GetDefaultHelper(Type type)
+        {
+            var t = type.TypeHandle;
 
-        static class Cache<T>
+            if (t.Equals(_vector2Type)) return _vector2;
+            if (t.Equals(_vector3Type)) return _vector3;
+            if (t.Equals(_vector4Type)) return _vector4;
+            if (t.Equals(_colorType)) return _color;
+            if (t.Equals(_color32Type)) return _color32;
+            if (t.Equals(_rectType)) return _rect;
+            if (t.Equals(_boundsType)) return _bounds;
+            if (t.Equals(_quaternionType)) return _quaternion;
+            if (t.Equals(_vector2IntType)) return _vector2Int;
+            if (t.Equals(_vector3IntType)) return _vector3Int;
+            if (t.Equals(_rangeIntType)) return _rangeInt;
+            if (t.Equals(_rectIntType)) return _rectInt;
+            if (t.Equals(_boundsIntType)) return _boundsInt;
+
+            return null;
+        }
+
+        private static class Cache<T>
         {
             public static readonly IEqualityComparer<T> Comparer;
 
@@ -59,37 +80,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        public static IEqualityComparer<T> GetDefault<T>()
-        {
-            return Cache<T>.Comparer;
-        }
-
-        static object GetDefaultHelper(Type type)
-        {
-            var t = type.TypeHandle;
-
-            if (t.Equals(vector2Type)) return Vector2;
-            if (t.Equals(vector3Type)) return Vector3;
-            if (t.Equals(vector4Type)) return Vector4;
-            if (t.Equals(colorType)) return Color;
-            if (t.Equals(color32Type)) return Color32;
-            if (t.Equals(rectType)) return Rect;
-            if (t.Equals(boundsType)) return Bounds;
-            if (t.Equals(quaternionType)) return Quaternion;
-
-#if UNITY_2017_2_OR_NEWER
-
-            if (t.Equals(vector2IntType)) return Vector2Int;
-            if (t.Equals(vector3IntType)) return Vector3Int;
-            if (t.Equals(rangeIntType)) return RangeInt;
-            if (t.Equals(rectIntType)) return RectInt;
-            if (t.Equals(boundsIntType)) return BoundsInt;
-#endif
-
-            return null;
-        }
-
-        sealed class Vector2EqualityComparer : IEqualityComparer<Vector2>
+        private sealed class Vector2EqualityComparer : IEqualityComparer<Vector2>
         {
             public bool Equals(Vector2 self, Vector2 vector)
             {
@@ -102,7 +93,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class Vector3EqualityComparer : IEqualityComparer<Vector3>
+        private sealed class Vector3EqualityComparer : IEqualityComparer<Vector3>
         {
             public bool Equals(Vector3 self, Vector3 vector)
             {
@@ -115,7 +106,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class Vector4EqualityComparer : IEqualityComparer<Vector4>
+        private sealed class Vector4EqualityComparer : IEqualityComparer<Vector4>
         {
             public bool Equals(Vector4 self, Vector4 vector)
             {
@@ -128,7 +119,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class ColorEqualityComparer : IEqualityComparer<Color>
+        private sealed class ColorEqualityComparer : IEqualityComparer<Color>
         {
             public bool Equals(Color self, Color other)
             {
@@ -141,7 +132,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class RectEqualityComparer : IEqualityComparer<Rect>
+        private sealed class RectEqualityComparer : IEqualityComparer<Rect>
         {
             public bool Equals(Rect self, Rect other)
             {
@@ -154,7 +145,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class BoundsEqualityComparer : IEqualityComparer<Bounds>
+        private sealed class BoundsEqualityComparer : IEqualityComparer<Bounds>
         {
             public bool Equals(Bounds self, Bounds vector)
             {
@@ -167,7 +158,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class QuaternionEqualityComparer : IEqualityComparer<Quaternion>
+        private sealed class QuaternionEqualityComparer : IEqualityComparer<Quaternion>
         {
             public bool Equals(Quaternion self, Quaternion vector)
             {
@@ -180,7 +171,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class Color32EqualityComparer : IEqualityComparer<Color32>
+        private sealed class Color32EqualityComparer : IEqualityComparer<Color32>
         {
             public bool Equals(Color32 self, Color32 vector)
             {
@@ -193,7 +184,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class Vector2IntEqualityComparer : IEqualityComparer<Vector2Int>
+        private sealed class Vector2IntEqualityComparer : IEqualityComparer<Vector2Int>
         {
             public bool Equals(Vector2Int self, Vector2Int vector)
             {
@@ -206,7 +197,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class Vector3IntEqualityComparer : IEqualityComparer<Vector3Int>
+        private sealed class Vector3IntEqualityComparer : IEqualityComparer<Vector3Int>
         {
             public static readonly Vector3IntEqualityComparer Default = new Vector3IntEqualityComparer();
 
@@ -221,7 +212,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class RangeIntEqualityComparer : IEqualityComparer<RangeInt>
+        private sealed class RangeIntEqualityComparer : IEqualityComparer<RangeInt>
         {
             public bool Equals(RangeInt self, RangeInt vector)
             {
@@ -234,7 +225,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class RectIntEqualityComparer : IEqualityComparer<RectInt>
+        private sealed class RectIntEqualityComparer : IEqualityComparer<RectInt>
         {
             public bool Equals(RectInt self, RectInt other)
             {
@@ -247,7 +238,7 @@ namespace GenericScriptableArchitecture
             }
         }
 
-        sealed class BoundsIntEqualityComparer : IEqualityComparer<BoundsInt>
+        private sealed class BoundsIntEqualityComparer : IEqualityComparer<BoundsInt>
         {
             public bool Equals(BoundsInt self, BoundsInt vector)
             {
@@ -262,4 +253,3 @@ namespace GenericScriptableArchitecture
         }
     }
 }
-#endif
