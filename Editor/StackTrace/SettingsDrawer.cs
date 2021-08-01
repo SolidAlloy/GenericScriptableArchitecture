@@ -15,7 +15,7 @@
         [SettingsProvider]
         public static SettingsProvider CreateSettingsProvider()
         {
-            return new SettingsProvider("Project Settings/Generic ScriptableObject Architecture", SettingsScope.Project)
+            return new SettingsProvider("Project/Generic ScriptableObject Architecture", SettingsScope.Project)
             {
                 guiHandler = OnGUI,
                 keywords = GetKeywords()

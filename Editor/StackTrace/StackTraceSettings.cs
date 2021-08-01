@@ -1,6 +1,5 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
-    using UnityEditor;
     using UnityEditor.SettingsManagement;
 
     internal static class StackTraceSettings
@@ -29,7 +28,7 @@
 
             _instance = new Settings(PackageName);
 
-            _enabledInProject = new UserSetting<bool>(_instance, nameof(_enabledInProject), false, SettingsScope.User);
+            _enabledInProject = new UserSetting<bool>(_instance, nameof(_enabledInProject), false);
         }
     }
 }
