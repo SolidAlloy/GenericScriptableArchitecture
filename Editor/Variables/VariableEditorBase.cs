@@ -10,8 +10,8 @@
 
     internal abstract class VariableEditorBase : GenericHeaderEditor
     {
-        protected bool WithHistory;
-        protected BaseVariable VariableBase;
+        protected bool _withHistory;
+        protected BaseVariable _baseVariable;
 
         private static readonly GUIContent _currentValueLabel = new GUIContent("Current Value");
 
@@ -32,9 +32,8 @@
         protected virtual void OnEnable()
         {
             // Can be null because we also use the editor for drawing Constant<T>
-            VariableBase = target as BaseVariable;
-
-            WithHistory = IsTargetWithHistory();
+            _baseVariable = target as BaseVariable;
+            _withHistory = IsTargetWithHistory();
 
             try
             {
@@ -53,7 +52,7 @@
         {
             var baseType = target.GetType().BaseType;
 
-            if (baseType is {IsGenericType: true})
+            if (baseType is { IsGenericType: true })
                 return baseType.GetGenericTypeDefinition() == typeof(VariableWithHistory<>);
 
             return false;
@@ -69,7 +68,7 @@
 
         private void GetPreviousValueField()
         {
-            if ( ! WithHistory)
+            if ( ! _withHistory)
                 return;
 
             const string previousValueFieldName = nameof(VariableWithHistory<int>._previousValue);
@@ -95,20 +94,19 @@
             ExitGUIOnEnterPress();
 
             bool changeAppliedToProperty;
+            bool previousExpandValue = _value.isExpanded;
 
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                using (new EditorGUI.DisabledScope(ApplicationUtil.InEditMode))
-                {
-                    EditorGUILayout.PropertyField(_value, _currentValueLabel);
-                }
+                EditorGUILayout.PropertyField(_value, _currentValueLabel);
 
                 // Must be called after PropertyField and before changeCheck.changed
                 changeAppliedToProperty = IsChangeAppliedToProperty();
 
-                if (changeCheck.changed)
+                // Do not count toggling foldout as a change.
+                if (changeCheck.changed && previousExpandValue == _value.isExpanded)
                 {
-                    if ( ! _changeCheckPassedPreviously && WithHistory)
+                    if ( ! _changeCheckPassedPreviously && _withHistory)
                     {
                         _previousValueObject = _valueField.GetValue(target).DeepCopy();
                     }
@@ -123,7 +121,7 @@
 
         private void ApplyChangeToVariable()
         {
-            if (WithHistory)
+            if (_withHistory)
             {
                 ChangePreviousValue();
             }
@@ -133,7 +131,7 @@
             }
 
             // ReSharper disable once Unity.NoNullPropagation
-            VariableBase?.InvokeValueChangedEvents();
+            _baseVariable?.InvokeValueChangedEvents();
         }
 
         private bool IsChangeAppliedToProperty()
@@ -164,14 +162,14 @@
 
         private void ChangePreviousValue()
         {
-            // Get previous value before applying the change
-            // object previousValue = _valueField.GetValue(target).DeepCopy();
-
             // Apply the changed value so that it is not lost.
             serializedObject.ApplyModifiedProperties();
 
             // Set the previousValue
             _previousValueField.SetValue(target, _previousValueObject);
+
+            // Set "HasPreviousValue" to true because it might still be false and is not set automatically.
+            _baseVariable.HasPreviousValueInternal = true;
 
             // Load the previous value to serialized object so that it is updated in the inspector
             serializedObject.Update();
@@ -207,11 +205,18 @@
 
         protected void DrawPreviousValue()
         {
-            if ( ! WithHistory)
+            if ( ! _withHistory)
                 return;
 
-            using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.PropertyField(_previousValue);
+            if (_baseVariable.HasPreviousValueInternal)
+            {
+                using (new EditorGUI.DisabledScope(true))
+                    EditorGUILayout.PropertyField(_previousValue);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Previous Value", "Not set yet.");
+            }
         }
     }
 }

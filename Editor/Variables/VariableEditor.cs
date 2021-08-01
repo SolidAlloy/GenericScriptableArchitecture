@@ -1,7 +1,7 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using UnityEditor;
-    using UnityEngine;
+    using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseVariable), true)]
     internal class VariableEditor : VariableEditorBase, IRepaintable
@@ -18,27 +18,22 @@
 
             InitializeListeners();
 
-            if (WithHistory)
+            if (_withHistory)
                 InitializeListenersWithHistory();
 
-            _stackTrace = new StackTraceDrawer(VariableBase, this);
+            _stackTrace = new StackTraceDrawer(_baseVariable, this);
         }
 
         private void InitializeListeners()
         {
             var expanded = serializedObject.FindProperty(nameof(Variable<bool>.ListenersExpanded));
-
-            _listeners = new FoldoutList<Object>(VariableBase.Listeners,
-                expanded, "Listeners For Value Change");
+            _listeners = new FoldoutList<Object>(_baseVariable.Listeners, expanded, "Listeners For Value Change");
         }
 
         private void InitializeListenersWithHistory()
         {
-            var expanded = serializedObject.FindProperty(
-                nameof(VariableWithHistory<bool>.ListenersWithHistoryExpanded));
-
-            _listenersWithHistory = new FoldoutList<Object>(VariableBase.ListenersWithHistory,
-                expanded, "Listeners For Value Change With History");
+            var expanded = serializedObject.FindProperty(nameof(VariableWithHistory<bool>.ListenersWithHistoryExpanded));
+            _listenersWithHistory = new FoldoutList<Object>(_baseVariable.ListenersWithHistory, expanded, "Listeners For Value Change With History");
         }
 
         protected override void DrawFields()
@@ -46,8 +41,12 @@
             EditorGUILayout.PropertyField(_description);
 
             DrawInitialValue();
-            DrawCurrentValue();
-            DrawPreviousValue();
+
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                DrawCurrentValue();
+                DrawPreviousValue();
+            }
 
             _stackTrace.Draw();
 

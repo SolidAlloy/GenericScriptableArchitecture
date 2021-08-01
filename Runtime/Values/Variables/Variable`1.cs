@@ -18,6 +18,9 @@
         , IReactiveProperty<T>, IDisposable, IObserverLinkedList<T>
 #endif
     {
+        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
+        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
+
         [SerializeField] internal T _initialValue;
         [SerializeField] internal T _value;
         [SerializeField] internal bool ListenersExpanded;
@@ -26,9 +29,6 @@
         private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
         private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
         private List<Action<T>> _responses = new List<Action<T>>();
-
-        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
-        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
 
         public T Value
         {

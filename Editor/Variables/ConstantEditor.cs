@@ -18,7 +18,9 @@
             EditorGUILayout.PropertyField(_description);
 
             DrawInitialValue();
-            DrawCurrentValue();
+
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                DrawCurrentValue();
         }
     }
 }

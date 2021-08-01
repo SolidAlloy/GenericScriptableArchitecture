@@ -16,6 +16,10 @@
 
         private static readonly List<Object> _emptyObjectList = new List<Object>();
 
+        // It is used only in VariableWithHistory, but since VariableWithHistory is generic, custom editor can't access it,
+        // so we have to keep it here in the non-generic class.
+        internal bool HasPreviousValueInternal { get; set; }
+
         bool IStackTraceProvider.Enabled
         {
             get => _stackTraceEnabled;

@@ -28,6 +28,8 @@
         private List<IEventListener<T, T>> _singleEventListeners = new List<IEventListener<T, T>>();
         private List<Action<T, T>> _responses = new List<Action<T, T>>();
 
+        public bool HasPreviousValue => HasPreviousValueInternal;
+
         [PublicAPI]
         public T PreviousValue => _previousValue;
 
@@ -56,18 +58,19 @@
 
         public void RemoveResponse(Action<T, T> response) => _responses.Remove(response);
 
-        protected override void InitializeValues()
-        {
-            base.InitializeValues();
-            _previousValue = _initialValue.DeepCopyInEditor();
-        }
-
         protected override void SetValue(T value)
         {
+            HasPreviousValueInternal = true;
             _previousValue = _value;
             _value = value;
             AddStackTrace(_previousValue, _value);
             InvokeValueChangedEvents();
+        }
+
+        protected override void InitializeValues()
+        {
+            base.InitializeValues();
+            HasPreviousValueInternal = false;
         }
 
         internal override void InvokeValueChangedEvents()
@@ -107,7 +110,7 @@
         private ObserverNode<(T, T)> _root;
         private ObserverNode<(T, T)> _last;
 
-        bool IReadOnlyReactivePropertyWithHistory<T>.HasValue => true;
+        bool IReadOnlyReactivePropertyWithHistory<T>.HasValue => HasPreviousValue;
 
         public IDisposable Subscribe(Action<T, T> onNext)
         {
@@ -138,7 +141,8 @@
             }
 
             // raise latest value on subscribe
-            observer.OnNext((_previousValue, _value));
+            if (HasPreviousValue)
+                observer.OnNext((_previousValue, _value));
 
             // subscribe node, node as subscription.
             var next = new ObserverNode<(T, T)>(this, observer);
