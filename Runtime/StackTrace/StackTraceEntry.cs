@@ -1,22 +1,29 @@
 ﻿namespace GenericScriptableArchitecture
 {
+#if UNITY_EDITOR
     using System;
     using System.Linq;
     using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
+    using SolidUtilities.Helpers.Editor;
     using UnityEngine;
+#endif
 
-    public class StackTraceEntry : IEquatable<StackTraceEntry>
+    public class StackTraceEntry
+#if UNITY_EDITOR
+        : IEquatable<StackTraceEntry>
+#endif
     {
+#if UNITY_EDITOR
         private readonly int _id;
         private readonly int _frameCount;
         private readonly string _stackTrace;
         private readonly object[] _values;
 
         private string _stringRepresentation;
-
+#endif
         public StackTraceEntry(params object[] values)
         {
+#if UNITY_EDITOR
             _id = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
             _stackTrace = Environment.StackTrace;
             _values = values;
@@ -25,8 +32,10 @@
             {
                 _frameCount = Time.frameCount;
             }
+#endif
         }
 
+#if UNITY_EDITOR
         public override bool Equals(object obj) => Equals(obj as StackTraceEntry);
 
         public bool Equals(StackTraceEntry other)
@@ -85,5 +94,6 @@
         }
 
         public static implicit operator string(StackTraceEntry trace) => trace.ToString();
+#endif
     }
 }

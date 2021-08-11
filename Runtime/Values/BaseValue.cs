@@ -11,9 +11,11 @@
 
     public abstract class BaseValue : GenericScriptableObject
     {
+#if UNITY_EDITOR
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
         private bool _subscribedToPlayMode;
+#endif
 
         protected virtual void OnEnable()
         {
@@ -33,6 +35,7 @@
                 InitializeValues();
         }
 
+#if UNITY_EDITOR
         private void OnDisable()
         {
             if ( ! _subscribedToPlayMode)
@@ -47,6 +50,7 @@
             if (stateChange == PlayModeStateChange.ExitingEditMode)
                 InitializeValues();
         }
+#endif
 
         protected abstract void InitializeValues();
     }
