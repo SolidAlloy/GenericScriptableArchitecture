@@ -63,6 +63,8 @@
 #endif
         }
 
+        #region Adding Removing Listeners
+
         public void AddListener(ScriptableEventListener listener) => _listeners.Add(listener);
 
         public void RemoveListener(ScriptableEventListener listener) => _listeners.Remove(listener);
@@ -79,6 +81,8 @@
 
         public void RemoveListener(IEventListener listener) => _singleEventListeners.Remove(listener);
 
+        #endregion
+
         #region UniRx
 #if UNIRX
         private ObservableHelper<Unit> _observableHelper;
@@ -91,6 +95,22 @@
 
         public void Dispose() => _observableHelper?.Dispose();
 #endif
+        #endregion
+
+        #region Operator Overloads
+
+        public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, Action response)
+        {
+            scriptableEvent.AddResponse(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, Action response)
+        {
+            scriptableEvent.RemoveResponse(response);
+            return scriptableEvent;
+        }
+
         #endregion
     }
 }
