@@ -11,5 +11,17 @@
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
         internal abstract List<Object> List { get; }
+
+        internal abstract List<Object> AddListeners { get; }
+
+        internal abstract List<Object> CountChangeListeners { get; }
+
+        internal abstract List<Object> MoveListeners { get; }
+
+        internal abstract List<Object> RemoveListeners { get; }
+
+        internal abstract List<Object> ReplaceListeners { get; }
+
+        internal abstract List<Object> ResetListeners { get; }
     }
 }
