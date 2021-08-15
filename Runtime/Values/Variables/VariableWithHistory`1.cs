@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using GenericUnityObjects;
     using JetBrains.Annotations;
+    using SolidUtilities.Helpers;
     using UnityEngine;
 
     using Object = UnityEngine.Object;
@@ -25,7 +26,7 @@
         [PublicAPI]
         public T PreviousValue => _previousValue;
 
-        internal override List<Object> ListenersWithHistory => _eventHelper.Listeners;
+        internal override List<Object> ListenersWithHistory => _eventHelper?.Listeners ?? ListHelper.Empty<Object>();
 
         protected override void OnEnable()
         {
