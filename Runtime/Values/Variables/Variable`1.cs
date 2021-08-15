@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using GenericUnityObjects;
+    using SolidUtilities.Helpers;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -36,7 +37,7 @@
             }
         }
 
-        internal override List<Object> Listeners => _eventHelper.Listeners;
+        internal override List<Object> Listeners => _eventHelper?.Listeners ?? ListHelper.Empty<Object>();
 
         protected override void OnEnable()
         {

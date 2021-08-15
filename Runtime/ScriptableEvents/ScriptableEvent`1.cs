@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using EasyButtons;
     using GenericUnityObjects;
+    using SolidUtilities.Helpers;
 
     [Serializable]
     [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T>")]
@@ -14,7 +15,7 @@
     {
         private EventHelper<T> _eventHelper;
 
-        internal override List<UnityEngine.Object> Listeners => _eventHelper.Listeners;
+        internal override List<UnityEngine.Object> Listeners => _eventHelper?.Listeners ?? ListHelper.Empty<UnityEngine.Object>();
 
         private void OnEnable() => _eventHelper = new EventHelper<T>(this);
 
