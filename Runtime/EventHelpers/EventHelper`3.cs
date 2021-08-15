@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SolidUtilities.Extensions;
     using Object = UnityEngine.Object;
 
     public class EventHelper<T1, T2, T3> : IEventHelper<T1, T2, T3>, IDisposable
@@ -32,15 +33,15 @@
 
         public void RemoveListener(ScriptableEventListener<T1, T2, T3> listener) => _scriptableEvents.Remove(listener);
 
-        public void AddListener(IEventListener<T1, T2, T3> listener) => _singleEventListeners.Add(listener);
+        public void AddListener(IEventListener<T1, T2, T3> listener) => _singleEventListeners.AddIfMissing(listener);
 
         public void RemoveListener(IEventListener<T1, T2, T3> listener) => _singleEventListeners.Remove(listener);
 
-        public void AddListener(IMultipleEventsListener<T1, T2, T3> listener) => _multipleEventsListeners.Add(listener);
+        public void AddListener(IMultipleEventsListener<T1, T2, T3> listener) => _multipleEventsListeners.AddIfMissing(listener);
 
         public void RemoveListener(IMultipleEventsListener<T1, T2, T3> listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action<T1, T2, T3> response) => _responses.Add(response);
+        public void AddResponse(Action<T1, T2, T3> response) => _responses.AddIfMissing(response);
 
         public void RemoveResponse(Action<T1, T2, T3> response) => _responses.Remove(response);
 

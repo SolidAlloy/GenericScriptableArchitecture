@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SolidUtilities.Extensions;
     using UniRx;
     using Object = UnityEngine.Object;
 
@@ -33,15 +34,15 @@
 
         public void RemoveListener(ScriptableEventListener<T> listener) => _scriptableListeners.Remove(listener);
 
-        public void AddListener(IEventListener<T> listener) => _singleEventListeners.Add(listener);
+        public void AddListener(IEventListener<T> listener) => _singleEventListeners.AddIfMissing(listener);
 
         public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
 
-        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Add(listener);
+        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.AddIfMissing(listener);
 
         public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action<T> response) => _responses.Add(response);
+        public void AddResponse(Action<T> response) => _responses.AddIfMissing(response);
 
         public void RemoveResponse(Action<T> response) => _responses.Remove(response);
 

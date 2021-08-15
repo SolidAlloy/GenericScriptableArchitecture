@@ -59,6 +59,9 @@
 
         public void AddListener(IEventListener<T, T> listener, bool notifyCurrentValue = false)
         {
+            if (_singleEventListeners.Contains(listener))
+                return;
+
             _singleEventListeners.Add(listener);
 
             if (notifyCurrentValue && _hasPreviousValue())
@@ -71,6 +74,9 @@
 
         public void AddListener(IMultipleEventsListener<T, T> listener, bool notifyCurrentValue = false)
         {
+            if (_multipleEventsListeners.Contains(listener))
+                return;
+
             _multipleEventsListeners.Add(listener);
 
             if (notifyCurrentValue && _hasPreviousValue())
@@ -83,6 +89,9 @@
 
         public void AddResponse(Action<T, T> response, bool notifyCurrentValue = false)
         {
+            if (_responses.Contains(response))
+                return;
+
             _responses.Add(response);
 
             if (notifyCurrentValue && _hasPreviousValue())
