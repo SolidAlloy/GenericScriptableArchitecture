@@ -2,21 +2,21 @@
 {
     public interface IEventListener
     {
-        public void OnEventRaised();
+        public void OnEventInvoked();
     }
 
-    public interface IEventListener<T>
+    public interface IEventListener<in T>
     {
-        public void OnEventRaised(T argument);
+        public void OnEventInvoked(T argument);
     }
 
-    public interface IEventListener<T1, T2>
+    public interface IEventListener<in T1, in T2>
     {
-        public void OnEventRaised(T1 arg0, T2 arg1);
+        public void OnEventInvoked(T1 arg0, T2 arg1);
     }
 
-    public interface IEventListener<T1, T2, T3>
+    public interface IEventListener<in T1, in T2, in T3>
     {
-        public void OnEventRaised(T1 arg0, T2 arg1, T3 arg2);
+        public void OnEventInvoked(T1 arg0, T2 arg1, T3 arg2);
     }
 }

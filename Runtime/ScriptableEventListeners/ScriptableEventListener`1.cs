@@ -14,7 +14,7 @@
 
         protected virtual void OnDisable() => _event?.RemoveListener(this);
 
-        public void OnEventRaised(T arg0)
+        public void OnEventInvoked(T arg0)
         {
             if ( ! CanBeInvoked())
                 return;

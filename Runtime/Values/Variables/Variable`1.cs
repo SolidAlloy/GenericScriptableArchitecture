@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using GenericUnityObjects;
     using UnityEngine;
     using Object = UnityEngine.Object;
@@ -15,7 +14,7 @@
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
     public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>, IEvent<T>
 #if UNIRX
-        , IReactiveProperty<T>, IDisposable, IObserverLinkedList<T>
+        , IReactiveProperty<T>
 #endif
     {
         public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
@@ -25,10 +24,7 @@
         [SerializeField] internal T _value;
         [SerializeField] internal bool ListenersExpanded;
 
-        private List<ScriptableEventListener<T>> _listeners = new List<ScriptableEventListener<T>>();
-        private List<IMultipleEventsListener<T>> _multipleEventsListeners = new List<IMultipleEventsListener<T>>();
-        private List<IEventListener<T>> _singleEventListeners = new List<IEventListener<T>>();
-        private List<Action<T>> _responses = new List<Action<T>>();
+        private EventHelperWithDefaultValue<T> _eventHelper;
 
         public T Value
         {
@@ -40,32 +36,41 @@
             }
         }
 
-        internal override List<Object> Listeners
-            => _responses
-                .Select(response => response.Target)
-                .Concat(_singleEventListeners)
-                .Concat(_multipleEventsListeners)
-                .Concat(_listeners)
-                .OfType<Object>()
-                .ToList();
+        internal override List<Object> Listeners => _eventHelper.Listeners;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _eventHelper = new EventHelperWithDefaultValue<T>(this, () => _value);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            _eventHelper.Dispose();
+        }
 
         public void SetValueAndForceNotify(T value) => SetValue(value);
 
-        public void AddListener(ScriptableEventListener<T> listener) => _listeners.Add(listener);
+        #region Adding Removing Listeners
 
-        public void RemoveListener(ScriptableEventListener<T> listener) => _listeners.Remove(listener);
+        public void AddListener(ScriptableEventListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Add(listener);
+        public void RemoveListener(ScriptableEventListener<T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
+        public void AddListener(IEventListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void AddListener(IEventListener<T> listener) => _singleEventListeners.Add(listener);
+        public void RemoveListener(IEventListener<T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
+        public void AddListener(IMultipleEventsListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void AddResponse(Action<T> response) => _responses.Add(response);
+        public void RemoveListener(IMultipleEventsListener<T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void RemoveResponse(Action<T> response) => _responses.Remove(response);
+        public void AddResponse(Action<T> response, bool notifyCurrentValue = false) => _eventHelper.AddResponse(response, notifyCurrentValue);
+
+        public void RemoveResponse(Action<T> response) => _eventHelper.RemoveResponse(response);
+
+        #endregion
 
         protected override void InitializeValues()
         {
@@ -84,30 +89,10 @@
             if ( ! CanBeInvoked())
                 return;
 
-            for (int i = _listeners.Count - 1; i != -1; i--)
-            {
-                _listeners[i].OnEventRaised(_value);
-            }
-
-            for (int i = _responses.Count - 1; i != -1; i--)
-            {
-                _responses[i].Invoke(_value);
-            }
-
-            for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
-            {
-                _multipleEventsListeners[i].OnEventRaised(this, _value);
-            }
-
-            for (int i = _singleEventListeners.Count - 1; i != -1; i--)
-            {
-                _singleEventListeners[i].OnEventRaised(_value);
-            }
-
-#if UNIRX
-            RaiseOnNext();
-#endif
+            _eventHelper.NotifyListeners(_value);
         }
+
+        #region Operator Overloads
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
 
@@ -190,87 +175,60 @@
             return ! (lhs == rhs);
         }
 
-        #region UniRx
-#if UNIRX
-        private bool _disposed;
-        private ObserverNode<T> _root;
-        private ObserverNode<T> _last;
+        public static Variable<T> operator +(Variable<T> variable, Action<T> response)
+        {
+            variable.AddResponse(response);
+            return variable;
+        }
 
+        public static Variable<T> operator -(Variable<T> variable, Action<T> response)
+        {
+            variable.RemoveResponse(response);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, ScriptableEventListener<T> listener)
+        {
+            variable.AddListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator -(Variable<T> variable, ScriptableEventListener<T> listener)
+        {
+            variable.RemoveListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, IEventListener<T> listener)
+        {
+            variable.AddListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator -(Variable<T> variable, IEventListener<T> listener)
+        {
+            variable.RemoveListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, IMultipleEventsListener<T> response)
+        {
+            variable.AddListener(response);
+            return variable;
+        }
+
+        public static Variable<T> operator -(Variable<T> variable, IMultipleEventsListener<T> response)
+        {
+            variable.RemoveListener(response);
+            return variable;
+        }
+
+        #endregion
+
+#if UNIRX
         bool IReadOnlyReactiveProperty<T>.HasValue => true;
 
-        public IDisposable Subscribe(IObserver<T> observer)
-        {
-            if (_disposed)
-            {
-                observer.OnCompleted();
-                return Disposable.Empty;
-            }
-
-            // raise latest value on subscribe
-            observer.OnNext(_value);
-
-            // subscribe node, node as subscription.
-            var next = new ObserverNode<T>(this, observer);
-
-            if (_root == null)
-            {
-                _root = _last = next;
-            }
-            else
-            {
-                _last.Next = next;
-                next.Previous = _last;
-                _last = next;
-            }
-
-            return next;
-        }
-
-        void IObserverLinkedList<T>.UnsubscribeNode(ObserverNode<T> node)
-        {
-            if (node == _root)
-                _root = node.Next;
-
-            if (node == _last)
-                _last = node.Previous;
-
-            if (node.Previous != null)
-                node.Previous.Next = node.Next;
-
-            if (node.Next != null)
-                node.Next.Previous = node.Previous;
-        }
-
-        public virtual void Dispose()
-        {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-
-            var node = _root;
-            _root = _last = null;
-
-            while (node != null)
-            {
-                node.OnCompleted();
-                node = node.Next;
-            }
-        }
-
-        protected virtual void RaiseOnNext()
-        {
-            if (_disposed)
-                return;
-
-            var node = _root;
-            while (node != null)
-            {
-                node.OnNext(_value);
-                node = node.Next;
-            }
-        }
+        public IDisposable Subscribe(IObserver<T> observer) => _eventHelper.Subscribe(observer);
 #endif
-        #endregion
     }
 }

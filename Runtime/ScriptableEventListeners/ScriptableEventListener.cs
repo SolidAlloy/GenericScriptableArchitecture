@@ -22,7 +22,7 @@
                 _event.RemoveListener(this);
         }
 
-        public void OnEventRaised()
+        public void OnEventInvoked()
         {
             if ( ! CanBeInvoked())
                 return;

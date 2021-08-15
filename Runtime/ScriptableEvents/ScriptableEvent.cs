@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using EasyButtons;
     using UnityEngine;
 #if UNIRX
@@ -13,22 +12,12 @@
     [CreateAssetMenu(menuName = Config.PackageName + Config.Events + "ScriptableEvent")]
     public class ScriptableEvent : BaseScriptableEvent, IEvent
 #if UNIRX
-        , IObservable<Unit>, IDisposable
+        , IObservable<Unit>
 #endif
     {
-        private List<ScriptableEventListener> _listeners = new List<ScriptableEventListener>();
-        private List<IMultipleEventsListener> _multipleEventsListeners = new List<IMultipleEventsListener>();
-        private List<IEventListener> _singleEventListeners = new List<IEventListener>();
-        private List<Action> _responses = new List<Action>();
+        private EventHelper _eventHelper;
 
-        internal override List<UnityEngine.Object> Listeners
-            => _responses
-                .Select(response => response.Target)
-                .Concat(_singleEventListeners)
-                .Concat(_multipleEventsListeners)
-                .Concat(_listeners)
-                .OfType<UnityEngine.Object>()
-                .ToList();
+        internal override List<UnityEngine.Object> Listeners => _eventHelper.Listeners;
 
         [Button(Mode = ButtonMode.EnabledInPlayMode)]
         public void Invoke()
@@ -37,65 +26,36 @@
                 return;
 
             AddStackTrace();
-
-            for (int i = _listeners.Count - 1; i != -1; i--)
-            {
-                _listeners[i].OnEventRaised();
-            }
-
-            for (int i = _responses.Count - 1; i != -1; i--)
-            {
-                _responses[i].Invoke();
-            }
-
-            for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
-            {
-                _multipleEventsListeners[i].OnEventRaised(this);
-            }
-
-            for (int i = _singleEventListeners.Count - 1; i != -1; i--)
-            {
-                _singleEventListeners[i].OnEventRaised();
-            }
-
-#if UNIRX
-            _observableHelper?.RaiseOnNext(Unit.Default);
-#endif
+            _eventHelper.NotifyListeners();
         }
+
+        private void OnEnable() => _eventHelper = new EventHelper(this);
+
+        private void OnDisable() => _eventHelper.Dispose();
 
         #region Adding Removing Listeners
 
-        public void AddListener(ScriptableEventListener listener) => _listeners.Add(listener);
+        public void AddListener(ScriptableEventListener listener) => _eventHelper.AddListener(listener);
 
-        public void RemoveListener(ScriptableEventListener listener) => _listeners.Remove(listener);
+        public void RemoveListener(ScriptableEventListener listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddResponse(Action response) => _responses.Add(response);
+        public void AddResponse(Action response) => _eventHelper.AddResponse(response);
 
-        public void RemoveResponse(Action response) => _responses.Remove(response);
+        public void RemoveResponse(Action response) => _eventHelper.RemoveResponse(response);
 
-        public void AddListener(IMultipleEventsListener listener) => _multipleEventsListeners.Add(listener);
+        public void AddListener(IMultipleEventsListener listener) => _eventHelper.AddListener(listener);
 
-        public void RemoveListener(IMultipleEventsListener listener) => _multipleEventsListeners.Remove(listener);
+        public void RemoveListener(IMultipleEventsListener listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddListener(IEventListener listener) => _singleEventListeners.Add(listener);
+        public void AddListener(IEventListener listener) => _eventHelper.AddListener(listener);
 
-        public void RemoveListener(IEventListener listener) => _singleEventListeners.Remove(listener);
+        public void RemoveListener(IEventListener listener) => _eventHelper.RemoveListener(listener);
 
         #endregion
 
-        #region UniRx
 #if UNIRX
-        private ObservableHelper<Unit> _observableHelper;
-
-        public IDisposable Subscribe(IObserver<Unit> observer)
-        {
-            _observableHelper ??= new ObservableHelper<Unit>();
-            return _observableHelper.Subscribe(observer);
-        }
-
-        public void Dispose() => _observableHelper?.Dispose();
+        public IDisposable Subscribe(IObserver<Unit> observer) => _eventHelper.Subscribe(observer);
 #endif
-        #endregion
 
         #region Operator Overloads
 
@@ -108,6 +68,42 @@
         public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, Action response)
         {
             scriptableEvent.RemoveResponse(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, ScriptableEventListener response)
+        {
+            scriptableEvent.AddListener(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, ScriptableEventListener response)
+        {
+            scriptableEvent.RemoveListener(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, IEventListener response)
+        {
+            scriptableEvent.AddListener(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, IEventListener response)
+        {
+            scriptableEvent.RemoveListener(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, IMultipleEventsListener response)
+        {
+            scriptableEvent.AddListener(response);
+            return scriptableEvent;
+        }
+
+        public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, IMultipleEventsListener response)
+        {
+            scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }
 

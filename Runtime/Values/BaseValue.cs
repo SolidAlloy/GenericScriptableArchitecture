@@ -35,16 +35,18 @@
                 InitializeValues();
         }
 
-#if UNITY_EDITOR
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
+#if UNITY_EDITOR
             if ( ! _subscribedToPlayMode)
                 return;
 
             _subscribedToPlayMode = false;
             EditorApplication.playModeStateChanged -= InitializeValues;
+#endif
         }
 
+#if UNITY_EDITOR
         private void InitializeValues(PlayModeStateChange stateChange)
         {
             if (stateChange == PlayModeStateChange.ExitingEditMode)
