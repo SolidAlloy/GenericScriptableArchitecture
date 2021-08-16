@@ -62,48 +62,72 @@
 
         public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, Action response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddResponse(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, Action response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveResponse(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, ScriptableEventListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, ScriptableEventListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, IEventListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, IEventListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator +(ScriptableEvent scriptableEvent, IMultipleEventsListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent operator -(ScriptableEvent scriptableEvent, IMultipleEventsListener response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }

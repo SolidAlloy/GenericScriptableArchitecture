@@ -42,6 +42,9 @@
 
         public void AddListener(ScriptableEventListener<T> listener, bool notifyCurrentValue = false)
         {
+            if (listener == null)
+                return;
+
             _scriptableListeners.Add(listener);
 
             if (notifyCurrentValue)
@@ -54,6 +57,9 @@
 
         public void AddListener(IEventListener<T> listener, bool notifyCurrentValue = false)
         {
+            if (listener == null)
+                return;
+
             if (_singleEventListeners.Contains(listener))
                 return;
 
@@ -69,6 +75,9 @@
 
         public void AddListener(IMultipleEventsListener<T> listener, bool notifyCurrentValue = false)
         {
+            if (listener == null)
+                return;
+
             if (_multipleEventsListeners.Contains(listener))
                 return;
 
@@ -84,6 +93,9 @@
 
         public void AddResponse(Action<T> response, bool notifyCurrentValue = false)
         {
+            if (response == null)
+                return;
+
             if (_responses.Contains(response))
                 return;
 

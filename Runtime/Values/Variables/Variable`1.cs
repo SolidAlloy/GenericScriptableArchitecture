@@ -196,30 +196,45 @@
 
         public static Variable<T> operator -(Variable<T> variable, ScriptableEventListener<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.RemoveListener(listener);
             return variable;
         }
 
         public static Variable<T> operator +(Variable<T> variable, IEventListener<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.AddListener(listener);
             return variable;
         }
 
         public static Variable<T> operator -(Variable<T> variable, IEventListener<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.RemoveListener(listener);
             return variable;
         }
 
         public static Variable<T> operator +(Variable<T> variable, IMultipleEventsListener<T> response)
         {
+            if (variable == null)
+                return null;
+
             variable.AddListener(response);
             return variable;
         }
 
         public static Variable<T> operator -(Variable<T> variable, IMultipleEventsListener<T> response)
         {
+            if (variable == null)
+                return null;
+
             variable.RemoveListener(response);
             return variable;
         }

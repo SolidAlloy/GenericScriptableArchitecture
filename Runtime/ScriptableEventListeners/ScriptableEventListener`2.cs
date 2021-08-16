@@ -12,12 +12,12 @@
 
         protected virtual void OnEnable()
         {
-            _event.AddListener(this);
+            _event?.AddListener(this);
         }
 
         protected virtual void OnDisable()
         {
-            _event.RemoveListener(this);
+            _event?.RemoveListener(this);
         }
 
         public void OnEventInvoked(T1 arg0, T2 arg1)

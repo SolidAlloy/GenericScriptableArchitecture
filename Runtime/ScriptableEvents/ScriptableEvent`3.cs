@@ -58,48 +58,72 @@
 
         public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddResponse(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveResponse(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.AddListener(response);
             return scriptableEvent;
         }
 
         public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> response)
         {
+            if (scriptableEvent == null)
+                return null;
+
             scriptableEvent.RemoveListener(response);
             return scriptableEvent;
         }

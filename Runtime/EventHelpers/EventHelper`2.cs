@@ -29,19 +29,43 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener<T1, T2> listener) => _scriptableEvents.Add(listener);
+        public void AddListener(ScriptableEventListener<T1, T2> listener)
+        {
+            if (listener == null)
+                return;
+
+            _scriptableEvents.Add(listener);
+        }
 
         public void RemoveListener(ScriptableEventListener<T1, T2> listener) => _scriptableEvents.Remove(listener);
 
-        public void AddListener(IEventListener<T1, T2> listener) => _singleEventListeners.AddIfMissing(listener);
+        public void AddListener(IEventListener<T1, T2> listener)
+        {
+            if (listener == null)
+                return;
+
+            _singleEventListeners.AddIfMissing(listener);
+        }
 
         public void RemoveListener(IEventListener<T1, T2> listener) => _singleEventListeners.Remove(listener);
 
-        public void AddListener(IMultipleEventsListener<T1, T2> listener) => _multipleEventsListeners.AddIfMissing(listener);
+        public void AddListener(IMultipleEventsListener<T1, T2> listener)
+        {
+            if (listener == null)
+                return;
+
+            _multipleEventsListeners.AddIfMissing(listener);
+        }
 
         public void RemoveListener(IMultipleEventsListener<T1, T2> listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action<T1, T2> response) => _responses.AddIfMissing(response);
+        public void AddResponse(Action<T1, T2> response)
+        {
+            if (response == null)
+                return;
+
+            _responses.AddIfMissing(response);
+        }
 
         public void RemoveResponse(Action<T1, T2> response) => _responses.Remove(response);
 

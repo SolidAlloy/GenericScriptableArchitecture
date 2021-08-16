@@ -30,19 +30,43 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener<T> listener) => _scriptableListeners.Add(listener);
+        public void AddListener(ScriptableEventListener<T> listener)
+        {
+            if (listener == null)
+                return;
+
+            _scriptableListeners.Add(listener);
+        }
 
         public void RemoveListener(ScriptableEventListener<T> listener) => _scriptableListeners.Remove(listener);
 
-        public void AddListener(IEventListener<T> listener) => _singleEventListeners.AddIfMissing(listener);
+        public void AddListener(IEventListener<T> listener)
+        {
+            if (listener == null)
+                return;
+
+            _singleEventListeners.AddIfMissing(listener);
+        }
 
         public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
 
-        public void AddListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.AddIfMissing(listener);
+        public void AddListener(IMultipleEventsListener<T> listener)
+        {
+            if (listener == null)
+                return;
+
+            _multipleEventsListeners.AddIfMissing(listener);
+        }
 
         public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action<T> response) => _responses.AddIfMissing(response);
+        public void AddResponse(Action<T> response)
+        {
+            if (response == null)
+                return;
+
+            _responses.AddIfMissing(response);
+        }
 
         public void RemoveResponse(Action<T> response) => _responses.Remove(response);
 

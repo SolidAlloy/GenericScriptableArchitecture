@@ -104,48 +104,72 @@
 
         public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, Action<T, T> response)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.AddResponse(response);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, Action<T, T> response)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.RemoveResponse(response);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, ScriptableEventListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.AddListener(listener);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, ScriptableEventListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.RemoveListener(listener);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, IEventListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.AddListener(listener);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, IEventListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.RemoveListener(listener);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, IMultipleEventsListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.AddListener(listener);
             return variableWithHistory;
         }
 
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, IMultipleEventsListener<T, T> listener)
         {
+            if (variableWithHistory == null)
+                return null;
+
             variableWithHistory.RemoveListener(listener);
             return variableWithHistory;
         }
