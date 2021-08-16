@@ -123,7 +123,7 @@
 
             for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
             {
-                _multipleEventsListeners[i].OnEventInvoked(this, value);
+                _multipleEventsListeners[i].OnEventInvoked(_parentEvent ?? this, value);
             }
 
             for (int i = _responses.Count - 1; i != -1; i--)

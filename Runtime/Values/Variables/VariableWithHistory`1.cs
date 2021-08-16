@@ -42,19 +42,19 @@
 
         #region Adding Removing Listeners
 
-        public void AddListener(ScriptableEventListener<T, T> listener, bool notifyCurrentCount = false) => _eventHelper.AddListener(listener, notifyCurrentCount);
+        public void AddListener(ScriptableEventListener<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
         public void RemoveListener(ScriptableEventListener<T, T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddListener(IMultipleEventsListener<T, T> listener, bool notifyCurrentCount = false) => _eventHelper.AddListener(listener, notifyCurrentCount);
+        public void AddListener(IMultipleEventsListener<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
         public void RemoveListener(IMultipleEventsListener<T, T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddListener(IEventListener<T, T> listener, bool notifyCurrentCount = false) => _eventHelper.AddListener(listener, notifyCurrentCount);
+        public void AddListener(IEventListener<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
         public void RemoveListener(IEventListener<T, T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddResponse(Action<T, T> response, bool notifyCurrentCount = false) => _eventHelper.AddResponse(response, notifyCurrentCount);
+        public void AddResponse(Action<T, T> response, bool notifyCurrentValue = false) => _eventHelper.AddResponse(response, notifyCurrentValue);
 
         public void RemoveResponse(Action<T, T> response) => _eventHelper.RemoveResponse(response);
 

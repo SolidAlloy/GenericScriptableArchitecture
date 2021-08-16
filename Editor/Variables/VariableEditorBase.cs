@@ -215,7 +215,7 @@
             }
             else
             {
-                EditorGUILayout.LabelField("Previous Value", "Not set yet.");
+                EditorGUILayout.LabelField("Previous Value", "Not set yet");
             }
         }
     }

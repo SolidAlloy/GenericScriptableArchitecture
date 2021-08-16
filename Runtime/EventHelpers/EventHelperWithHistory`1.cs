@@ -128,7 +128,7 @@
 
             for (int i = _multipleEventsListeners.Count - 1; i != -1; i--)
             {
-                _multipleEventsListeners[i].OnEventInvoked(this, previousValue, currentValue);
+                _multipleEventsListeners[i].OnEventInvoked(_parentEvent ?? this, previousValue, currentValue);
             }
 
             for (int i = _responses.Count - 1; i != -1; i--)

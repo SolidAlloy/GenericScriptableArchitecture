@@ -5,7 +5,9 @@
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
+    using UnityEditorInternal;
     using UnityEngine;
+    using UnityEngine.Assertions;
 
     public readonly struct EventHolderDrawerUtil
     {
@@ -13,10 +15,12 @@
         private readonly SerializedProperty _event;
         private readonly SerializedProperty _variable;
         private readonly SerializedProperty _type;
+        private readonly int _argsCount;
 
-        public EventHolderDrawerUtil(SerializedProperty property)
+        public EventHolderDrawerUtil(SerializedProperty property, int argsCount)
         {
             _mainProperty = property;
+            _argsCount = argsCount;
             _event = _mainProperty.FindPropertyRelative(nameof(_event));
             _variable = _mainProperty.FindPropertyRelative(nameof(_variable));
             _type = _mainProperty.FindPropertyRelative(nameof(_type));
@@ -56,7 +60,7 @@
                 int previousIndent = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = 0;
 
-                EventType = ChoiceButton.DrawAndCheckType(buttonRect, EventType);
+                EventType = ChoiceButton.DrawAndCheckType(buttonRect, EventType, _argsCount);
                 EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
 
                 EditorGUI.indentLevel = previousIndent;
@@ -95,14 +99,16 @@
                 imagePosition = ImagePosition.ImageOnly
             };
 
-            private static readonly string[] _popupOptions = { "Scriptable Event", "Variable" };
+            private static readonly string[] _popupOptionsOne = { "Scriptable Event", "Variable" };
+            private static readonly string[] _popupOptionsTwo = { "Scriptable Event", "Variable With History" };
 
             public static float Width => _buttonStyle.fixedWidth;
 
             [Pure]
-            public static EventTypes DrawAndCheckType(Rect buttonRect, EventTypes currentType)
+            public static EventTypes DrawAndCheckType(Rect buttonRect, EventTypes currentType, int argsCount)
             {
-                int result = EditorGUI.Popup(buttonRect, (int) currentType, _popupOptions, _buttonStyle);
+                Assert.IsTrue(argsCount == 1 || argsCount == 2, "argsCount equals 1 or 2");
+                int result = EditorGUI.Popup(buttonRect, (int) currentType, argsCount == 1 ? _popupOptionsOne : _popupOptionsTwo, _buttonStyle);
                 return (EventTypes) result;
             }
         }

@@ -12,8 +12,8 @@
     {
         public override void OnGUI(Rect fieldRect, SerializedProperty property, GUIContent label)
         {
-            var helper = new EventHolderDrawerUtil(property);
-            
+            var helper = new EventHolderDrawerUtil(property, 2);
+
             if (GenericArgsAreEqual(property))
             {
                 helper.DrawButtonAndValue(fieldRect, label);
