@@ -96,23 +96,23 @@
 
         public void RemoveListener(IMultipleEventsListener<T, T> listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action<T, T> response, bool notifyCurrentValue = false)
+        public void AddListener(Action<T, T> listener, bool notifyCurrentValue = false)
         {
-            if (response == null)
+            if (listener == null)
                 return;
 
-            if (_responses.Contains(response))
+            if (_responses.Contains(listener))
                 return;
 
-            _responses.Add(response);
+            _responses.Add(listener);
 
             if (notifyCurrentValue && _hasPreviousValue())
             {
-                response.Invoke(_getPreviousValue(), _getCurrentValue());
+                listener.Invoke(_getPreviousValue(), _getCurrentValue());
             }
         }
 
-        public void RemoveResponse(Action<T, T> response) => _responses.Remove(response);
+        public void RemoveListener(Action<T, T> listener) => _responses.Remove(listener);
 
         public void NotifyListeners(T previousValue, T currentValue)
         {

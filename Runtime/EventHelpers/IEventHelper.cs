@@ -17,9 +17,9 @@
 
         void RemoveListener(IMultipleEventsListener listener);
 
-        void AddResponse(Action response);
+        void AddListener(Action listener);
 
-        void RemoveResponse(Action response);
+        void RemoveListener(Action listener);
 
 #if UNIRX
         IObservable<Unit> Observe();

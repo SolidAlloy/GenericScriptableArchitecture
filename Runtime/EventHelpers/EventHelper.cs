@@ -62,15 +62,15 @@
 
         public void RemoveListener(IMultipleEventsListener listener) => _multipleEventsListeners.Remove(listener);
 
-        public void AddResponse(Action response)
+        public void AddListener(Action listener)
         {
-            if (response == null)
+            if (listener == null)
                 return;
 
-            _responses.AddIfMissing(response);
+            _responses.AddIfMissing(listener);
         }
 
-        public void RemoveResponse(Action response) => _responses.Remove(response);
+        public void RemoveListener(Action listener) => _responses.Remove(listener);
 
         public void NotifyListeners()
         {

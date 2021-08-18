@@ -46,9 +46,9 @@
 
         public void RemoveListener(IMultipleEventsListener<T1, T2, T3> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddResponse(Action<T1, T2, T3> response) => _eventHelper.AddResponse(response);
+        public void AddListener(Action<T1, T2, T3> listener) => _eventHelper.AddListener(listener);
 
-        public void RemoveResponse(Action<T1, T2, T3> response) => _eventHelper.RemoveResponse(response);
+        public void RemoveListener(Action<T1, T2, T3> listener) => _eventHelper.RemoveListener(listener);
 
         public IDisposable Subscribe(IObserver<(T1, T2, T3)> observer) => _eventHelper.Subscribe(observer);
 
@@ -56,75 +56,75 @@
 
         #region Operator Overloads
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.AddResponse(response);
+            scriptableEvent.AddListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.RemoveResponse(response);
+            scriptableEvent.RemoveListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.AddListener(response);
+            scriptableEvent.AddListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, ScriptableEventListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.RemoveListener(response);
+            scriptableEvent.RemoveListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.AddListener(response);
+            scriptableEvent.AddListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IEventListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.RemoveListener(response);
+            scriptableEvent.RemoveListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.AddListener(response);
+            scriptableEvent.AddListener(listener);
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> response)
+        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IMultipleEventsListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
 
-            scriptableEvent.RemoveListener(response);
+            scriptableEvent.RemoveListener(listener);
             return scriptableEvent;
         }
 

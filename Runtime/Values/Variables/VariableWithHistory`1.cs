@@ -54,9 +54,9 @@
 
         public void RemoveListener(IEventListener<T, T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddResponse(Action<T, T> response, bool notifyCurrentValue = false) => _eventHelper.AddResponse(response, notifyCurrentValue);
+        public void AddListener(Action<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void RemoveResponse(Action<T, T> response) => _eventHelper.RemoveResponse(response);
+        public void RemoveListener(Action<T, T> listener) => _eventHelper.RemoveListener(listener);
 
         #endregion
 
@@ -102,21 +102,21 @@
 
         public override string ToString() => $"VariableWithHistory{{{Value}}}";
 
-        public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, Action<T, T> response)
+        public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, Action<T, T> listener)
         {
             if (variableWithHistory == null)
                 return null;
 
-            variableWithHistory.AddResponse(response);
+            variableWithHistory.AddListener(listener);
             return variableWithHistory;
         }
 
-        public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, Action<T, T> response)
+        public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, Action<T, T> listener)
         {
             if (variableWithHistory == null)
                 return null;
 
-            variableWithHistory.RemoveResponse(response);
+            variableWithHistory.RemoveListener(listener);
             return variableWithHistory;
         }
 

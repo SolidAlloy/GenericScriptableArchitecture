@@ -16,9 +16,9 @@
 
         void RemoveListener(IMultipleEventsListener<T1, T2> listener);
 
-        void AddResponse(Action<T1, T2> response);
+        void AddListener(Action<T1, T2> listener);
 
-        void RemoveResponse(Action<T1, T2> response);
+        void RemoveListener(Action<T1, T2> listener);
 
 #if UNIRX
         IDisposable Subscribe(IObserver<(T1, T2)> observer);

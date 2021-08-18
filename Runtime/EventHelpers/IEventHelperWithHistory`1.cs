@@ -12,9 +12,9 @@
 
         void RemoveListener(IMultipleEventsListener<T, T> listener);
 
-        void AddResponse(Action<T, T> response, bool notifyCurrentValue = false);
+        void AddListener(Action<T, T> listener, bool notifyCurrentValue = false);
 
-        void RemoveResponse(Action<T, T> response);
+        void RemoveListener(Action<T, T> listener);
 
 #if UNIRX
         IDisposable Subscribe(IObserver<(T Previous, T Current)> observer);

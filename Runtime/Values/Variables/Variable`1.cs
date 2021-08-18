@@ -67,9 +67,9 @@
 
         public void RemoveListener(IMultipleEventsListener<T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddResponse(Action<T> response, bool notifyCurrentValue = false) => _eventHelper.AddResponse(response, notifyCurrentValue);
+        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void RemoveResponse(Action<T> response) => _eventHelper.RemoveResponse(response);
+        public void RemoveListener(Action<T> listener) => _eventHelper.RemoveListener(listener);
 
         #endregion
 
@@ -176,15 +176,15 @@
             return ! (lhs == rhs);
         }
 
-        public static Variable<T> operator +(Variable<T> variable, Action<T> response)
+        public static Variable<T> operator +(Variable<T> variable, Action<T> listener)
         {
-            variable.AddResponse(response);
+            variable.AddListener(listener);
             return variable;
         }
 
-        public static Variable<T> operator -(Variable<T> variable, Action<T> response)
+        public static Variable<T> operator -(Variable<T> variable, Action<T> listener)
         {
-            variable.RemoveResponse(response);
+            variable.RemoveListener(listener);
             return variable;
         }
 
@@ -221,21 +221,21 @@
             return variable;
         }
 
-        public static Variable<T> operator +(Variable<T> variable, IMultipleEventsListener<T> response)
+        public static Variable<T> operator +(Variable<T> variable, IMultipleEventsListener<T> listener)
         {
             if (variable == null)
                 return null;
 
-            variable.AddListener(response);
+            variable.AddListener(listener);
             return variable;
         }
 
-        public static Variable<T> operator -(Variable<T> variable, IMultipleEventsListener<T> response)
+        public static Variable<T> operator -(Variable<T> variable, IMultipleEventsListener<T> listener)
         {
             if (variable == null)
                 return null;
 
-            variable.RemoveListener(response);
+            variable.RemoveListener(listener);
             return variable;
         }
 
