@@ -178,19 +178,46 @@
 
         public static Variable<T> operator +(Variable<T> variable, Action<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.AddListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, (Action<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variable == null)
+                return null;
+
+            variable.AddListener(args.Listener, args.NotifyCurrentValue);
             return variable;
         }
 
         public static Variable<T> operator -(Variable<T> variable, Action<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.RemoveListener(listener);
             return variable;
         }
 
         public static Variable<T> operator +(Variable<T> variable, ScriptableEventListener<T> listener)
         {
+            if (variable == null)
+                return null;
+
             variable.AddListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, (ScriptableEventListener<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variable == null)
+                return null;
+
+            variable.AddListener(args.Listener, args.NotifyCurrentValue);
             return variable;
         }
 
@@ -212,6 +239,15 @@
             return variable;
         }
 
+        public static Variable<T> operator +(Variable<T> variable, (IEventListener<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variable == null)
+                return null;
+
+            variable.AddListener(args.Listener, args.NotifyCurrentValue);
+            return variable;
+        }
+
         public static Variable<T> operator -(Variable<T> variable, IEventListener<T> listener)
         {
             if (variable == null)
@@ -227,6 +263,15 @@
                 return null;
 
             variable.AddListener(listener);
+            return variable;
+        }
+
+        public static Variable<T> operator +(Variable<T> variable, (IMultipleEventsListener<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variable == null)
+                return null;
+
+            variable.AddListener(args.Listener, args.NotifyCurrentValue);
             return variable;
         }
 

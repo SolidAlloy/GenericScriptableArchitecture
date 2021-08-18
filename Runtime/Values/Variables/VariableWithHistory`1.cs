@@ -111,6 +111,15 @@
             return variableWithHistory;
         }
 
+        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (Action<T, T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableWithHistory == null)
+                return null;
+
+            variableWithHistory.AddListener(args.Listener, args.NotifyCurrentValue);
+            return variableWithHistory;
+        }
+
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, Action<T, T> listener)
         {
             if (variableWithHistory == null)
@@ -126,6 +135,15 @@
                 return null;
 
             variableWithHistory.AddListener(listener);
+            return variableWithHistory;
+        }
+
+        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (ScriptableEventListener<T, T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableWithHistory == null)
+                return null;
+
+            variableWithHistory.AddListener(args.Listener, args.NotifyCurrentValue);
             return variableWithHistory;
         }
 
@@ -147,6 +165,15 @@
             return variableWithHistory;
         }
 
+        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (IEventListener<T, T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableWithHistory == null)
+                return null;
+
+            variableWithHistory.AddListener(args.Listener, args.NotifyCurrentValue);
+            return variableWithHistory;
+        }
+
         public static VariableWithHistory<T> operator -(VariableWithHistory<T> variableWithHistory, IEventListener<T, T> listener)
         {
             if (variableWithHistory == null)
@@ -162,6 +189,15 @@
                 return null;
 
             variableWithHistory.AddListener(listener);
+            return variableWithHistory;
+        }
+
+        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (IMultipleEventsListener<T, T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableWithHistory == null)
+                return null;
+
+            variableWithHistory.AddListener(args.Listener, args.NotifyCurrentValue);
             return variableWithHistory;
         }
 
