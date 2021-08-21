@@ -4,11 +4,8 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Runtime.InteropServices;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using UniRx;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using Object = UnityEngine.Object;
@@ -21,15 +18,15 @@
     [SuppressMessage("ReSharper", "Unity.NoNullPropagation",
         Justification = "It's ok to invoke scriptable events via null-coalescing operators because the event " +
                         "can be null only if it is not assigned in the inspector.")]
-    public class RuntimeSet<TUnityObject> : RuntimeSetBase, IList<TUnityObject>, IEvent<(int Index, TUnityObject Item)>
+    public class RuntimeSet<TUnityObject> : BaseRuntimeSet, IList<TUnityObject>, IEvent<(int Index, TUnityObject Item)>
 #if UNIRX
         , IDisposable
 #endif
-        where TUnityObject : UnityEngine.Object
+        where TUnityObject : Object
     {
         private List<TUnityObject> _list = new List<TUnityObject>();
 
-        internal override List<UnityEngine.Object> List => _list.ConvertAll(item => (UnityEngine.Object) item);
+        internal override List<Object> List => _list.ConvertAll(item => (Object) item);
 
         #region IList
 
@@ -181,7 +178,7 @@
 
         private EventHelperWithDefaultValue<int> _countChangeEvent;
         public IEventHelperWithDefaultValue<int> CountChangeEvent => _countChangeEvent;
-        internal override List<Object> CountChangeListeners => _countChangeEvent.Listeners;
+        internal override List<Object> CountChangeListeners => _countChangeEvent?.Listeners;
 
         private readonly EventHelper<(int OldIndex, int NewIndex, TUnityObject Item)> _moveEvent = new EventHelper<(int OldIndex, int NewIndex, TUnityObject Item)>();
         public IEventHelper<(int OldIndex, int NewIndex, TUnityObject Item)> MoveEvent => _moveEvent;

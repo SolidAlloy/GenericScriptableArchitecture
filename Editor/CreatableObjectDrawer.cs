@@ -9,8 +9,9 @@
 
     [CustomPropertyDrawer(typeof(BaseValue), true)]
     [CustomPropertyDrawer(typeof(BaseScriptableEvent), true)]
+    [CustomPropertyDrawer(typeof(BaseRuntimeSet), true)]
 #if ODIN_INSPECTOR
     [DrawerPriority(0, 0, 4)]
 #endif
-    public class ScriptableEventDrawer : CreatableObjectDrawer { }
+    public class ScriptableArchitectureObjectDrawer : CreatableObjectDrawer { }
 }
