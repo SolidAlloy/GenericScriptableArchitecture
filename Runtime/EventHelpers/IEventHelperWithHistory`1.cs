@@ -4,13 +4,9 @@
 
     public interface IEventHelperWithHistory<T> : IEvent<T, T>
     {
-        void AddListener(IEventListener<T, T> listener, bool notifyCurrentValue = false);
+        void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false);
 
-        void RemoveListener(IEventListener<T, T> listener);
-
-        void AddListener(IMultipleEventsListener<T, T> listener, bool notifyCurrentValue = false);
-
-        void RemoveListener(IMultipleEventsListener<T, T> listener);
+        void RemoveListener(IListener<T, T> listener);
 
         void AddListener(Action<T, T> listener, bool notifyCurrentValue = false);
 

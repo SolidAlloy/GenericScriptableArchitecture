@@ -55,17 +55,9 @@
 
         #region Adding Removing Listeners
 
-        public void AddListener(ScriptableEventListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
+        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void RemoveListener(ScriptableEventListener<T> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(IEventListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(IEventListener<T> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(IMultipleEventsListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(IMultipleEventsListener<T> listener) => _eventHelper.RemoveListener(listener);
+        public void RemoveListener(IListener<T> listener) => _eventHelper.RemoveListener(listener);
 
         public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
@@ -203,7 +195,7 @@
             return variable;
         }
 
-        public static Variable<T> operator +(Variable<T> variable, ScriptableEventListener<T> listener)
+        public static Variable<T> operator +(Variable<T> variable, IListener<T> listener)
         {
             if (variable == null)
                 return null;
@@ -212,7 +204,7 @@
             return variable;
         }
 
-        public static Variable<T> operator +(Variable<T> variable, (ScriptableEventListener<T> Listener, bool NotifyCurrentValue) args)
+        public static Variable<T> operator +(Variable<T> variable, (IListener<T> Listener, bool NotifyCurrentValue) args)
         {
             if (variable == null)
                 return null;
@@ -221,61 +213,7 @@
             return variable;
         }
 
-        public static Variable<T> operator -(Variable<T> variable, ScriptableEventListener<T> listener)
-        {
-            if (variable == null)
-                return null;
-
-            variable.RemoveListener(listener);
-            return variable;
-        }
-
-        public static Variable<T> operator +(Variable<T> variable, IEventListener<T> listener)
-        {
-            if (variable == null)
-                return null;
-
-            variable.AddListener(listener);
-            return variable;
-        }
-
-        public static Variable<T> operator +(Variable<T> variable, (IEventListener<T> Listener, bool NotifyCurrentValue) args)
-        {
-            if (variable == null)
-                return null;
-
-            variable.AddListener(args.Listener, args.NotifyCurrentValue);
-            return variable;
-        }
-
-        public static Variable<T> operator -(Variable<T> variable, IEventListener<T> listener)
-        {
-            if (variable == null)
-                return null;
-
-            variable.RemoveListener(listener);
-            return variable;
-        }
-
-        public static Variable<T> operator +(Variable<T> variable, IMultipleEventsListener<T> listener)
-        {
-            if (variable == null)
-                return null;
-
-            variable.AddListener(listener);
-            return variable;
-        }
-
-        public static Variable<T> operator +(Variable<T> variable, (IMultipleEventsListener<T> Listener, bool NotifyCurrentValue) args)
-        {
-            if (variable == null)
-                return null;
-
-            variable.AddListener(args.Listener, args.NotifyCurrentValue);
-            return variable;
-        }
-
-        public static Variable<T> operator -(Variable<T> variable, IMultipleEventsListener<T> listener)
+        public static Variable<T> operator -(Variable<T> variable, IListener<T> listener)
         {
             if (variable == null)
                 return null;

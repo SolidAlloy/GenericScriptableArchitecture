@@ -9,14 +9,14 @@
     public class EventHelper<T1, T2, T3> : IEventHelper<T1, T2, T3>, IDisposable
     {
         private readonly IEvent<T1, T2, T3> _parentEvent;
-        private readonly List<ScriptableEventListener<T1, T2, T3>> _scriptableEvents = new List<ScriptableEventListener<T1, T2, T3>>();
+        private readonly List<ScriptableEventListener<T1, T2, T3>> _scriptableListeners = new List<ScriptableEventListener<T1, T2, T3>>();
         private readonly List<IEventListener<T1, T2, T3>> _singleEventListeners = new List<IEventListener<T1, T2, T3>>();
         private readonly List<IMultipleEventsListener<T1, T2, T3>> _multipleEventsListeners = new List<IMultipleEventsListener<T1, T2, T3>>();
         private readonly List<Action<T1, T2, T3>> _responses = new List<Action<T1, T2, T3>>();
 
         public List<Object> Listeners => _responses
             .Select(response => response.Target)
-            .Concat(_scriptableEvents)
+            .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)
             .Concat(_multipleEventsListeners)
             .OfType<Object>()
@@ -29,35 +29,40 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener<T1, T2, T3> listener)
+        public void AddListener(IListener<T1, T2, T3> listener)
         {
             if (listener == null)
                 return;
 
-            _scriptableEvents.Add(listener);
+            if (listener is ScriptableEventListener<T1, T2, T3> scriptableListener)
+            {
+                _scriptableListeners.Add(scriptableListener);
+            }
+            else if (listener is IEventListener<T1, T2, T3> eventListener)
+            {
+                _singleEventListeners.AddIfMissing(eventListener);
+            }
+            else if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
+            {
+                _multipleEventsListeners.AddIfMissing(multipleEventsListener);
+            }
         }
 
-        public void RemoveListener(ScriptableEventListener<T1, T2, T3> listener) => _scriptableEvents.Remove(listener);
-
-        public void AddListener(IEventListener<T1, T2, T3> listener)
+        public void RemoveListener(IListener<T1, T2, T3> listener)
         {
-            if (listener == null)
-                return;
-
-            _singleEventListeners.AddIfMissing(listener);
+            if (listener is ScriptableEventListener<T1, T2, T3> scriptableListener)
+            {
+                _scriptableListeners.Remove(scriptableListener);
+            }
+            else if (listener is IEventListener<T1, T2, T3> eventListener)
+            {
+                _singleEventListeners.Remove(eventListener);
+            }
+            else if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
+            {
+                _multipleEventsListeners.Remove(multipleEventsListener);
+            }
         }
-
-        public void RemoveListener(IEventListener<T1, T2, T3> listener) => _singleEventListeners.Remove(listener);
-
-        public void AddListener(IMultipleEventsListener<T1, T2, T3> listener)
-        {
-            if (listener == null)
-                return;
-
-            _multipleEventsListeners.AddIfMissing(listener);
-        }
-
-        public void RemoveListener(IMultipleEventsListener<T1, T2, T3> listener) => _multipleEventsListeners.Remove(listener);
 
         public void AddListener(Action<T1, T2, T3> listener)
         {
@@ -71,9 +76,9 @@
 
         public void NotifyListeners(T1 arg0, T2 arg1, T3 arg2)
         {
-            for (int i = _scriptableEvents.Count - 1; i != -1; i--)
+            for (int i = _scriptableListeners.Count - 1; i != -1; i--)
             {
-                _scriptableEvents[i].OnEventInvoked(arg0, arg1, arg2);
+                _scriptableListeners[i].OnEventInvoked(arg0, arg1, arg2);
             }
 
             for (int i = _singleEventListeners.Count - 1; i != -1; i--)

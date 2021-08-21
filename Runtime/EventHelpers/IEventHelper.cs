@@ -5,17 +5,9 @@
 
     public interface IEventHelper : IEvent
     {
-        public void AddListener(ScriptableEventListener listener);
+        public void AddListener(IListener listener);
 
-        public void RemoveListener(ScriptableEventListener listener);
-
-        void AddListener(IEventListener listener);
-
-        void RemoveListener(IEventListener listener);
-
-        void AddListener(IMultipleEventsListener listener);
-
-        void RemoveListener(IMultipleEventsListener listener);
+        public void RemoveListener(IListener listener);
 
         void AddListener(Action listener);
 

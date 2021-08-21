@@ -35,17 +35,9 @@
 
         #region Adding Removing Listeners
 
-        public void AddListener(ScriptableEventListener<T1, T2> listener) => _eventHelper.AddListener(listener);
+        public void AddListener(IListener<T1, T2> listener) => _eventHelper.AddListener(listener);
 
-        public void RemoveListener(ScriptableEventListener<T1, T2> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(IEventListener<T1, T2> listener) => _eventHelper.AddListener(listener);
-
-        public void RemoveListener(IEventListener<T1, T2> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(IMultipleEventsListener<T1, T2> listener) => _eventHelper.AddListener(listener);
-
-        public void RemoveListener(IMultipleEventsListener<T1, T2> listener) => _eventHelper.RemoveListener(listener);
+        public void RemoveListener(IListener<T1, T2> listener) => _eventHelper.RemoveListener(listener);
 
         public void AddListener(Action<T1, T2> listener) => _eventHelper.AddListener(listener);
 
@@ -77,7 +69,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2> operator +(ScriptableEvent<T1, T2> scriptableEvent, ScriptableEventListener<T1, T2> listener)
+        public static ScriptableEvent<T1, T2> operator +(ScriptableEvent<T1, T2> scriptableEvent, IListener<T1, T2> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -86,43 +78,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2> operator -(ScriptableEvent<T1, T2> scriptableEvent, ScriptableEventListener<T1, T2> listener)
-        {
-            if (scriptableEvent == null)
-                return null;
-
-            scriptableEvent.RemoveListener(listener);
-            return scriptableEvent;
-        }
-
-        public static ScriptableEvent<T1, T2> operator +(ScriptableEvent<T1, T2> scriptableEvent, IEventListener<T1, T2> listener)
-        {
-            if (scriptableEvent == null)
-                return null;
-
-            scriptableEvent.AddListener(listener);
-            return scriptableEvent;
-        }
-
-        public static ScriptableEvent<T1, T2> operator -(ScriptableEvent<T1, T2> scriptableEvent, IEventListener<T1, T2> listener)
-        {
-            if (scriptableEvent == null)
-                return null;
-
-            scriptableEvent.RemoveListener(listener);
-            return scriptableEvent;
-        }
-
-        public static ScriptableEvent<T1, T2> operator +(ScriptableEvent<T1, T2> scriptableEvent, IMultipleEventsListener<T1, T2> listener)
-        {
-            if (scriptableEvent == null)
-                return null;
-
-            scriptableEvent.AddListener(listener);
-            return scriptableEvent;
-        }
-
-        public static ScriptableEvent<T1, T2> operator -(ScriptableEvent<T1, T2> scriptableEvent, IMultipleEventsListener<T1, T2> listener)
+        public static ScriptableEvent<T1, T2> operator -(ScriptableEvent<T1, T2> scriptableEvent, IListener<T1, T2> listener)
         {
             if (scriptableEvent == null)
                 return null;

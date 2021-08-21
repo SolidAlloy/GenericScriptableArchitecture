@@ -30,35 +30,40 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener<T> listener)
+        public void AddListener(IListener<T> listener)
         {
             if (listener == null)
                 return;
 
-            _scriptableListeners.Add(listener);
+            if (listener is ScriptableEventListener<T> scriptableListener)
+            {
+                _scriptableListeners.Add(scriptableListener);
+            }
+            else if (listener is IEventListener<T> eventListener)
+            {
+                _singleEventListeners.AddIfMissing(eventListener);
+            }
+            else if (listener is IMultipleEventsListener<T> multipleEventsListener)
+            {
+                _multipleEventsListeners.AddIfMissing(multipleEventsListener);
+            }
         }
 
-        public void RemoveListener(ScriptableEventListener<T> listener) => _scriptableListeners.Remove(listener);
-
-        public void AddListener(IEventListener<T> listener)
+        public void RemoveListener(IListener<T> listener)
         {
-            if (listener == null)
-                return;
-
-            _singleEventListeners.AddIfMissing(listener);
+            if (listener is ScriptableEventListener<T> scriptableListener)
+            {
+                _scriptableListeners.Remove(scriptableListener);
+            }
+            else if (listener is IEventListener<T> eventListener)
+            {
+                _singleEventListeners.Remove(eventListener);
+            }
+            else if (listener is IMultipleEventsListener<T> multipleEventsListener)
+            {
+                _multipleEventsListeners.Remove(multipleEventsListener);
+            }
         }
-
-        public void RemoveListener(IEventListener<T> listener) => _singleEventListeners.Remove(listener);
-
-        public void AddListener(IMultipleEventsListener<T> listener)
-        {
-            if (listener == null)
-                return;
-
-            _multipleEventsListeners.AddIfMissing(listener);
-        }
-
-        public void RemoveListener(IMultipleEventsListener<T> listener) => _multipleEventsListeners.Remove(listener);
 
         public void AddListener(Action<T> listener)
         {

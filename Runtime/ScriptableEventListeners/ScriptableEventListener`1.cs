@@ -5,7 +5,7 @@
     using UnityEngine.Events;
 
     [Serializable]
-    public class ScriptableEventListener<T> : BaseScriptableEventListener
+    public class ScriptableEventListener<T> : BaseScriptableEventListener, IListener<T>
     {
         [SerializeField] private EventHolder<T> _event;
         [SerializeField] private UnityEvent<T> _response;

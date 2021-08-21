@@ -4,17 +4,9 @@
 
     public interface IEventHelper<T1, T2> : IEvent<T1, T2>
     {
-        public void AddListener(ScriptableEventListener<T1, T2> listener);
+        void AddListener(IListener<T1, T2> listener);
 
-        public void RemoveListener(ScriptableEventListener<T1, T2> listener);
-
-        void AddListener(IEventListener<T1, T2> listener);
-
-        void RemoveListener(IEventListener<T1, T2> listener);
-
-        void AddListener(IMultipleEventsListener<T1, T2> listener);
-
-        void RemoveListener(IMultipleEventsListener<T1, T2> listener);
+        void RemoveListener(IListener<T1, T2> listener);
 
         void AddListener(Action<T1, T2> listener);
 

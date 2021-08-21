@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SolidUtilities.Extensions;
     using Object = UnityEngine.Object;
 
 #if UNIRX
@@ -45,56 +46,45 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener<T, T> listener, bool notifyCurrentValue = false)
+        public void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false)
         {
             if (listener == null)
                 return;
 
-            _scriptableListeners.Add(listener);
-
-            if (notifyCurrentValue && _hasPreviousValue())
+            if (listener is ScriptableEventListener<T, T> scriptableListener)
             {
-                listener.OnEventInvoked(_getPreviousValue(), _getCurrentValue());
+                _scriptableListeners.Add(scriptableListener);
+
+                if (notifyCurrentValue && _hasPreviousValue())
+                    scriptableListener.OnEventInvoked(_getCurrentValue(), _getCurrentValue());
+            }
+            else if (listener is IEventListener<T, T> eventListener)
+            {
+                if (_singleEventListeners.AddIfMissing(eventListener) && notifyCurrentValue && _hasPreviousValue())
+                    eventListener.OnEventInvoked(_getCurrentValue(), _getCurrentValue());
+            }
+            else if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
+            {
+                if (_multipleEventsListeners.AddIfMissing(multipleEventsListener) && notifyCurrentValue && _hasPreviousValue())
+                    multipleEventsListener.OnEventInvoked(_parentEvent ?? this, _getCurrentValue(), _getCurrentValue());
             }
         }
 
-        public void RemoveListener(ScriptableEventListener<T, T> listener) => _scriptableListeners.Remove(listener);
-
-        public void AddListener(IEventListener<T, T> listener, bool notifyCurrentValue = false)
+        public void RemoveListener(IListener<T, T> listener)
         {
-            if (listener == null)
-                return;
-
-            if (_singleEventListeners.Contains(listener))
-                return;
-
-            _singleEventListeners.Add(listener);
-
-            if (notifyCurrentValue && _hasPreviousValue())
+            if (listener is ScriptableEventListener<T, T> scriptableListener)
             {
-                listener.OnEventInvoked(_getPreviousValue(), _getCurrentValue());
+                _scriptableListeners.Remove(scriptableListener);
+            }
+            else if (listener is IEventListener<T, T> eventListener)
+            {
+                _singleEventListeners.Remove(eventListener);
+            }
+            else if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
+            {
+                _multipleEventsListeners.Remove(multipleEventsListener);
             }
         }
-
-        public void RemoveListener(IEventListener<T, T> listener) => _singleEventListeners.Remove(listener);
-
-        public void AddListener(IMultipleEventsListener<T, T> listener, bool notifyCurrentValue = false)
-        {
-            if (listener == null)
-                return;
-
-            if (_multipleEventsListeners.Contains(listener))
-                return;
-
-            _multipleEventsListeners.Add(listener);
-
-            if (notifyCurrentValue && _hasPreviousValue())
-            {
-                listener.OnEventInvoked(_parentEvent ?? this, _getPreviousValue(), _getCurrentValue());
-            }
-        }
-
-        public void RemoveListener(IMultipleEventsListener<T, T> listener) => _multipleEventsListeners.Remove(listener);
 
         public void AddListener(Action<T, T> listener, bool notifyCurrentValue = false)
         {

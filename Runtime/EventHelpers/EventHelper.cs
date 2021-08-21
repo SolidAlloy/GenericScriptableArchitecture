@@ -32,35 +32,40 @@
             _parentEvent = parentEvent;
         }
 
-        public void AddListener(ScriptableEventListener listener)
+        public void AddListener(IListener listener)
         {
             if (listener == null)
                 return;
 
-            _scriptableListeners.Add(listener);
+            if (listener is ScriptableEventListener scriptableListener)
+            {
+                _scriptableListeners.Add(scriptableListener);
+            }
+            else if (listener is IEventListener eventListener)
+            {
+                _singleEventListeners.AddIfMissing(eventListener);
+            }
+            else if (listener is IMultipleEventsListener multipleEventsListener)
+            {
+                _multipleEventsListeners.AddIfMissing(multipleEventsListener);
+            }
         }
 
-        public void RemoveListener(ScriptableEventListener listener) => _scriptableListeners.Remove(listener);
-
-        public void AddListener(IEventListener listener)
+        public void RemoveListener(IListener listener)
         {
-            if (listener == null)
-                return;
-
-            _singleEventListeners.AddIfMissing(listener);
+            if (listener is ScriptableEventListener scriptableListener)
+            {
+                _scriptableListeners.Remove(scriptableListener);
+            }
+            else if (listener is IEventListener eventListener)
+            {
+                _singleEventListeners.Remove(eventListener);
+            }
+            else if (listener is IMultipleEventsListener multipleEventsListener)
+            {
+                _multipleEventsListeners.Remove(multipleEventsListener);
+            }
         }
-
-        public void RemoveListener(IEventListener listener) => _singleEventListeners.Remove(listener);
-
-        public void AddListener(IMultipleEventsListener listener)
-        {
-            if (listener == null)
-                return;
-
-            _multipleEventsListeners.AddIfMissing(listener);
-        }
-
-        public void RemoveListener(IMultipleEventsListener listener) => _multipleEventsListeners.Remove(listener);
 
         public void AddListener(Action listener)
         {
