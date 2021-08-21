@@ -62,7 +62,7 @@
 
             (_, Type type) = property.GetFieldInfoAndType();
             var assetMenuAttribute = type.GetCustomAttribute<CreateGenericAssetMenuAttribute>();
-            var fileName = assetMenuAttribute.FileName ?? $"New {type.Name}";
+            var fileName = assetMenuAttribute?.FileName ?? $"New {type.Name}";
 
             var path = EditorUtility.SaveFilePanel(
                 "Create a variable",

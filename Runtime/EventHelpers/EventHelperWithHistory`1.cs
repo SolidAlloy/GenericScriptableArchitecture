@@ -57,13 +57,17 @@
 
                 if (notifyCurrentValue && _hasPreviousValue())
                     scriptableListener.OnEventInvoked(_getCurrentValue(), _getCurrentValue());
+
+                return;
             }
-            else if (listener is IEventListener<T, T> eventListener)
+
+            if (listener is IEventListener<T, T> eventListener)
             {
                 if (_singleEventListeners.AddIfMissing(eventListener) && notifyCurrentValue && _hasPreviousValue())
                     eventListener.OnEventInvoked(_getCurrentValue(), _getCurrentValue());
             }
-            else if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
+
+            if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
             {
                 if (_multipleEventsListeners.AddIfMissing(multipleEventsListener) && notifyCurrentValue && _hasPreviousValue())
                     multipleEventsListener.OnEventInvoked(_parentEvent ?? this, _getCurrentValue(), _getCurrentValue());
@@ -75,12 +79,15 @@
             if (listener is ScriptableEventListener<T, T> scriptableListener)
             {
                 _scriptableListeners.Remove(scriptableListener);
+                return;
             }
-            else if (listener is IEventListener<T, T> eventListener)
+
+            if (listener is IEventListener<T, T> eventListener)
             {
                 _singleEventListeners.Remove(eventListener);
             }
-            else if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
+
+            if (listener is IMultipleEventsListener<T, T> multipleEventsListener)
             {
                 _multipleEventsListeners.Remove(multipleEventsListener);
             }

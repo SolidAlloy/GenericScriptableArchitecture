@@ -37,12 +37,15 @@
             if (listener is ScriptableEventListener<T1, T2, T3> scriptableListener)
             {
                 _scriptableListeners.Add(scriptableListener);
+                return;
             }
-            else if (listener is IEventListener<T1, T2, T3> eventListener)
+
+            if (listener is IEventListener<T1, T2, T3> eventListener)
             {
                 _singleEventListeners.AddIfMissing(eventListener);
             }
-            else if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
+
+            if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
             {
                 _multipleEventsListeners.AddIfMissing(multipleEventsListener);
             }
@@ -53,12 +56,15 @@
             if (listener is ScriptableEventListener<T1, T2, T3> scriptableListener)
             {
                 _scriptableListeners.Remove(scriptableListener);
+                return;
             }
-            else if (listener is IEventListener<T1, T2, T3> eventListener)
+
+            if (listener is IEventListener<T1, T2, T3> eventListener)
             {
                 _singleEventListeners.Remove(eventListener);
             }
-            else if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
+
+            if (listener is IMultipleEventsListener<T1, T2, T3> multipleEventsListener)
             {
                 _multipleEventsListeners.Remove(multipleEventsListener);
             }
