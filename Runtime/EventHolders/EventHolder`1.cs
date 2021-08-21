@@ -11,6 +11,7 @@
         [SerializeField] private ScriptableEvent<T> _event;
         [SerializeField] private Variable<T> _variable;
         [SerializeField] private EventTypes _type = EventTypes.ScriptableEvent;
+        [SerializeField] private bool _notifyCurrentValue;
 
         public void AddListener(ScriptableEventListener<T> listener)
         {
@@ -21,7 +22,7 @@
                     break;
 
                 case EventTypes.Variable:
-                    _variable?.AddListener(listener);
+                    _variable?.AddListener(listener, _notifyCurrentValue);
                     break;
 
                 default:

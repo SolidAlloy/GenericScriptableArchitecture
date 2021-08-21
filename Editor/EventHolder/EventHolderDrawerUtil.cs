@@ -15,6 +15,7 @@
         private readonly SerializedProperty _event;
         private readonly SerializedProperty _variable;
         private readonly SerializedProperty _type;
+        private readonly SerializedProperty _notifyCurrentValue;
         private readonly int _argsCount;
 
         public EventHolderDrawerUtil(SerializedProperty property, int argsCount)
@@ -24,6 +25,7 @@
             _event = _mainProperty.FindPropertyRelative(nameof(_event));
             _variable = _mainProperty.FindPropertyRelative(nameof(_variable));
             _type = _mainProperty.FindPropertyRelative(nameof(_type));
+            _notifyCurrentValue = _mainProperty.FindPropertyRelative(nameof(_notifyCurrentValue));
         }
 
         private EventTypes EventType
@@ -48,29 +50,40 @@
 
         public void DrawButtonAndValue(Rect fieldRect, GUIContent label)
         {
-            using (new EditorDrawHelper.PropertyWrapper(fieldRect, label, _mainProperty))
+            using var _ = new EditorDrawHelper.PropertyWrapper(fieldRect, label, _mainProperty);
+
+            fieldRect.height = EditorGUIUtility.singleLineHeight;
+            (Rect labelRect, Rect buttonRect, Rect valueRect) = GetLabelButtonValueRects(fieldRect);
+
+            EditorGUI.HandlePrefixLabel(fieldRect, labelRect, label);
+
+            // The indent level must be made 0 for the button and value to be displayed normally, without any
+            // additional indent. Otherwise, the button will not be clickable, and the value will look shifted
+            // compared to other fields.
+            int previousIndent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
+
+            EventType = ChoiceButton.DrawAndCheckType(buttonRect, EventType, _argsCount);
+            EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
+
+            if (EventType == EventTypes.Variable)
             {
-                (Rect labelRect, Rect buttonRect, Rect valueRect) = GetLabelButtonValueRects(fieldRect);
-
-                EditorGUI.HandlePrefixLabel(fieldRect, labelRect, label);
-
-                // The indent level must be made 0 for the button and value to be displayed normally, without any
-                // additional indent. Otherwise, the button will not be clickable, and the value will look shifted
-                // compared to other fields.
-                int previousIndent = EditorGUI.indentLevel;
-                EditorGUI.indentLevel = 0;
-
-                EventType = ChoiceButton.DrawAndCheckType(buttonRect, EventType, _argsCount);
-                EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
-
-                EditorGUI.indentLevel = previousIndent;
+                fieldRect.y += EditorGUIUtility.singleLineHeight;
+                EditorGUI.PropertyField(fieldRect, _notifyCurrentValue, GUIContentHelper.Temp("Fire current value on enable"));
             }
+
+            EditorGUI.indentLevel = previousIndent;
         }
 
         public void DrawEvent(Rect fieldRect, GUIContent label)
         {
             EventType = EventTypes.ScriptableEvent;
             EditorGUI.PropertyField(fieldRect, _event, label);
+        }
+
+        public float GetPropertyHeight()
+        {
+            return EditorGUIUtility.singleLineHeight * (EventType == EventTypes.Variable ? 2f : 1f);
         }
 
         private (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)

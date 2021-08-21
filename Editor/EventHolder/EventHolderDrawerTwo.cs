@@ -10,6 +10,12 @@
     [CustomPropertyDrawer(typeof(EventHolderBaseTwo), true)]
     public class EventHolderDrawerTwo : PropertyDrawer
     {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            var helper = new EventHolderDrawerUtil(property, 2);
+            return helper.GetPropertyHeight();
+        }
+
         public override void OnGUI(Rect fieldRect, SerializedProperty property, GUIContent label)
         {
             var helper = new EventHolderDrawerUtil(property, 2);
