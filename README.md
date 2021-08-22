@@ -682,3 +682,7 @@ private static void ReportSize(float size)
 }
 ```
 
+## Acknowledgments
+
+- Thanks to [UnityAtoms](https://github.com/unity-atoms/unity-atoms) for their icons, some of which were used in this package under the MIT license.
+- Thanks to [Daniel Everland](https://github.com/DanielEverland/ScriptableObject-Architecture). Its stack trace implementation was used as inspiration for the feature in this package.
