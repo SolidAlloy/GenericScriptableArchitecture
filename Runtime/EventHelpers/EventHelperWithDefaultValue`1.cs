@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using SolidUtilities.Extensions;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
 #if UNIRX
@@ -27,6 +28,9 @@
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)
             .Concat(_multipleEventsListeners)
+#if UNIRX
+            .Concat(_observers.Select(node => node.GetTarget()))
+#endif
             .OfType<Object>()
             .ToList();
 
@@ -56,17 +60,26 @@
                 return;
             }
 
+            bool isValidListener = false;
+
             if (listener is IEventListener<T> eventListener)
             {
+                isValidListener = true;
+
                 if (_singleEventListeners.AddIfMissing(eventListener) && notifyCurrentValue)
                     eventListener.OnEventInvoked(_getCurrentValue());
             }
 
             if (listener is IMultipleEventsListener<T> multipleEventsListener)
             {
+                isValidListener = true;
+
                 if (_multipleEventsListeners.AddIfMissing(multipleEventsListener) && notifyCurrentValue)
                     multipleEventsListener.OnEventInvoked(_parentEvent ?? this, _getCurrentValue());
             }
+
+            if ( ! isValidListener)
+                Debug.LogWarning($"Tried to subscribe to {_parentEvent?.ToString() ?? "an event"} with a listener that does not implement any of supported interfaces.");
         }
 
         public void RemoveListener(IListener<T> listener)
@@ -139,6 +152,7 @@
 
         private ObserverNode<T> _root;
         private ObserverNode<T> _last;
+        private readonly List<ObserverNode<T>> _observers = new List<ObserverNode<T>>();
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
@@ -153,6 +167,8 @@
 
             // subscribe node, node as subscription.
             var next = new ObserverNode<T>(this, observer);
+
+            _observers.Add(next);
 
             if (_root == null)
             {
@@ -170,6 +186,8 @@
 
         void IObserverLinkedList<T>.UnsubscribeNode(ObserverNode<T> node)
         {
+            _observers.Remove(node);
+
             if (node == _root)
                 _root = node.Next;
 

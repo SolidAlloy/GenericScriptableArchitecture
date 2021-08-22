@@ -3,6 +3,9 @@
     using System;
 
     public interface IEventHelperWithDefaultValue<T> : IEvent<T>
+#if UNIRX
+        , IObservable<T>
+#endif
     {
         void AddListener(IListener<T> listener, bool notifyCurrentValue = false);
 
@@ -11,9 +14,5 @@
         void AddListener(Action<T> listener, bool notifyCurrentValue = false);
 
         void RemoveListener(Action<T> listener);
-
-#if UNIRX
-        IDisposable Subscribe(IObserver<T> observer);
-#endif
     }
 }

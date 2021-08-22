@@ -1,29 +1,32 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using EasyButtons.Editor;
-    using GenericUnityObjects.UnityEditorInternals;
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
-    internal class ScriptableEventEditor : GenericHeaderEditor, IRepaintable
+    internal class ScriptableEventEditor : PlayModeUpdatableEditor, IRepaintable
     {
         private ButtonsDrawer _buttonsDrawer;
         private FoldoutList<UnityEngine.Object> _listenersList;
         private SerializedProperty _description;
         private StackTraceDrawer _stackTrace;
+        private BaseScriptableEvent _typedTarget;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _buttonsDrawer = new ButtonsDrawer(target);
-            var typedTarget = (BaseScriptableEvent) target;
+            _typedTarget = (BaseScriptableEvent) target;
 
             var responseTargetsExpanded = serializedObject.FindProperty(nameof(BaseScriptableEvent.ListenersExpanded));
-            _listenersList = new FoldoutList<UnityEngine.Object>(typedTarget.Listeners, responseTargetsExpanded, "Listeners");
+            _listenersList = new FoldoutList<UnityEngine.Object>(_typedTarget.Listeners, responseTargetsExpanded, "Listeners");
 
             _description = serializedObject.FindProperty("_description");
 
-            _stackTrace = new StackTraceDrawer(typedTarget, this);
+            _stackTrace = new StackTraceDrawer(_typedTarget, this);
         }
+
+        protected override void Update() => _listenersList.Update(_typedTarget.Listeners);
 
         public override void OnInspectorGUI()
         {

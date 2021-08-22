@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using SolidUtilities.Extensions;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
     public class EventHelper<T1, T2> : IEventHelper<T1, T2>, IDisposable
@@ -19,6 +20,9 @@
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)
             .Concat(_multipleEventsListeners)
+#if UNIRX
+            .Concat(_observableHelper?.Targets ?? Enumerable.Empty<object>())
+#endif
             .OfType<Object>()
             .ToList();
 
@@ -59,15 +63,22 @@
                 return;
             }
 
+            bool isValidListener = false;
+
             if (listener is IEventListener<T1, T2> eventListener)
             {
-                _singleEventListeners.Remove(eventListener);
+                isValidListener = true;
+                _singleEventListeners.AddIfMissing(eventListener);
             }
 
             if (listener is IMultipleEventsListener<T1, T2> multipleEventsListener)
             {
-                _multipleEventsListeners.Remove(multipleEventsListener);
+                isValidListener = true;
+                _multipleEventsListeners.AddIfMissing(multipleEventsListener);
             }
+
+            if ( ! isValidListener)
+                Debug.LogWarning($"Tried to subscribe to {_parentEvent?.ToString() ?? "an event"} with a listener that does not implement any of supported interfaces.");
         }
 
         public void AddListener(Action<T1, T2> listener)

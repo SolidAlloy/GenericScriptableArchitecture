@@ -17,13 +17,20 @@ namespace GenericScriptableArchitecture
             return new SubscribeWithHistory<T>(onNext, onError, onCompleted);
         }
 
-        private class SubscribeWithHistory<T> : IObserver<(T, T)>
+        public abstract class SubscribeWithHistory
+        {
+            public abstract object Target { get; }
+        }
+
+        public class SubscribeWithHistory<T> : SubscribeWithHistory, IObserver<(T, T)>
         {
             private readonly Action<T, T> _onNext;
             private readonly Action<Exception> _onError;
             private readonly Action _onCompleted;
 
             private int _isStopped;
+
+            public override object Target => _onNext.Target;
 
             public SubscribeWithHistory(Action<T, T> onNext, Action<Exception> onError, Action onCompleted)
             {

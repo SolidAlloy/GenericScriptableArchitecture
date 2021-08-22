@@ -8,7 +8,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
-    internal abstract class VariableEditorBase : GenericHeaderEditor
+    internal abstract class VariableEditorBase : PlayModeUpdatableEditor
     {
         protected bool _withHistory;
         protected BaseVariable _baseVariable;
@@ -29,8 +29,10 @@
         private int _previousKeyboardControl;
         private object _previousValueObject;
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             // Can be null because we also use the editor for drawing Constant<T>
             _baseVariable = target as BaseVariable;
             _withHistory = IsTargetWithHistory();

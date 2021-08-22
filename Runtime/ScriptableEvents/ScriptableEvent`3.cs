@@ -42,7 +42,9 @@
 
         public void RemoveListener(Action<T1, T2, T3> listener) => _eventHelper.RemoveListener(listener);
 
+#if UNIRX
         public IDisposable Subscribe(IObserver<(T1, T2, T3)> observer) => _eventHelper.Subscribe(observer);
+#endif
 
         #endregion
 

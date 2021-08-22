@@ -4,8 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using SolidUtilities.Extensions;
-    using UniRx;
+    using UnityEngine;
     using Object = UnityEngine.Object;
+
+#if UNIRX
+    using UniRx;
+#endif
 
     public class EventHelper<T> : IEventHelper<T>, IDisposable
     {
@@ -20,6 +24,9 @@
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)
             .Concat(_multipleEventsListeners)
+#if UNIRX
+            .Concat(_observableHelper?.Targets ?? Enumerable.Empty<object>())
+#endif
             .OfType<Object>()
             .ToList();
 
@@ -41,15 +48,22 @@
                 return;
             }
 
+            bool isValidListener = false;
+
             if (listener is IEventListener<T> eventListener)
             {
+                isValidListener = true;
                 _singleEventListeners.AddIfMissing(eventListener);
             }
 
             if (listener is IMultipleEventsListener<T> multipleEventsListener)
             {
+                isValidListener = true;
                 _multipleEventsListeners.AddIfMissing(multipleEventsListener);
             }
+
+            if ( ! isValidListener)
+                Debug.LogWarning($"Tried to subscribe to {_parentEvent?.ToString() ?? "an event"} with a listener that does not implement any of supported interfaces.");
         }
 
         public void RemoveListener(IListener<T> listener)
@@ -104,7 +118,6 @@
             }
 
 #if UNIRX
-            _subject?.OnNext(arg0);
             _observableHelper?.RaiseOnNext(arg0);
 #endif
         }
@@ -113,15 +126,6 @@
 
 #if UNIRX
         private bool _disposed;
-
-        private Subject<T> _subject;
-        public IObservable<T> Observe()
-        {
-            if (_disposed)
-                return Observable.Empty<T>();
-
-            return _subject ??= new Subject<T>();
-        }
 
         private ObservableHelper<T> _observableHelper;
 
@@ -141,19 +145,6 @@
             _disposed = true;
 
             _observableHelper?.Dispose();
-
-            if (_subject == null)
-                return;
-
-            try
-            {
-                _subject.OnCompleted();
-            }
-            finally
-            {
-                _subject.Dispose();
-                _subject = null;
-            }
 #endif
         }
 

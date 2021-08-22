@@ -21,8 +21,7 @@
         public ClampedInt(int value, int min, int max)
         {
             if (min > max)
-                throw new ArgumentOutOfRangeException(nameof(max),
-                    $"Min argument must be less or equal the max argument ({max}), passed {min} instead.");
+                throw new ArgumentOutOfRangeException(nameof(max), $"Min argument must be less or equal the max argument ({max}), passed {min} instead.");
 
             _min = min;
             _max = max;

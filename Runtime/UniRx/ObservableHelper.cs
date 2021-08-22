@@ -2,6 +2,8 @@
 namespace GenericScriptableArchitecture
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using UniRx;
 
     public class ObservableHelper<T> : IDisposable, IObserverLinkedList<T>
@@ -9,6 +11,10 @@ namespace GenericScriptableArchitecture
         private bool _disposed;
         private ObserverNode<T> _root;
         private ObserverNode<T> _last;
+
+        private readonly List<ObserverNode<T>> _observers = new List<ObserverNode<T>>();
+
+        public IEnumerable<object> Targets => _observers.Select(node => node.GetTarget());
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
@@ -20,6 +26,8 @@ namespace GenericScriptableArchitecture
 
             // subscribe node, node as subscription.
             var next = new ObserverNode<T>(this, observer);
+
+            _observers.Add(next);
 
             if (_root == null)
             {
@@ -37,6 +45,8 @@ namespace GenericScriptableArchitecture
 
         void IObserverLinkedList<T>.UnsubscribeNode(ObserverNode<T> node)
         {
+            _observers.Remove(node);
+
             if (node == _root)
                 _root = node.Next;
 

@@ -1,33 +1,44 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System.Collections.Generic;
-    using GenericUnityObjects.UnityEditorInternals;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseRuntimeSet), true)]
-    public class RuntimeSetEditor : GenericHeaderEditor
+    internal class RuntimeSetEditor : PlayModeUpdatableEditor
     {
         private ReorderableList _listDrawer;
-
         private List<FoldoutList<Object>> _eventListeners;
+        private BaseRuntimeSet _typedTarget;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _listDrawer = GetReorderableList();
 
-            var baseRuntimeSet = (BaseRuntimeSet) target;
+            _typedTarget = (BaseRuntimeSet) target;
 
             _eventListeners = new List<FoldoutList<Object>>
             {
-                new FoldoutList<Object>(baseRuntimeSet.AddListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.AddExpanded)), "Add Event Listeners"),
-                new FoldoutList<Object>(baseRuntimeSet.CountChangeListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.CountChangeExpanded)), "Count Change Event Listeners"),
-                new FoldoutList<Object>(baseRuntimeSet.MoveListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.MoveExpanded)), "Move Event Listeners"),
-                new FoldoutList<Object>(baseRuntimeSet.RemoveListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.RemoveExpanded)), "Remove Event Listeners"),
-                new FoldoutList<Object>(baseRuntimeSet.ReplaceListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ReplaceExpanded)), "Replace Event Listeners"),
-                new FoldoutList<Object>(baseRuntimeSet.ResetListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ResetExpanded)), "Reset Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.AddListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.AddExpanded)), "Add Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.CountChangeListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.CountChangeExpanded)), "Count Change Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.MoveListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.MoveExpanded)), "Move Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.RemoveListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.RemoveExpanded)), "Remove Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.ReplaceListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ReplaceExpanded)), "Replace Event Listeners"),
+                new FoldoutList<Object>(_typedTarget.ResetListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ResetExpanded)), "Reset Event Listeners"),
             };
+        }
+
+        protected override void Update()
+        {
+            _eventListeners[0].Update(_typedTarget.AddListeners);
+            _eventListeners[1].Update(_typedTarget.CountChangeListeners);
+            _eventListeners[2].Update(_typedTarget.MoveListeners);
+            _eventListeners[3].Update(_typedTarget.RemoveListeners);
+            _eventListeners[4].Update(_typedTarget.ReplaceListeners);
+            _eventListeners[5].Update(_typedTarget.ResetListeners);
         }
 
         public override void OnInspectorGUI()

@@ -1,9 +1,15 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+
+#if UNIRX
     using UniRx;
+#endif
 
     public interface IEventHelper : IEvent
+#if UNIRX
+        , IObservable<Unit>
+#endif
     {
         public void AddListener(IListener listener);
 
@@ -12,11 +18,5 @@
         void AddListener(Action listener);
 
         void RemoveListener(Action listener);
-
-#if UNIRX
-        IObservable<Unit> Observe();
-
-        IDisposable Subscribe(IObserver<Unit> observer);
-#endif
     }
 }

@@ -4,8 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using SolidUtilities.Extensions;
-    using UniRx;
+    using UnityEngine;
     using Object = UnityEngine.Object;
+
+#if UNIRX
+    using UniRx;
+#endif
 
     public class EventHelper : IEventHelper, IDisposable
     {
@@ -20,6 +24,9 @@
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)
             .Concat(_multipleEventsListeners)
+#if UNIRX
+            .Concat(_observableHelper?.Targets ?? Enumerable.Empty<object>())
+#endif
             .OfType<Object>()
             .ToList();
 
@@ -43,15 +50,22 @@
                 return;
             }
 
+            bool isValidListener = false;
+
             if (listener is IEventListener eventListener)
             {
+                isValidListener = true;
                 _singleEventListeners.AddIfMissing(eventListener);
             }
 
             if (listener is IMultipleEventsListener multipleEventsListener)
             {
+                isValidListener = true;
                 _multipleEventsListeners.AddIfMissing(multipleEventsListener);
             }
+
+            if ( ! isValidListener)
+                Debug.LogWarning($"Tried to subscribe to {_parentEvent?.ToString() ?? "an event"} with a listener that does not implement any of supported interfaces.");
         }
 
         public void RemoveListener(IListener listener)
@@ -106,24 +120,14 @@
             }
 
 #if UNIRX
-            _subject?.OnNext(Unit.Default);
             _observableHelper?.RaiseOnNext(Unit.Default);
 #endif
         }
 
         #region UniRx
 #if UNIRX
+
         private bool _disposed;
-
-        private Subject<Unit> _subject;
-
-        public IObservable<Unit> Observe()
-        {
-            if (_disposed)
-                return Observable.Empty<Unit>();
-
-            return _subject ??= new Subject<Unit>();
-        }
 
         private ObservableHelper<Unit> _observableHelper;
 
@@ -143,19 +147,6 @@
             _disposed = true;
 
             _observableHelper?.Dispose();
-
-            if (_subject == null)
-                return;
-
-            try
-            {
-                _subject.OnCompleted();
-            }
-            finally
-            {
-                _subject.Dispose();
-                _subject = null;
-            }
 #endif
         }
 

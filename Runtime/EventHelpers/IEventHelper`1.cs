@@ -3,6 +3,9 @@
     using System;
 
     public interface IEventHelper<T> : IEvent<T>
+#if UNIRX
+        , IObservable<T>
+#endif
     {
         void AddListener(IListener<T> listener);
 
@@ -11,11 +14,5 @@
         void AddListener(Action<T> listener);
 
         void RemoveListener(Action<T> listener);
-
-#if UNIRX
-        IObservable<T> Observe();
-
-        IDisposable Subscribe(IObserver<T> observer);
-#endif
     }
 }

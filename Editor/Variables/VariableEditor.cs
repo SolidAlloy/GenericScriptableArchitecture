@@ -24,6 +24,14 @@
             _stackTrace = new StackTraceDrawer(_baseVariable, this);
         }
 
+        protected override void Update()
+        {
+            _listeners.Update(_baseVariable.Listeners);
+
+            if (_withHistory)
+                _listenersWithHistory.Update(_baseVariable.ListenersWithHistory);
+        }
+
         private void InitializeListeners()
         {
             var expanded = serializedObject.FindProperty(nameof(Variable<bool>.ListenersExpanded));

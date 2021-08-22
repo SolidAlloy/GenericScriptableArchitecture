@@ -3,6 +3,9 @@
     using System;
 
     public interface IEventHelperWithHistory<T> : IEvent<T, T>
+#if UNIRX
+        , IObservable<(T Previous, T Current)>
+#endif
     {
         void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false);
 
@@ -11,9 +14,5 @@
         void AddListener(Action<T, T> listener, bool notifyCurrentValue = false);
 
         void RemoveListener(Action<T, T> listener);
-
-#if UNIRX
-        IDisposable Subscribe(IObserver<(T Previous, T Current)> observer);
-#endif
     }
 }
