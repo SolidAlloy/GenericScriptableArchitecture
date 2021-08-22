@@ -1,5 +1,7 @@
 # Generic ScriptableObject Architecture
- ScriptableObject architecture with small, easy-to-expand codebase, and simple UI.
+ScriptableObject architecture with small, easy-to-expand codebase, and simple UI.
+
+[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-architecture?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-unity-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableArchitecture/blob/main/LICENSE) ![Unity: 2020.2](https://img.shields.io/badge/unity-2020.2-yellow) ![.NET 4.x](https://img.shields.io/badge/.NET-4.x-9cf)
 
 Another take on ScriptableObject architecture from [Ryan Hipple's 2017 Unite talk](https://www.youtube.com/watch?v=raQ3iHhE_Kk)
 
