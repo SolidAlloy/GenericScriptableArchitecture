@@ -43,6 +43,7 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
         "com.solidalloy.util",
         "com.solidalloy.type.references",
         "com.solidalloy.generic-unity-objects",
+        "com.madsbangh.easybuttons",
         "com.solidalloy.generic-scriptable-architecture",
         "com.openupm"
       ]
@@ -62,9 +63,10 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 1. In Unity, open **Window** -> **Package Manager**.
 2. Press the **+** button, choose "**Add package from git URL...**"
 3. Enter "https://github.com/SolidAlloy/SolidUtilities.git" and press **Add**.
-4. Do the same with three more packages:
+4. Do the same with four more packages:
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unit
    - https://github.com/SolidAlloy/GenericUnityObjects.git
+   - https://github.com/madsbangh/EasyButtons
    - https://github.com/SolidAlloy/GenericScriptableArchitecture
 
 ## Quick Start
