@@ -17,6 +17,56 @@ In ScriptableObject architecture, variables and events are scriptable objects. T
 
 Have you ever heard of advantages of ECS? That data-driven architecture is good for games and allows for better decoupling of systems and managing mechanics? ScriptableObject architecture provides just that. It doesn't provide the efficiency benefit of ECS, but doesn't require you to change the GameObject-Component workflow you are used to. So it's very easy to pick up and integrate only where you need it. Of course, not every variable should be a scriptable object. You declare variables as scriptable objects only when you need to interact with the 'outside world', be it another prefab or scene.
 
+## Requirements
+
+- Unity 2020.2 or higher
+- .NET 4.x :heavy_exclamation_mark:
+
+## How To Install
+
+### OpenUPM
+
+Once you have the OpenUPM cli, run the following command:
+
+```
+openupm install com.solidalloy.generic-scriptable-architecture
+```
+
+Or if you don't have it, add the scoped registry to manifest.json with the desired dependency semantic version:
+
+```json
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.solidalloy.util",
+        "com.solidalloy.type.references",
+        "com.solidalloy.generic-unity-objects",
+        "com.solidalloy.generic-scriptable-architecture",
+        "com.openupm"
+      ]
+    }
+  ],
+  "dependencies": {
+    "com.solidalloy.generic-scriptable-architecture": "1.0.0"
+  },
+```
+
+
+
+### Git URL
+
+Project supports Unity Package Manager. To install it as a Git package do the following:
+
+1. In Unity, open **Window** -> **Package Manager**.
+2. Press the **+** button, choose "**Add package from git URL...**"
+3. Enter "https://github.com/SolidAlloy/SolidUtilities.git" and press **Add**.
+4. Do the same with three more packages:
+   - https://github.com/SolidAlloy/ClassTypeReference-for-Unit
+   - https://github.com/SolidAlloy/GenericUnityObjects.git
+   - https://github.com/SolidAlloy/GenericScriptableArchitecture
+
 ## Quick Start
 
 ### Variable
