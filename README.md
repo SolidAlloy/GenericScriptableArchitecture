@@ -74,16 +74,16 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 ### Variable
 
 1. Go to the *Create* context menu, choose Variable
-   ![image-20210814081833531](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814081833531.png)
+   ![Create Variable](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/create-variable.png)
 
 2. Choose a type of the variable you would like to use. Here, we will choose `float`
-   ![image-20210814082013166](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814082013166.png)
+   ![Choose Variable Type](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/choose-variable-type.png)
 
 3. Enter a name for the variable, and it will be created
-   ![image-20210814084356514](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814084356514.png)
+   ![Balloon Variable](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-variable.png)
 
 4. You can create a description for the variable, choose its initial value. Notice how the variable is a generic class, so you can create variables of any type with the same steps, without having to write any additional classes. We will cover the "Enable stack trace" in the [Stack trace](#debugging) section.
-   ![image-20210814084450180](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814084450180.png)
+   ![Balloon Inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-inspector.png)
 
 5. Let's now use the variable. We have one class that will increment the counter:
 
@@ -121,22 +121,22 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
    ```
 
 6. Now, if we assign the created variable to the fields and create the Balloon game object as a 3D sphere, it will start inflating in play mode:
-   ![balloon-animated](D:\Temp\balloon-animated.gif)
+   ![Balloon Animated](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-animated.gif)
    Of course, variables don't always change every frame. If you want to listen for a variable change instead of getting it in `Update()`, check out the section on Variables.
 7. We can also change the balloon size in inspector, and the balloon will react. Don't forget to disable AirPump component so that it stops inflating the balloon.
-   ![balloon-play-inspector](D:\Temp\balloon-play-inspector.gif)
+   ![Balloon PlayMode Inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-play-inspector.gif)
 
 
 
 ### Scriptable Event
 
 1. We can create a scriptable event with the same *Create* context menu
-   ![image-20210814090200765](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814090200765.png)
+   ![Create Scriptable Event](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/create-scriptable-event.png)
 
 2. Let's choose an event with one generic argument which will also be float, and name it "Balloon popped"
 
 3. We can also create a description for the event. The invoke button is grayed out, but we will be able to invoke it in play mode. Stack trace is covered in a separate section
-   ![image-20210814091906665](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814091906665.png)
+   ![Balloon Event Inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-event-inspector.png)
 
 4. Let's create a needle that will pop a balloon:
 
@@ -212,21 +212,21 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
    ```
 
 6. In this example, we will connect methods through the `ScriptableEventListener` component. Let's add one to the balloon, and one to the air pump. You can find `ScriptableEventListener<T>` in the Add Component menu
-   ![image-20210814100027792](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814100027792.png)
+   ![Scriptable Event Listener Add](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-add.png)
    Then choose the `float` type for it
-   ![image-20210814100132267](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814100132267.png)
+   ![Scriptable Event Listener Choose Type](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-choose-type.png)
 
 7. Voila! We can assign the scriptable event to it and choose the `Balloon.Pop()` method inside.
-   ![image-20210814100342633](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210814100342633.png)
+   ![Scriptable Event Inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-inspector.png)
    Do the same with Air Pump and choose `OnBalloonPopped` method.
 
 8. Let's test it in play mode. Let the balloon inflate, then pop it
-   ![balloon-pops](D:\Temp\balloon-pops.gif)
+   ![Balloon pops](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-pops.gif)
    As you can see, it works well. The balloon pops, and the pump stops working and knows the size at which the balloon popped.
 
 9. The cool thing is we can also invoke events directly if we don't have an easily reachable button or command to do it.
 
-   ![pop-balloon-event](D:\Temp\pop-balloon-event.gif)
+   ![Pop Balloon Event](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/pop-balloon-event.gif)
    Notice how we can see all the listeners of the event.
 
 This is one of the multiple ways to listen for an event. GenericScriptableArchitecture has much more than shown in the Ryan Hipple's talk.
@@ -398,7 +398,7 @@ Variable is another common component of ScriptableObject Architecture. The most 
 
 In Edit Mode, you can set the initial value of the variable. In Play Mode, the initial value is not editable by default to avoid accident changes. However, when you see it should be changed but don't want exit Play Mode at the moment, you make it editable by pressing the checkbox on the right.
 
-![variable-enable-initial-value](D:\Temp\variable-enable-initial-value.png)
+![variable-enable-initial-value](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/variable-enable-initial-value.png)
 
 You can subscribe to variable like to a scriptable event, using all the methods described in the previous section. +=, `AddListener`, `Subscribe` - all these methods are declared in the `Variable` class too.
 
@@ -443,7 +443,7 @@ private void Start()
 
 You can subscribe to a variable with ScriptableEventListener. The dropdown button in the ScriptableEventListener interface lets you choose between an event and a variable:
 
-![scriptable-event-listener-dropdown](D:\Temp\scriptable-event-listener-dropdown.png)
+![scriptable-event-listener-dropdown](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-dropdown.png)
 
 ### Variable With History
 
@@ -484,7 +484,7 @@ public class TestBehaviour : MonoBehaviour, IEventListener<int, int>
 
 Just like you can subscribe to a variable with history using `IEventListener<T, T>`, you can do it with a ScriptableEventListener that has two generic arguments of same type:
 
-![scriptable-event-listener-with-history](D:\Temp\scriptable-event-listener-with-history.png)
+![scriptable-event-listener-with-history](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-with-history.png)
 
 You can also ask to fire the current value immediately on subscribe, like with the regular variable. However, note that the previous value might not be set at the moment of subscribe. In this case, the response will not be triggered immediately even if you set notifyCurrentValue to true. It will be triggered only once a new value is passed to the variable so that it is able to provide both previous and current values to subscribers.
 
@@ -496,7 +496,7 @@ _variableWithHistory.AddListener(value => Debug.Log($"new current value: {value}
 
 The previous value can be seen in the variable inspector:
 
-![variable-with-history-previous-field](D:\Temp\variable-with-history-previous-field.gif)
+![variable-with-history-previous-field](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/variable-with-history-previous-field.gif)
 
 ### Constant
 
@@ -513,14 +513,14 @@ public class Balloon : MonoBehaviour
 }
 ```
 
-![reference-inspector](D:\Temp\reference-inspector.png)
+![reference-inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/reference-inspector.png)
 
 ### Runtime Set
 
 The main purpose of RuntimeSet is to keep a collection of items grouped by some rule. If the set contains an item, it means it has some property e.g. it is one of enemies. It is a replacement for tags, but an item can have multiple tags because it can add itself to multiple runtime sets. The basic use of RuntimeSet is the following one:
 
 - There's a runtime set of game objects called *Enemies*:
-  ![enemies-inspector-edit-mode](D:\Temp\enemies-inspector-edit-mode.png)
+  ![enemies-inspector-edit-mode](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/enemies-inspector-edit-mode.png)
 
 - Each enemy keeps themselves in the set while they are active:
 
@@ -565,7 +565,7 @@ The main purpose of RuntimeSet is to keep a collection of items grouped by some 
 
 You can see all the current active enemies in the set:
 
-![enemies-in-set](D:\Temp\enemies-in-set.png)
+![enemies-in-set](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/enemies-in-set.png)
 
 You will use runtime sets of `GameObject`s most frequently, but you can always put another type of `MonoBehaviour` or even `ScriptableObject` there. Sometimes, you not only need to check if the object is in the runtime set, but also get some of its values. In order to not call `GetComponent<T>()` every time for that, you can optimize it by creating `RuntimeSet<Transform>` or `RuntimeSet<Collider>`.
 
@@ -622,15 +622,15 @@ As with variables and events, you can see all the current listeners to different
 ## Debugging
 
 When a variable or event is used in lots of places, it can sometimes be hard to find what changed its value or why someone hasn't received the event. To debug such issues, you can enable stack traces on events, variables, and scriptable event listeners. Gathering stack traces from thousands of calls can be very taxing on the editor performance, so it is advised to enable it only on the variables/events you need to debug at the moment. Press the *Enable Stack Trace* button to start debugging an event:
-![enable-stack-trace-button](D:\Temp\enable-stack-trace-button.png)
+![enable-stack-trace-button](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/enable-stack-trace-button.png)
 
 Once you are in Play Mode, you will see stack traces for all the invocations of the event and where they were made from.
-![stack-trace-inspector](D:\Temp\stack-trace-inspector.png)
+![stack-trace-inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/stack-trace-inspector.png)
 
 For each invocation, you can see a frame since startup, in which the event was invoked, the parameters that were passed to the event, and the detailed stack trace. The links in the stack trace are clickable, and you can go to the specific line where the event was called.
 
 There can be a situation, when you need to debug multiple events and variables, and it's tedious to toggle stack traces in all of them. In such case, you can enable stack traces for all the assets in the project. Don't forget to disable them when debugging is finished.
-![stack-trace-project-settings](D:\Temp\stack-trace-project-settings.png)
+![stack-trace-project-settings](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/stack-trace-project-settings.png)
 
 The stack trace system is completely stripped from game builds, so you won't see any impact on performance even if you forgot to disable stack traces from a couple of assets.
 
@@ -639,7 +639,7 @@ I haven't implemented a visual debug system like in [ScriptableObject-Architectu
 ## Custom data structures
 
 Since the system is built on generics, it doesn't have a fancy custom inspector for each type of generic argument. You can't enable a slider on `Variable<int>`, for example. However, I see it as a good thing. If you need to limit the variable's value, why not limit it in the code, so no one can set the value outside of limit through a script? For this reason, I have `ClampedInt` and `ClampedFloat` structs included in the plugin. A variable with such a value looks like this:
-![clamped-float-inspector](D:\Temp\clamped-float-inspector.png)
+![clamped-float-inspector](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/clamped-float-inspector.png)
 
 The cool thing about this is that the value is also clamped when it is set through code, so you won't have situation when you clamped the variable in the inspector between 1 and 10, but someone has set it to 15 in a script.
 
@@ -652,7 +652,7 @@ I might support some decorator attributes on variables and events. Leave your su
 ### Some listeners are not shown in the listeners list
 
 When an object subscribes to an event or variable, it is usually shown in the list of listeners:
-![listeners-list](D:\Temp\listeners-list.png)
+![listeners-list](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableArchitecture/main/.images/listeners-list.png)
 
 The limitation of the list is that it can only show listeners that inherit from `UnityEngine.Object` (`MonoBehaviour` and `ScriptableObject`). Also, if you subscribe with an action or through UniRx and provide a static method, there is no way to find the original target of the action, so it will not appear in the list:
 
