@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.0.0...1.0.1) (2021-08-23)
+
+
+### Bug Fixes
+
+* Fixed reference to the Timeline assembly ([566fb24](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/566fb2456a1c478ca32c2f4755b0861a08e3d22b))
+
 # 1.0.0 (2021-08-22)
 
 
