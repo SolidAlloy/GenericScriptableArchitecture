@@ -638,14 +638,17 @@ As with variables and events, you can see all the current listeners to different
 ## Debugging
 
 When a variable or event is used in lots of places, it can sometimes be hard to find what changed its value or why someone hasn't received the event. To debug such issues, you can enable stack traces on events, variables, and scriptable event listeners. Gathering stack traces from thousands of calls can be very taxing on the editor performance, so it is advised to enable it only on the variables/events you need to debug at the moment. Press the *Enable Stack Trace* button to start debugging an event:
+
 ![enable-stack-trace-button](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/enable-stack-trace-button.png)
 
 Once you are in Play Mode, you will see stack traces for all the invocations of the event and where they were made from.
+
 ![stack-trace-inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/stack-trace-inspector.png)
 
 For each invocation, you can see a frame since startup, in which the event was invoked, the parameters that were passed to the event, and the detailed stack trace. The links in the stack trace are clickable, and you can go to the specific line where the event was called.
 
 There can be a situation, when you need to debug multiple events and variables, and it's tedious to toggle stack traces in all of them. In such case, you can enable stack traces for all the assets in the project. Don't forget to disable them when debugging is finished.
+
 ![stack-trace-project-settings](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/stack-trace-project-settings.png)
 
 The stack trace system is completely stripped from game builds, so you won't see any impact on performance even if you forgot to disable stack traces from a couple of assets.
@@ -655,6 +658,7 @@ I haven't implemented a visual debug system like in [ScriptableObject-Architectu
 ## Custom data structures
 
 Since the system is built on generics, it doesn't have a fancy custom inspector for each type of generic argument. You can't enable a slider on `Variable<int>`, for example. However, I see it as a good thing. If you need to limit the variable's value, why not limit it in the code, so no one can set the value outside of limit through a script? For this reason, I have `ClampedInt` and `ClampedFloat` structs included in the plugin. A variable with such a value looks like this:
+
 ![clamped-float-inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/clamped-float-inspector.png)
 
 The cool thing about this is that the value is also clamped when it is set through code, so you won't have situation when you clamped the variable in the inspector between 1 and 10, but someone has set it to 15 in a script.
