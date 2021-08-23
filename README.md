@@ -82,9 +82,11 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
    ![Choose Variable Type](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/choose-variable-type.png)
 
 3. Enter a name for the variable, and it will be created
+   
    ![Balloon Variable](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-variable.png)
 
 4. You can create a description for the variable, choose its initial value. Notice how the variable is a generic class, so you can create variables of any type with the same steps, without having to write any additional classes. We will cover the "Enable stack trace" in the [Stack trace](#debugging) section.
+   
    ![Balloon Inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-inspector.png)
 
 5. Let's now use the variable. We have one class that will increment the counter:
@@ -123,9 +125,12 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
    ```
 
 6. Now, if we assign the created variable to the fields and create the Balloon game object as a 3D sphere, it will start inflating in play mode:
+   
    ![Balloon Animated](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-animated.gif)
+   
    Of course, variables don't always change every frame. If you want to listen for a variable change instead of getting it in `Update()`, check out the section on Variables.
 7. We can also change the balloon size in inspector, and the balloon will react. Don't forget to disable AirPump component so that it stops inflating the balloon.
+   
    ![Balloon PlayMode Inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-play-inspector.gif)
 
 
@@ -138,6 +143,7 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 2. Let's choose an event with one generic argument which will also be float, and name it "Balloon popped"
 
 3. We can also create a description for the event. The invoke button is grayed out, but we will be able to invoke it in play mode. Stack trace is covered in a separate section
+   
    ![Balloon Event Inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-event-inspector.png)
 
 4. Let's create a needle that will pop a balloon:
@@ -214,21 +220,29 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
    ```
 
 6. In this example, we will connect methods through the `ScriptableEventListener` component. Let's add one to the balloon, and one to the air pump. You can find `ScriptableEventListener<T>` in the Add Component menu
+   
    ![Scriptable Event Listener Add](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-add.png)
+   
    Then choose the `float` type for it
+   
    ![Scriptable Event Listener Choose Type](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-choose-type.png)
 
 7. Voila! We can assign the scriptable event to it and choose the `Balloon.Pop()` method inside.
+   
    ![Scriptable Event Inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-inspector.png)
+   
    Do the same with Air Pump and choose `OnBalloonPopped` method.
 
 8. Let's test it in play mode. Let the balloon inflate, then pop it
+   
    ![Balloon pops](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/balloon-pops.gif)
+   
    As you can see, it works well. The balloon pops, and the pump stops working and knows the size at which the balloon popped.
 
 9. The cool thing is we can also invoke events directly if we don't have an easily reachable button or command to do it.
 
    ![Pop Balloon Event](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/pop-balloon-event.gif)
+   
    Notice how we can see all the listeners of the event.
 
 This is one of the multiple ways to listen for an event. GenericScriptableArchitecture has much more than shown in the Ryan Hipple's talk.
