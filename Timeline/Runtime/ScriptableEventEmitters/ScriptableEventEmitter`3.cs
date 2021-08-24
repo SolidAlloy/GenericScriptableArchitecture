@@ -1,11 +1,11 @@
-﻿namespace GenericScriptableArchitecture
+﻿namespace GenericScriptableArchitecture.Timeline
 {
     using System;
     using UnityEngine;
 
     /// <inheritdoc/>
     [Serializable]
-    public abstract class ScriptableEventEmitter<T1, T2, T3> : ScriptableEventEmitterBase
+    public class ScriptableEventEmitter<T1, T2, T3> : BaseScriptableEventEmitter
     {
         [SerializeField] private ScriptableEvent<T1, T2, T3> _event;
         [SerializeField] private T1 _arg0;

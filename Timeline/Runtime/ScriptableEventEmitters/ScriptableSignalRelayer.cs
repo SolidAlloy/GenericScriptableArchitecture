@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableArchitecture
+﻿namespace GenericScriptableArchitecture.Timeline
 {
     using UnityEngine;
     using UnityEngine.Playables;
@@ -11,7 +11,7 @@
     {
         public void OnNotify(Playable _, INotification notification, object __)
         {
-            if (notification is ScriptableEventEmitterBase eventEmitter)
+            if (notification is BaseScriptableEventEmitter eventEmitter)
                 eventEmitter.InvokeEvent();
         }
     }

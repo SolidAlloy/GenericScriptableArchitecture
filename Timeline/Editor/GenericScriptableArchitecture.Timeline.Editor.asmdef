@@ -1,0 +1,34 @@
+{
+    "name": "GenericScriptableArchitecture.Timeline.Editor",
+    "rootNamespace": "GenericScriptableArchitecture.Timeline.Editor",
+    "references": [
+        "GUID:02f771204943f4a40949438e873e3eff",
+        "GUID:5e5112f3f59fe2046a07e37f1f26484c",
+        "GUID:f06555f75b070af458a003d92f9efb00",
+        "GUID:4cf0b59bfc01ab3409b5f5c1d2888de4",
+        "GUID:9168b41b563c2d84b94cfe84212541a9",
+        "GUID:2e5fb71161fa6f74f958f989fbdbb839",
+        "GUID:ea6a6314f279f814facc8c48a7d3c9f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "GenericUnityEditorInternals.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "USE_TIMELINE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.timeline",
+            "expression": "",
+            "define": "USE_TIMELINE"
+        }
+    ],
+    "noEngineReferences": false
+}

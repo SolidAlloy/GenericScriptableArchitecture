@@ -1,0 +1,28 @@
+{
+    "name": "GenericScriptableArchitecture.Timeline",
+    "rootNamespace": "GenericScriptableArchitecture.Timeline",
+    "references": [
+        "GUID:4cf0b59bfc01ab3409b5f5c1d2888de4",
+        "GUID:f06555f75b070af458a003d92f9efb00",
+        "GUID:9168b41b563c2d84b94cfe84212541a9"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "TimelineInternals.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "USE_TIMELINE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.timeline",
+            "expression": "",
+            "define": "USE_TIMELINE"
+        }
+    ],
+    "noEngineReferences": false
+}

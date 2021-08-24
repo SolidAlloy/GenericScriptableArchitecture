@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
+    <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
+    <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\Administrator\.nuget\packages\</NuGetPackageFolders>
+    <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">5.8.0</NuGetToolVersion>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <SourceRoot Include="$([MSBuild]::EnsureTrailingSlash($(NuGetPackageFolders)))" />
+  </ItemGroup>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)opensesame.net.compilers.toolset\3.7.0\build\OpenSesame.Net.Compilers.Toolset.props" Condition="Exists('$(NuGetPackageRoot)opensesame.net.compilers.toolset\3.7.0\build\OpenSesame.Net.Compilers.Toolset.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.codeanalysis.analyzers\3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('$(NuGetPackageRoot)microsoft.codeanalysis.analyzers\3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props')" />
+  </ImportGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgWintellect_Analyzers Condition=" '$(PkgWintellect_Analyzers)' == '' ">C:\Users\Administrator\.nuget\packages\wintellect.analyzers\1.0.6</PkgWintellect_Analyzers>
+    <PkgUnityEngineAnalyzer Condition=" '$(PkgUnityEngineAnalyzer)' == '' ">C:\Users\Administrator\.nuget\packages\unityengineanalyzer\1.0.0</PkgUnityEngineAnalyzer>
+    <PkgStyleCop_Analyzers_Unstable Condition=" '$(PkgStyleCop_Analyzers_Unstable)' == '' ">C:\Users\Administrator\.nuget\packages\stylecop.analyzers.unstable\1.2.0.312</PkgStyleCop_Analyzers_Unstable>
+    <PkgRoslynator_Analyzers Condition=" '$(PkgRoslynator_Analyzers)' == '' ">C:\Users\Administrator\.nuget\packages\roslynator.analyzers\3.0.0</PkgRoslynator_Analyzers>
+    <PkgReflectionAnalyzers Condition=" '$(PkgReflectionAnalyzers)' == '' ">C:\Users\Administrator\.nuget\packages\reflectionanalyzers\0.1.22-dev</PkgReflectionAnalyzers>
+    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\Administrator\.nuget\packages\microsoft.codeanalysis.analyzers\3.3.2</PkgMicrosoft_CodeAnalysis_Analyzers>
+    <PkgErrorProne_NET_Structs Condition=" '$(PkgErrorProne_NET_Structs)' == '' ">C:\Users\Administrator\.nuget\packages\errorprone.net.structs\0.3.0-beta.0</PkgErrorProne_NET_Structs>
+    <PkgErrorProne_NET_CoreAnalyzers Condition=" '$(PkgErrorProne_NET_CoreAnalyzers)' == '' ">C:\Users\Administrator\.nuget\packages\errorprone.net.coreanalyzers\0.3.0-beta.0</PkgErrorProne_NET_CoreAnalyzers>
+  </PropertyGroup>
+</Project>

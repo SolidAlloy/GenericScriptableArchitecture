@@ -1,0 +1,105 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\TimelineInternals.csproj": {}
+  },
+  "projects": {
+    "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\TimelineInternals.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\TimelineInternals.csproj",
+        "projectName": "TimelineInternals",
+        "projectPath": "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\TimelineInternals.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net48"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "d:\\UnityProjects\\UsefulStuff\\DLLs\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net48": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net48": {
+          "dependencies": {
+            "ErrorProne.NET.CoreAnalyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.3.0-beta.0, )"
+            },
+            "ErrorProne.NET.Structs": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.3.0-beta.0, )"
+            },
+            "Microsoft.CodeAnalysis.Analyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.3.2, )"
+            },
+            "OpenSesame.Net.Compilers.Toolset": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.7.0, )"
+            },
+            "ReflectionAnalyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.1.22-dev, )"
+            },
+            "Roslynator.Analyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.2.0-beta.312, )"
+            },
+            "StyleCop.Analyzers.Unstable": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.2.0.312, )"
+            },
+            "UnityEngineAnalyzer": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.0, )"
+            },
+            "Wintellect.Analyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.6, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

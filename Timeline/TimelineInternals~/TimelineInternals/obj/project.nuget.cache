@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "p6RBIng4UJniIVZI+Fnj6sGMnjDs9nFloeV1wfmneGRGZcWNyTmYdfK7yzgM6dsIZxnK3BootvvVbgGiTSCkdw==",
+  "success": true,
+  "projectFilePath": "D:\\UnityProjects\\Packages Test\\Packages\\GenericScriptableArchitecture\\Timeline\\TimelineInternals~\\TimelineInternals\\TimelineInternals.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\errorprone.net.coreanalyzers\\0.3.0-beta.0\\errorprone.net.coreanalyzers.0.3.0-beta.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\errorprone.net.structs\\0.3.0-beta.0\\errorprone.net.structs.0.3.0-beta.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.2\\microsoft.codeanalysis.analyzers.3.3.2.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\opensesame.net.compilers.toolset\\3.7.0\\opensesame.net.compilers.toolset.3.7.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\reflectionanalyzers\\0.1.22-dev\\reflectionanalyzers.0.1.22-dev.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\roslynator.analyzers\\3.0.0\\roslynator.analyzers.3.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\stylecop.analyzers\\1.2.0-beta.312\\stylecop.analyzers.1.2.0-beta.312.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\stylecop.analyzers.unstable\\1.2.0.312\\stylecop.analyzers.unstable.1.2.0.312.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\unityengineanalyzer\\1.0.0\\unityengineanalyzer.1.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\wintellect.analyzers\\1.0.6\\wintellect.analyzers.1.0.6.nupkg.sha512"
+  ],
+  "logs": []
+}

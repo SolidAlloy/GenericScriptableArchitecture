@@ -1,12 +1,15 @@
-﻿namespace GenericScriptableArchitecture
+﻿namespace GenericScriptableArchitecture.Timeline
 {
+    using System;
     using UnityEngine;
+    using UnityEngine.Timeline;
 
     /// <inheritdoc/>
-    [ExcludeFromPreset]
-    public class ScriptableEventEmitter : ScriptableEventEmitterBase
+    [Serializable]
+    public class ScriptableEventEmitter<T> : BaseScriptableEventEmitter
     {
-        [SerializeField] private ScriptableEvent _event;
+        [SerializeField] private ScriptableEvent<T> _event;
+        [SerializeField] private T _arg0;
 
         protected override BaseScriptableEvent BaseEvent => _event;
 
@@ -18,7 +21,7 @@
                 return;
             }
 
-            _event.Invoke();
+            _event.Invoke(_arg0);
         }
     }
 }
