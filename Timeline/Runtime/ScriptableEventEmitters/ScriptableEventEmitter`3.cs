@@ -1,10 +1,12 @@
 ﻿namespace GenericScriptableArchitecture.Timeline
 {
     using System;
+    using GenericUnityObjects;
     using UnityEngine;
+    using UnityEngine.Timeline;
 
     /// <inheritdoc/>
-    [Serializable]
+    [Serializable, ApplyToChildren(typeof(HideInMenuAttribute))]
     public class ScriptableEventEmitter<T1, T2, T3> : BaseScriptableEventEmitter
     {
         [SerializeField] private ScriptableEvent<T1, T2, T3> _event;
