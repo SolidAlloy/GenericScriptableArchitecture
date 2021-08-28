@@ -29,7 +29,7 @@
 
         #region Marker Code
 
-        [SerializeField, TimeField, Tooltip("Time for the marker")] double m_Time;
+        [SerializeField, TimeField, Tooltip("Time for the marker")] private double m_Time;
 
         /// <inheritdoc/>
         public TrackAsset parent { get; private set; }
@@ -40,8 +40,8 @@
         /// </remarks>
         public double time
         {
-            get { return m_Time; }
-            set { m_Time = Math.Max(value, 0); }
+            get => m_Time;
+            set => m_Time = Math.Max(value, 0);
         }
 
         /// <inheritdoc/>
@@ -52,23 +52,7 @@
             if (parent == null)
             {
                 parent = parentTrack;
-                try
-                {
-                    OnInitialize(parentTrack);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.Message, this);
-                }
             }
-        }
-
-        /// <summary>
-        /// Override this method to receive a callback when the marker is initialized.
-        /// </summary>
-        /// <param name="aPent">The track that contains the marker.</param>
-        public virtual void OnInitialize(TrackAsset aPent)
-        {
         }
 
         #endregion
