@@ -667,6 +667,27 @@ If you need to have a custom inspector for the variable of your type, just imple
 
 I might support some decorator attributes on variables and events. Leave your suggestions in the issues.
 
+## Using events in Timeline
+
+You can use scriptable events as markers in Timeline. To add an event, right-click on a track, go to *ScriptableEvents* => *Add Event Emitter*
+
+![right-context-menu](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/right-context-menu.png)
+
+"Add Event Emitter" adds an empty emitter which you can assign an event to.
+"Add Event From Emitter" requires you to assign an event of matching type immediately, like the "Add Signal Emitter From Signal Asset" menu.
+
+They work just like regular Signal Emitters - they fire the event when their time comes in the timeline. However, you can subscribe to them like to all other Scriptable Events. Also, you can raise those events from scripts, so they are more versatile.
+
+You can also drag-n-drop an event asset to the timeline, and a respective emitter will be created automatically:
+
+![drop-event-on-timeline](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/drop-event-on-timeline.gif)
+
+:heavy_exclamation_mark: **Important** :heavy_exclamation_mark: Add a component called **Scriptable Signal Relayer** next to **Playable Director** for events to be invoked from timeline:
+
+![scriptable-signal-relayer](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-signal-relayer.png)
+
+If an event emitter is created on a specific track instead of the **Markers** header, **ScriptableSignalRelayer** must be added to the game object assigned to the track.
+
 ## Additional notes
 
 ### Some listeners are not shown in the listeners list
