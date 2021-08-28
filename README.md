@@ -673,8 +673,9 @@ You can use scriptable events as markers in Timeline. To add an event, right-cli
 
 ![right-context-menu](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/right-context-menu.png)
 
-"Add Event Emitter" adds an empty emitter which you can assign an event to.
-"Add Event From Emitter" requires you to assign an event of matching type immediately, like the "Add Signal Emitter From Signal Asset" menu.
+"**Add Event Emitter**" adds an empty emitter which you can assign an event to.
+
+"**Add Event From Emitter**" requires you to assign an event of matching type immediately, like the "Add Signal Emitter From Signal Asset" menu.
 
 They work just like regular Signal Emitters - they fire the event when their time comes in the timeline. However, you can subscribe to them like to all other Scriptable Events. Also, you can raise those events from scripts, so they are more versatile.
 
