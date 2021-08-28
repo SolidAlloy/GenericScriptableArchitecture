@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.0.1...1.1.0) (2021-08-28)
+
+
+### Bug Fixes
+
+* Added TimelineInternals sln and csproj files to git repo ([22c30db](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/22c30db68ebdbec768017d3651543599587de185))
+
+
+### Features
+
+* Fixed emitters for new Timeline package version and added a custom action menu for generating generic emitters ([07ed92c](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/07ed92c35c84d697bea0b6444e65cac7771e58a9))
+* Started generating emitters with each new concrete ScriptableEvent ([0090890](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/0090890d8f3c31b8ca801c37684b38bcb7fe836d))
+* Started using the new ApplyToChildren attribute on ScriptableEventEmitters ([235f36e](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/235f36e4f6dcfce9a5501b6bffa06ef1f8fd4768))
+
 ## [1.0.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.0.0...1.0.1) (2021-08-23)
 
 
