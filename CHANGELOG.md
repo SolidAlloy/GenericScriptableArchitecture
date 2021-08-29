@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.0...1.1.1) (2021-08-29)
+
+
+### Bug Fixes
+
+* Fixed compilation error when using Timeline 1.4.8 ([a0c9768](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/a0c976802ad819991293c6cc181d514346de88b8))
+
 # [1.1.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.0.1...1.1.0) (2021-08-28)
 
 
