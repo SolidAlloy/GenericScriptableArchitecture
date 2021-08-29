@@ -130,7 +130,13 @@
             }
         }
 
-        private static List<TrackAsset> GetTracks(ActionContext context) => context.tracks.Concat(context.clips.Select(clip => clip.GetParentTrack())).Distinct().ToList();
+        private static List<TrackAsset> GetTracks(ActionContext context) => context.tracks.Concat(context.clips.Select(clip => clip.
+#if TIMELINE_1_5_OR_NEWER
+            GetParentTrack()
+#else
+            parentTrack
+#endif
+        )).Distinct().ToList();
 
         private static string GetNiceEmitterName(Type eventEmitterType)
         {

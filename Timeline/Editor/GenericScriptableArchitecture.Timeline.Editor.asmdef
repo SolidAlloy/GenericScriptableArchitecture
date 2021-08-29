@@ -28,6 +28,11 @@
             "name": "com.unity.timeline",
             "expression": "",
             "define": "USE_TIMELINE"
+        },
+        {
+            "name": "com.unity.timeline",
+            "expression": "1.5",
+            "define": "TIMELINE_1_5_OR_NEWER"
         }
     ],
     "noEngineReferences": false
