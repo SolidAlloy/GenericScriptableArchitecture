@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.1...1.1.2) (2021-08-30)
+
+
+### Bug Fixes
+
+* Fixed icon assets not being loaded when installing a package from git or openupm ([e62b8c4](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/e62b8c4c92de59a2bda4bd31fa0ecd993e200459))
+
 ## [1.1.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.0...1.1.1) (2021-08-29)
 
 
