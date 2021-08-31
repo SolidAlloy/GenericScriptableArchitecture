@@ -1,3 +1,11 @@
+## [1.1.3](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.2...1.1.3) (2021-08-31)
+
+
+### Bug Fixes
+
+* Deleted accidentally added cache file ([62f9563](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/62f95635bd6a333f3cbb5e8e333dbb2891c423bf))
+* Fixed bugs in the GenericUnityObjects dependency package ([ebfd9d2](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/ebfd9d2e6897b49335f68fa1658de67062837fe7))
+
 ## [1.1.2](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.1...1.1.2) (2021-08-30)
 
 
