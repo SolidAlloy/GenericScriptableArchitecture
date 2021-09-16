@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.4...1.1.5) (2021-09-16)
+
+
+### Bug Fixes
+
+* Fixed an issue with missing generic MonoBehaviours after pulling changes from git ([e25cc42](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/e25cc4276d8a59f8cb8003c0f8413a6e6af938ba))
+
 ## [1.1.4](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.3...1.1.4) (2021-09-05)
 
 
