@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.5...1.1.6) (2021-09-27)
+
+
+### Bug Fixes
+
+* Integrated fixes from SolidUtilities and GenericUnityObjects ([0741d83](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/0741d83e2a15d247e4db4e9ae43f7c9e9ec0ff09))
+
 ## [1.1.5](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.4...1.1.5) (2021-09-16)
 
 
