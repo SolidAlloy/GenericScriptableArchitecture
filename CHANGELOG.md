@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.6...1.1.7) (2021-09-29)
+
+
+### Bug Fixes
+
+* Fixed MissingReferenceException sometimes appearing on MacOS ([dc3b3de](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/dc3b3de4fec71023d10a211bfafd3e6d64b7f51e))
+
 ## [1.1.6](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.5...1.1.6) (2021-09-27)
 
 
