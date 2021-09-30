@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.7...1.1.8) (2021-09-30)
+
+
+### Bug Fixes
+
+* Started saving config changes to disk immediately after a change in generated assemblies ([f08cc24](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/f08cc24e25abfe28a8c77bdc04709781fcdf7b68))
+
 ## [1.1.7](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.6...1.1.7) (2021-09-29)
 
 
