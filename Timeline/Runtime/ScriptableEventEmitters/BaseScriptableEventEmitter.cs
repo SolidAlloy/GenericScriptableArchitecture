@@ -2,10 +2,13 @@
 {
     using System;
     using GenericUnityObjects;
-    using Internals;
     using UnityEngine;
     using UnityEngine.Playables;
     using UnityEngine.Timeline;
+
+#if GSA_TIMELINE
+    using Internals;
+#endif
 
     /// <summary>
     /// Marker that invokes an attached event when triggered. A game object that has PlayableDirector component must
@@ -29,7 +32,11 @@
 
         #region Marker Code
 
-        [SerializeField, TimeField, Tooltip("Time for the marker")] private double m_Time;
+        [SerializeField, Tooltip("Time for the marker"),
+#if GSA_TIMELINE
+         TimeField
+#endif
+        ] private double m_Time;
 
         /// <inheritdoc/>
         public TrackAsset parent { get; private set; }

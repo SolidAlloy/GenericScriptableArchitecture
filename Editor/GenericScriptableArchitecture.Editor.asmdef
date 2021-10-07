@@ -24,6 +24,12 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.timeline",
+            "expression": "",
+            "define": "USE_TIMELINE"
+        }
+    ],
     "noEngineReferences": false
 }
