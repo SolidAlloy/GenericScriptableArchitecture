@@ -1,3 +1,10 @@
+## [1.1.9](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.8...1.1.9) (2021-10-07)
+
+
+### Bug Fixes
+
+* Fixed error in TimelineInternals.dll when Timeline package is not installed ([8c73f40](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/8c73f402037648812d2a0d7e403472847ca19252))
+
 ## [1.1.8](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.7...1.1.8) (2021-09-30)
 
 
