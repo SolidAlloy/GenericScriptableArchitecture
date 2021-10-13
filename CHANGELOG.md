@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.9...1.2.0) (2021-10-13)
+
+
+### Features
+
+* Added an ability to traverse the hierarchy of types in the dropdown ([2c1b045](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/2c1b04508403107759e40d10c006b64000e888ee))
+
 ## [1.1.9](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.8...1.1.9) (2021-10-07)
 
 
