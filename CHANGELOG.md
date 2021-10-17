@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.0...1.2.1) (2021-10-17)
+
+
+### Bug Fixes
+
+* Fixed exceptions when using UnityEvents interface and when creating new generic unity objects ([167318c](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/167318c4ad54c9a11ee24f496937ecee58e39b9f))
+
 # [1.2.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.1.9...1.2.0) (2021-10-13)
 
 
