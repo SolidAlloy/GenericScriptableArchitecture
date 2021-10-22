@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.1...1.2.2) (2021-10-22)
+
+
+### Bug Fixes
+
+* Fixed NRE when opening a type dropdown on MacOS ([3d5b3ad](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/3d5b3adb84a4207ea4eaf2a633bbb2d851b2fe11))
+
 ## [1.2.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.0...1.2.1) (2021-10-17)
 
 
