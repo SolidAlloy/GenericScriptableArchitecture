@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.3...1.2.4) (2021-11-16)
+
+
+### Bug Fixes
+
+* Fixed incompatibilities with Unity 2021.2 ([411aa8c](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/411aa8c689f5686d2e5da38c5095896b6d688282))
+
 ## [1.2.3](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.2...1.2.3) (2021-10-24)
 
 
