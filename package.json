@@ -5,7 +5,7 @@
   "description": "ScriptableObject architecture with small, easy-to-expand codebase, and simple UI.",
   "dependencies": {
     "com.solidalloy.util": "1.33.1",
-    "com.solidalloy.generic-unity-objects": "2.11.4",
+    "com.solidalloy.generic-unity-objects": "2.12.1",
     "com.madsbangh.easybuttons": "1.3.0",
     "com.unity.settings-manager": "1.0.3"
   },
