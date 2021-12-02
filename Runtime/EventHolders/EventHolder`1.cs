@@ -14,6 +14,8 @@
         [SerializeField] private EventTypes _type = EventTypes.ScriptableEvent;
         [SerializeField] private bool _notifyCurrentValue;
 
+        public bool DrawObjectField = true;
+
         public BaseEvent Event
         {
             get => _type == EventTypes.ScriptableEvent ? _event : _variable;

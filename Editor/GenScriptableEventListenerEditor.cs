@@ -19,14 +19,24 @@
 
         private GenScriptableEventListener _target;
         private ScriptableEventListenerEditor _componentEditor;
+        private BaseScriptableEventListener _component;
 
         private void OnEnable()
         {
-            _target = target as GenScriptableEventListener;
+            _target = (GenScriptableEventListener) target;
+        }
+
+        private void OnDisable()
+        {
+            if (target == null)
+            {
+                RemoveComponent(_component);
+            }
         }
 
         public override void OnInspectorGUI()
         {
+            _component = _target._component;
             DrawObjectField();
             DrawUnityEvent();
         }
@@ -107,12 +117,12 @@
             if (_target._component != null && _componentEditor == null)
             {
                 _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_target._component, typeof(ScriptableEventListenerEditor));
+                _target._component.DrawObjectField = false;
             }
 
             if (_componentEditor == null)
                 return;
 
-            // TODO: pass info to EventHolderDrawer that the object field shouldn't be drawn.
             _componentEditor.OnInspectorGUI();
         }
 

@@ -16,6 +16,8 @@
             set => _event.Event = value;
         }
 
+        public override bool DrawObjectField { get => _event.DrawObjectField; set => _event.DrawObjectField = value; }
+
         protected virtual void OnEnable()
         {
             _event?.AddListener(this);

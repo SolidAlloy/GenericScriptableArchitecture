@@ -2,17 +2,15 @@
 {
     using GenericUnityObjects.UnityEditorInternals;
     using UnityEditor;
-    using UnityEngine;
 
     [CustomEditor(typeof(BaseScriptableEventListener), true)]
     public class ScriptableEventListenerEditor : GenericHeaderEditor, IRepaintable
     {
         private SerializedProperty _eventProperty;
         private SerializedProperty _responseProperty;
-
         private StackTraceDrawer _stackTrace;
-
         private bool _initialized;
+        private BaseScriptableEventListener _target;
 
         private void OnEnable()
         {
@@ -22,6 +20,8 @@
             {
                 return;
             }
+
+            _target = target as BaseScriptableEventListener;
 
             _eventProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._event));
             _responseProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._response));
@@ -44,7 +44,9 @@
             if (guiWrapper.HasMissingScript)
                 return;
 
-            EditorGUILayout.PropertyField(_eventProperty);
+            if (_eventProperty.propertyType != SerializedPropertyType.ObjectReference || _target.DrawObjectField)
+                EditorGUILayout.PropertyField(_eventProperty);
+
             EditorGUILayout.PropertyField(_responseProperty);
 
             Undo.RecordObject(target, "Changed stack trace settings");

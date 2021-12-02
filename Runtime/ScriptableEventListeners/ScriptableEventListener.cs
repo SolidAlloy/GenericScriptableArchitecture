@@ -20,6 +20,8 @@
             }
         }
 
+        public override bool DrawObjectField { get; set; }
+
         private void OnEnable()
         {
             if (_event != null)
