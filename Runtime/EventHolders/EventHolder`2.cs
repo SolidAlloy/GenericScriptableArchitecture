@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using System.IO;
     using UnityEngine;
 
     internal class EventHolderBaseTwo { }
@@ -12,6 +13,28 @@
         [SerializeField] private VariableWithHistory<T1> _variable;
         [SerializeField] private EventTypes _type = EventTypes.ScriptableEvent;
         [SerializeField] private bool _notifyCurrentValue;
+
+        public BaseEvent Event
+        {
+            get => _type == EventTypes.ScriptableEvent ? _event : _variable;
+            set
+            {
+                if (value is ScriptableEvent<T1, T2> @event)
+                {
+                    _type = EventTypes.ScriptableEvent;
+                    _event = @event;
+                }
+                else if (value is VariableWithHistory<T1> variable)
+                {
+                    _type = EventTypes.Variable;
+                    _variable = variable;
+                }
+                else
+                {
+                    throw new InvalidDataException($"Tried to set the event that wasn't either ScriptableEvent or Variable: {value.GetType()}");
+                }
+            }
+        }
 
         public void AddListener(ScriptableEventListener<T1, T2> listener)
         {

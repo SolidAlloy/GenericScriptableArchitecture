@@ -30,6 +30,8 @@
 
         ICollection<StackTraceEntry> IStackTraceProvider.Entries => _stackTraceEntries;
 
+        public abstract BaseEvent Event { get; set; }
+
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)
         {

@@ -10,6 +10,16 @@
         [SerializeField] internal ScriptableEvent _event;
         [SerializeField] internal UnityEvent _response;
 
+        public override BaseEvent Event
+        {
+            get => _event;
+            set
+            {
+                if (value is ScriptableEvent scriptableEvent)
+                    _event = scriptableEvent;
+            }
+        }
+
         private void OnEnable()
         {
             if (_event != null)

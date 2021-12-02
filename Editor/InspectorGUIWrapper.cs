@@ -18,7 +18,10 @@
             {
                 using (new EditorGUI.DisabledScope(true))
                 {
-                    EditorGUILayout.PropertyField(_editor.serializedObject.FindProperty("m_Script"));
+                    var scriptProperty = _editor.serializedObject.FindProperty("m_Script");
+
+                    if (scriptProperty != null)
+                        EditorGUILayout.PropertyField(scriptProperty);
                 }
             }
             else

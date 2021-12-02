@@ -12,7 +12,7 @@
     using UnityEditor;
 #endif
 
-    public abstract class BaseScriptableEvent : GenericScriptableObject, IStackTraceProvider
+    public abstract class BaseScriptableEvent : BaseEvent, IStackTraceProvider
     {
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] private bool _stackTraceEnabled;

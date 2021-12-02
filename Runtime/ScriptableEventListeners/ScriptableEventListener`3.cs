@@ -10,6 +10,16 @@
         [SerializeField] private ScriptableEvent<T1, T2, T3> _event;
         [SerializeField] private UnityEvent<T1, T2, T3> _response;
 
+        public override BaseEvent Event
+        {
+            get => _event;
+            set
+            {
+                if (value is ScriptableEvent<T1, T2, T3> scriptableEvent)
+                    _event = scriptableEvent;
+            }
+        }
+
         protected virtual void OnEnable()
         {
             if (_event != null)

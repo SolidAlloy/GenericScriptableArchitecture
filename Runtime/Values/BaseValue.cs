@@ -1,6 +1,5 @@
 ﻿namespace GenericScriptableArchitecture
 {
-    using GenericUnityObjects;
     using JetBrains.Annotations;
     using SolidUtilities.Attributes;
     using UnityEngine;
@@ -9,7 +8,7 @@
     using UnityEditor;
 #endif
 
-    public abstract class BaseValue : GenericScriptableObject
+    public abstract class BaseValue : BaseEvent
     {
 #if UNITY_EDITOR
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
