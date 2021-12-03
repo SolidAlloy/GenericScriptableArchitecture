@@ -1,7 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
-    using System.Reflection;
     using GenericUnityObjects.Editor;
     using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
@@ -36,14 +35,47 @@
 
         public override void OnInspectorGUI()
         {
-            _component = _target._component;
+            CreateComponentEditorIfNeeded();
             DrawObjectField();
             DrawUnityEvent();
+        }
+
+        private void CreateComponentEditorIfNeeded()
+        {
+            if (_component == _target._component)
+                return;
+
+            _component = _target._component;
+
+            if (_component == null)
+                return;
+
+            _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_component, typeof(ScriptableEventListenerEditor));
+            SetHideFlags(_componentEditor.serializedObject);
+            // It is necessary to change DrawObjectField after HideFlags because serializedObject.ApplyModifiedProperties() inside SetHideFlags discards the changed value of DrawObjectField
+            _component.DrawObjectField = false;
+        }
+
+        private void SetHideFlags(SerializedObject componentSerializedObject)
+        {
+            // The only way to set the hide flags persistently.
+            var hideFlagsProp = componentSerializedObject.FindProperty("m_ObjectHideFlags");
+            const int hideInInspector = (int) HideFlags.HideInInspector;
+
+            if (hideFlagsProp.intValue != hideInInspector)
+            {
+                hideFlagsProp.intValue = hideInInspector;
+                componentSerializedObject.ApplyModifiedProperties();
+            }
         }
 
         private void DrawObjectField()
         {
             var oldEvent = GetCurrentEvent();
+
+            if (_target._component != null)
+                Undo.RecordObject(_target._component, "Changed event field");
+
             var newEvent = GenericObjectDrawer.ObjectField("Event", oldEvent, typeof(BaseEvent), true);
 
             if (newEvent != oldEvent)
@@ -71,8 +103,7 @@
             }
             else
             {
-                _target._component = component;
-                component.Event = newEvent as BaseEvent;
+                ChangeHiddenComponent(_target, component, newEvent as BaseEvent);
             }
         }
 
@@ -86,8 +117,7 @@
 
                 var component = thisListener.gameObject.GetComponent(componentType) as BaseScriptableEventListener;
 
-                thisListener._component = component;
-                component.Event = @event;
+                ChangeHiddenComponent(thisListener, component, @event);
             }
             finally
             {
@@ -97,29 +127,32 @@
             }
         }
 
+        private static void ChangeHiddenComponent(GenScriptableEventListener listener, BaseScriptableEventListener component, BaseEvent @event)
+        {
+            // The flags are set persistently only through serializedObject, we do it when an editor is created.
+            // However, if we don't set the flags here, the component will appear for a frame and we don't want that.
+            component.hideFlags = HideFlags.HideInInspector;
+
+            Undo.RecordObject(listener, "Change component");
+            listener._component = component;
+
+            Undo.RecordObject(component, "Change event");
+            component.Event = @event;
+
+            PrefabUtility.RecordPrefabInstancePropertyModifications(component);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(listener);
+        }
+
         private void RemoveComponent(Component component)
         {
             if (component == null)
                 return;
 
-            if (Application.isPlaying)
-            {
-                Destroy(component);
-            }
-            else
-            {
-                DestroyImmediate(component);
-            }
+            Undo.DestroyObjectImmediate(component);
         }
 
         private void DrawUnityEvent()
         {
-            if (_target._component != null && _componentEditor == null)
-            {
-                _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_target._component, typeof(ScriptableEventListenerEditor));
-                _target._component.DrawObjectField = false;
-            }
-
             if (_componentEditor == null)
                 return;
 
@@ -137,7 +170,7 @@
             if (genericArgs == null)
             {
                 reloadRequired = false;
-                return _target.gameObject.AddComponent(genericTypeDefinition);
+                return Undo.AddComponent(_target.gameObject, genericTypeDefinition);
             }
 
             return GenericBehaviourCreator.AddComponent(null, _target.gameObject, genericTypeDefinition, genericArgs, out reloadRequired);
