@@ -14,7 +14,7 @@
     public class EventHelper : IEventHelper, IDisposable
     {
         private readonly IEvent _parentEvent;
-        private readonly List<ScriptableEventListener> _scriptableListeners = new List<ScriptableEventListener>();
+        private readonly List<VoidScriptableEventListener> _scriptableListeners = new List<VoidScriptableEventListener>();
         private readonly List<IEventListener> _singleEventListeners = new List<IEventListener>();
         private readonly List<IMultipleEventsListener> _multipleEventsListeners = new List<IMultipleEventsListener>();
         private readonly List<Action> _responses = new List<Action>();
@@ -44,7 +44,7 @@
             if (listener == null)
                 return;
 
-            if (listener is ScriptableEventListener scriptableListener)
+            if (listener is VoidScriptableEventListener scriptableListener)
             {
                 _scriptableListeners.Add(scriptableListener);
                 return;
@@ -70,7 +70,7 @@
 
         public void RemoveListener(IListener listener)
         {
-            if (listener is ScriptableEventListener scriptableListener)
+            if (listener is VoidScriptableEventListener scriptableListener)
             {
                 _scriptableListeners.Remove(scriptableListener);
                 return;

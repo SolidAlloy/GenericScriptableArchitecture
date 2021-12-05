@@ -9,20 +9,20 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
-    [CustomEditor(typeof(GenScriptableEventListener))]
-    public class GenScriptableEventListenerEditor : Editor // TODO: change temp name
+    [CustomEditor(typeof(ScriptableEventListener))]
+    public class WildcardScriptableEventListenerEditor : Editor
     {
         private const string WildcardListenerKey = "ListenerEditor_WildcardListener";
         private const string ListenerTypeKey = "ListenerEditor_ListenerType";
         private const string EventKey = "ListenerEditor_EventReference";
 
-        private GenScriptableEventListener _target;
+        private ScriptableEventListener _target;
         private ScriptableEventListenerEditor _componentEditor;
         private BaseScriptableEventListener _component;
 
         private void OnEnable()
         {
-            _target = (GenScriptableEventListener) target;
+            _target = (ScriptableEventListener) target;
         }
 
         private void OnDisable()
@@ -111,7 +111,7 @@
         {
             try
             {
-                var thisListener = PersistentStorage.GetData<GenScriptableEventListener>(WildcardListenerKey);
+                var thisListener = PersistentStorage.GetData<ScriptableEventListener>(WildcardListenerKey);
                 var componentType = PersistentStorage.GetData<TypeReference>(ListenerTypeKey).Type;
                 var @event = PersistentStorage.GetData<Object>(EventKey) as BaseEvent;
 
@@ -127,7 +127,7 @@
             }
         }
 
-        private static void ChangeHiddenComponent(GenScriptableEventListener listener, BaseScriptableEventListener component, BaseEvent @event)
+        private static void ChangeHiddenComponent(ScriptableEventListener listener, BaseScriptableEventListener component, BaseEvent @event)
         {
             // The flags are set persistently only through serializedObject, we do it when an editor is created.
             // However, if we don't set the flags here, the component will appear for a frame and we don't want that.
@@ -190,7 +190,7 @@
             {
                 if (concreteEventType == typeof(ScriptableEvent))
                 {
-                    definition = typeof(ScriptableEventListener);
+                    definition = typeof(VoidScriptableEventListener);
                     return (definition, genericArgs);
                 }
 

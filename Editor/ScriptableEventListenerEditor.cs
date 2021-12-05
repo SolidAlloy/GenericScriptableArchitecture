@@ -23,8 +23,8 @@
 
             _target = target as BaseScriptableEventListener;
 
-            _eventProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._event));
-            _responseProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._response));
+            _eventProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._event));
+            _responseProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._response));
 
             _stackTrace = new StackTraceDrawer((IStackTraceProvider) target, this);
 
