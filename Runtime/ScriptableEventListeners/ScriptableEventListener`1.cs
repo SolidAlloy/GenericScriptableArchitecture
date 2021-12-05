@@ -5,6 +5,7 @@
     using UnityEngine.Events;
 
     [Serializable]
+    [AddComponentMenu("")]
     public class ScriptableEventListener<T> : BaseScriptableEventListener, IListener<T>
     {
         [SerializeField] private EventHolder<T> _event = new EventHolder<T>();
