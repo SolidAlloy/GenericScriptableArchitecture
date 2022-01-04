@@ -2,17 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using JetBrains.Annotations;
-    using SolidUtilities.Editor.Extensions;
+    using SolidUtilities.Editor;
     using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
-    using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
     [CustomPropertyDrawer(typeof(ReferenceBase), true)]
-    internal class ReferenceDrawer : PropertyDrawer
+    internal class ReferenceDrawer : DrawerWithModes
     {
         private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
 
@@ -22,13 +19,13 @@
         private SerializedProperty _variable;
         private SerializedProperty _constant;
 
-        private ReferenceBase.ValueTypes ValueType
+        protected override int PopupValue
         {
-            get => (ReferenceBase.ValueTypes) _valueType.enumValueIndex;
-            set => _valueType.enumValueIndex = (int) value;
+            get => _valueType.enumValueIndex;
+            set => _valueType.enumValueIndex = value;
         }
 
-        private SerializedProperty ExposedProperty
+        protected override SerializedProperty ExposedProperty
         {
             get
             {
@@ -42,55 +39,33 @@
             }
         }
 
+        protected override bool ShouldDrawFoldout =>
+            ValueType != ReferenceBase.ValueTypes.Value && ObjectReference != null || _value.propertyType == SerializedPropertyType.Generic;
+
+        private static readonly string[] _popupOptions = { "Value", "Constant", "Variable" };
+        protected override string[] PopupOptions => _popupOptions;
+
+        private ReferenceBase.ValueTypes ValueType => (ReferenceBase.ValueTypes) PopupValue;
+
         private Object ObjectReference => ExposedProperty.objectReferenceValue;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             FindProperties(property);
 
-            if ( ValueType != ReferenceBase.ValueTypes.Value || ! property.isExpanded)
+            if ( ValueType != ReferenceBase.ValueTypes.Value)
                 return EditorGUIUtility.singleLineHeight;
 
-            // If a property has a custom property drawer, it will be drown inside a foldout anyway, so we account for
-            // it by adding a single line height.
-
-            float additionalHeight = ExposedProperty.HasCustomPropertyDrawer() ? EditorGUIUtility.singleLineHeight : 0f;
-            return EditorGUI.GetPropertyHeight(ExposedProperty, GUIContent.none) + additionalHeight;
+            return base.GetPropertyHeight(property, label);
         }
 
         public override void OnGUI(Rect fieldRect, SerializedProperty property, GUIContent label)
         {
             FindProperties(property);
-
-            using (new EditorDrawHelper.PropertyWrapper(fieldRect, label, property))
-            {
-                (Rect labelRect, Rect buttonRect, Rect valueRect) = GetLabelButtonValueRects(fieldRect);
-
-                DrawLabel(property, fieldRect, labelRect, label);
-
-                // The indent level must be made 0 for the button and value to be displayed normally, without any
-                // additional indent. Otherwise, the button will not be clickable, and the value will look shifted
-                // compared to other fields.
-                int previousIndent = EditorGUI.indentLevel;
-                EditorGUI.indentLevel = 0;
-
-                ValueType = ChoiceButton.DrawAndCheckType(buttonRect, ValueType);
-                DrawValue(property, valueRect, fieldRect, previousIndent);
-
-                EditorGUI.indentLevel = previousIndent;
-            }
+            base.OnGUI(fieldRect, property, label);
         }
 
-        private void FindProperties(SerializedProperty property)
-        {
-            _mainProperty = property;
-            _valueType = _mainProperty.FindPropertyRelative("ValueType");
-            _value = _mainProperty.FindPropertyRelative("_value");
-            _variable = _mainProperty.FindPropertyRelative("_variable");
-            _constant = _mainProperty.FindPropertyRelative("_constant");
-        }
-
-        private void DrawValue(SerializedProperty property, Rect valueRect, Rect totalRect, int indentLevel)
+        protected override void DrawValue(SerializedProperty property, Rect valueRect, Rect totalRect, int indentLevel)
         {
             switch (ValueType)
             {
@@ -100,64 +75,11 @@
                     break;
 
                 case ReferenceBase.ValueTypes.Value:
-                    DrawValue(valueRect, totalRect, indentLevel);
+                    DrawValueProperty(property, valueRect, totalRect, indentLevel);
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(ExposedProperty),
-                        "Unknown value type in the reference.");
-            }
-        }
-
-        private void DrawValue(Rect valueRect, Rect totalRect, int indentLevel)
-        {
-            if (_value.propertyType == SerializedPropertyType.Generic)
-            {
-                DrawValueInFoldout(totalRect, indentLevel);
-            }
-            else
-            {
-                EditorGUI.PropertyField(valueRect, _value, GUIContent.none);
-            }
-        }
-
-        private void DrawValueInFoldout(Rect totalRect, int indentLevel)
-        {
-            if ( ! _mainProperty.isExpanded)
-                return;
-
-            var shiftedRect = totalRect.ShiftOneLineDown(indentLevel + 1);
-
-            if (_value.HasCustomPropertyDrawer())
-            {
-                shiftedRect.height = EditorGUI.GetPropertyHeight(_value);
-                EditorGUI.PropertyField(shiftedRect, _value, GUIContent.none);
-                return;
-            }
-
-            // This draws all child fields of the _constantValue property with indent.
-            SerializedProperty iterator = _value.Copy();
-            var nextProp = _value.Copy();
-            nextProp.NextVisible(false);
-
-            while (iterator.NextVisible(true) && ! SerializedProperty.EqualContents(iterator, nextProp))
-            {
-                shiftedRect.height = EditorGUI.GetPropertyHeight(iterator, false);
-                EditorGUI.PropertyField(totalRect, iterator, true);
-                shiftedRect.ShiftOneLineDown(lineHeight: shiftedRect.height);
-            }
-        }
-
-        private void DrawObjectReference(Rect valueRect, SerializedProperty property, int indentLevel)
-        {
-            EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
-
-            if ( ! property.isExpanded || ObjectReference == null)
-                return;
-
-            using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
-            {
-                GetInlineEditor(ObjectReference).OnInspectorGUI();
+                    throw new ArgumentOutOfRangeException(nameof(ExposedProperty), "Unknown value type in the reference.");
             }
         }
 
@@ -172,54 +94,25 @@
             return editor;
         }
 
-        private (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
+        private void FindProperties(SerializedProperty property)
         {
-            const float indentWidth = 15f;
-            const float valueLeftIndent = 2f;
-
-            totalRect.height = EditorGUIUtility.singleLineHeight;
-
-            (Rect labelAndButtonRect, Rect valueRect) = totalRect.CutVertically(EditorGUIUtility.labelWidth);
-
-            labelAndButtonRect.xMin += EditorGUI.indentLevel * indentWidth;
-
-            float buttonWidth = ChoiceButton.Width;
-
-            (Rect labelRect, Rect buttonRect) =
-                labelAndButtonRect.CutVertically(buttonWidth, fromRightSide: true);
-
-            valueRect.xMin += valueLeftIndent;
-            return (labelRect, buttonRect, valueRect);
+            _mainProperty = property;
+            _valueType = _mainProperty.FindPropertyRelative("ValueType");
+            _value = _mainProperty.FindPropertyRelative("_value");
+            _variable = _mainProperty.FindPropertyRelative("_variable");
+            _constant = _mainProperty.FindPropertyRelative("_constant");
         }
 
-        private void DrawLabel(SerializedProperty property, Rect totalRect, Rect labelRect, GUIContent label)
+        private void DrawObjectReference(Rect valueRect, SerializedProperty property, int indentLevel)
         {
-            if (ValueType != ReferenceBase.ValueTypes.Value && ObjectReference != null || _value.propertyType == SerializedPropertyType.Generic)
-            {
-                property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
-            }
-            else
-            {
-                EditorGUI.HandlePrefixLabel(totalRect, labelRect, label);
-            }
-        }
+            EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
 
-        private static class ChoiceButton
-        {
-            private static readonly GUIStyle _buttonStyle = new GUIStyle(GUI.skin.GetStyle("PaneOptions"))
+            if ( ! property.isExpanded || ObjectReference == null)
+                return;
+
+            using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
             {
-                imagePosition = ImagePosition.ImageOnly
-            };
-
-            private static readonly string[] _popupOptions = { "Value", "Constant", "Variable" };
-
-            public static float Width => _buttonStyle.fixedWidth;
-
-            [Pure]
-            public static ReferenceBase.ValueTypes DrawAndCheckType(Rect buttonRect, ReferenceBase.ValueTypes currentType)
-            {
-                int result = EditorGUI.Popup(buttonRect, (int) currentType, _popupOptions, _buttonStyle);
-                return (ReferenceBase.ValueTypes) result;
+                GetInlineEditor(ObjectReference).OnInspectorGUI();
             }
         }
     }
