@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using SolidUtilities.Extensions;
+    using SolidUtilities;
     using UnityEngine;
     using Object = UnityEngine.Object;
 

@@ -4,8 +4,8 @@
     using System.Linq;
     using System.Text.RegularExpressions;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Helpers;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;

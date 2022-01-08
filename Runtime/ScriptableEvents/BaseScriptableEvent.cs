@@ -4,7 +4,7 @@
     using System.Diagnostics;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using SolidUtilities.Attributes;
+    using SolidUtilities;
     using UnityEngine;
     using Debug = UnityEngine.Debug;
 

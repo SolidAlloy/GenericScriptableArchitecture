@@ -5,7 +5,7 @@
     using System.Linq;
     using EasyButtons;
     using GenericUnityObjects;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
 
     [Serializable]
     [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T1,T2,T3>")]

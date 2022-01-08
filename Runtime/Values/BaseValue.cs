@@ -1,7 +1,7 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using JetBrains.Annotations;
-    using SolidUtilities.Attributes;
+    using SolidUtilities;
     using UnityEngine;
 
 #if UNITY_EDITOR

@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using SolidUtilities.Editor;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor.PropertyDrawers;
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;

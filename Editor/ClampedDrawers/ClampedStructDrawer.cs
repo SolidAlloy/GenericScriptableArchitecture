@@ -1,8 +1,7 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
-    using SolidUtilities.Editor.Extensions;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEngine;

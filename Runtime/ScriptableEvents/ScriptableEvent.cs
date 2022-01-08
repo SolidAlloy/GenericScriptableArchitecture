@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using EasyButtons;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using UnityEngine;
 #if UNIRX
     using UniRx;

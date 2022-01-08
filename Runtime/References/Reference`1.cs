@@ -35,9 +35,9 @@
             {
                 return ValueType switch
                 {
-                    ValueTypes.Constant => _constant.Value,
+                    ValueTypes.Constant => _constant == null ? default : _constant.Value,
                     ValueTypes.Value => _value,
-                    ValueTypes.Variable => _variable.Value,
+                    ValueTypes.Variable => _variable == null ? default : _variable.Value,
                     _ => throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.")
                 };
             }

@@ -2,8 +2,8 @@
 {
     using System;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;

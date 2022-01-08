@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using UnityEngine;
 
     using Object = UnityEngine.Object;

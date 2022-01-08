@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using SolidUtilities.Attributes;
+    using SolidUtilities;
     using UnityEngine;
 
     public abstract class BaseRuntimeSet : GenericScriptableObject

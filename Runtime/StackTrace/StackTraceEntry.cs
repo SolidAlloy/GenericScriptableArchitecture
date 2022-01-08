@@ -3,8 +3,8 @@
 #if UNITY_EDITOR
     using System;
     using System.Linq;
-    using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers.Editor;
+    using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEngine;
 #endif
 
