@@ -49,7 +49,7 @@
                     _expandedProperty.boolValue = newValue;
                     _clearCache();
                 },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
+                drawElementCallback = (rect, index, _, __) =>
                 {
                     if ( ! _expandedProperty.boolValue)
                         return;

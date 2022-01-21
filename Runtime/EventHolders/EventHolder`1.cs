@@ -18,7 +18,7 @@
 
         public BaseEvent Event
         {
-            get => _type == EventTypes.ScriptableEvent ? _event : _variable;
+            get => _type == EventTypes.ScriptableEvent ? (BaseEvent) _event : (BaseEvent) _variable;
             set
             {
                 if (value is ScriptableEvent<T> @event)
