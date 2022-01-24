@@ -1,15 +1,15 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using ExtEvents;
     using UnityEngine;
-    using UnityEngine.Events;
 
     [Serializable]
     [AddComponentMenu("")]
     public class ScriptableEventListener<T1, T2> : BaseScriptableEventListener, IListener<T1, T2>
     {
         [SerializeField] private EventHolder<T1, T2> _event = new EventHolder<T1, T2>();
-        [SerializeField] private UnityEvent<T1, T2> _response;
+        [SerializeField] private ExtEvent<T1, T2> _response;
 
         public override BaseEvent Event
         {
