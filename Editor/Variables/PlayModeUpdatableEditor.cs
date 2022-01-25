@@ -1,6 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
-    using GenericUnityObjects.UnityEditorInternals;
+    using GenericUnityObjects.Editor;
     using UnityEditor;
 
     internal abstract class PlayModeUpdatableEditor : GenericHeaderEditor

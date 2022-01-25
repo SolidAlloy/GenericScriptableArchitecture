@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using GenericUnityObjects.Editor;
     using GenericUnityObjects.UnityEditorInternals;
     using UnityEditor;
 
