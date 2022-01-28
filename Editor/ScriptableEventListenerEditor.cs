@@ -1,7 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using GenericUnityObjects.Editor;
-    using GenericUnityObjects.UnityEditorInternals;
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEventListener), true)]
@@ -13,8 +12,10 @@
         private bool _initialized;
         private BaseScriptableEventListener _target;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+            
             // The targets length is 0 or the first target is null for a couple frames after the domains reload.
             // We need to avoid exceptions while the target is not set by Unity.
             if (targets.Length == 0 || target == null)

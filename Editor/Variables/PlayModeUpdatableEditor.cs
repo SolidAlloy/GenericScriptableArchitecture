@@ -8,13 +8,15 @@
         private const int UpdateFrameCount = 20;
         private int _frameCounter;
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             EditorApplication.update += OnUpdate;
         }
 
-        protected virtual void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             EditorApplication.update -= OnUpdate;
         }
 
