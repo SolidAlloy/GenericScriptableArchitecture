@@ -43,9 +43,11 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
       "url": "https://package.openupm.com",
       "scopes": [
         "com.solidalloy.util",
+        "com.solidalloy.unity-dropdown",
         "com.solidalloy.type.references",
         "com.solidalloy.generic-unity-objects",
         "com.madsbangh.easybuttons",
+        "com.solidalloy.extevents",
         "com.solidalloy.generic-scriptable-architecture",
         "com.openupm"
       ]
@@ -68,8 +70,9 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 4. Do the same with four more packages:
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unit
    - https://github.com/SolidAlloy/GenericUnityObjects.git
-   - https://github.com/madsbangh/EasyButtons
-   - https://github.com/SolidAlloy/GenericScriptableArchitecture
+   - https://github.com/madsbangh/EasyButtons.git
+   - https://github.com/SolidAlloy/ExtEvents.git
+   - https://github.com/SolidAlloy/GenericScriptableArchitecture.git
 
 ## Quick Start
 
