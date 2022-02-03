@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.5...1.3.0) (2022-02-03)
+
+
+### Bug Fixes
+
+* Fixed drawing of a serializable class without custom property drawer inside Reference ([79c6f60](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/79c6f609fc2be77560d2015626d8f5d6aae981fa))
+* Removed Net Standard 2.1 features to support older versions of Unity ([990c860](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/990c860602c69e1318e89bf027822a1d6fd75f89))
+
+
+### Features
+
+* Replaced UnityEvent with ExtEvent in ScriptableEventListeners ([0ada411](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/0ada411d3a998934071561bd0ff8b27b8afa490f))
+
 ## [1.2.5](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.2.4...1.2.5) (2021-11-21)
 
 
