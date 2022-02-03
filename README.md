@@ -26,6 +26,8 @@ Have you ever heard of advantages of ECS? That data-driven architecture is good 
 
 ## How To Install
 
+:heavy_exclamation_mark: Before installing the package, please disable the **Assembly Version Validation** option in **Player Settings**.
+
 ### OpenUPM
 
 Once you have the OpenUPM cli, run the following command:
