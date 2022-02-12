@@ -4,7 +4,7 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEventListener), true)]
-    public class ScriptableEventListenerEditor : GenericHeaderEditor, IRepaintable
+    public class ScriptableEventListenerEditor : Editor, IRepaintable
     {
         private SerializedProperty _eventProperty;
         private SerializedProperty _responseProperty;
@@ -12,10 +12,8 @@
         private bool _initialized;
         private BaseScriptableEventListener _target;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
-            
             // The targets length is 0 or the first target is null for a couple frames after the domains reload.
             // We need to avoid exceptions while the target is not set by Unity.
             if (targets.Length == 0 || target == null)
@@ -31,6 +29,11 @@
             _stackTrace = new StackTraceDrawer((IStackTraceProvider) target, this);
 
             _initialized = true;
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         public override void OnInspectorGUI()

@@ -3,21 +3,24 @@
     using GenericUnityObjects.Editor;
     using UnityEditor;
 
-    internal abstract class PlayModeUpdatableEditor : GenericHeaderEditor
+    internal abstract class PlayModeUpdatableEditor : Editor
     {
         private const int UpdateFrameCount = 20;
         private int _frameCounter;
 
-        protected override void OnEnable()
+        protected virtual void OnEnable()
         {
-            base.OnEnable();
             EditorApplication.update += OnUpdate;
         }
 
-        protected override void OnDisable()
+        protected virtual void OnDisable()
         {
-            base.OnDisable();
             EditorApplication.update -= OnUpdate;
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         private void OnUpdate()

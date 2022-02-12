@@ -2,7 +2,6 @@
 {
     using System;
     using System.Reflection;
-    using GenericUnityObjects.UnityEditorInternals;
     using SolidUtilities.UnityEngineInternals;
     using UnityEditor;
     using UnityEngine;
