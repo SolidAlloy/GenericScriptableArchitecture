@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.1...1.3.2) (2022-02-13)
+
+
+### Bug Fixes
+
+* Fixed bugs in GenericUnityObjects and ExtEvents ([090bba6](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/090bba6990ff1f7e82d25522b9a35a0fbbe3cf10))
+
 ## [1.3.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.0...1.3.1) (2022-02-03)
 
 
