@@ -11,8 +11,9 @@
 
     internal class FoldoutList<TElement> where TElement : Object
     {
-        private static readonly MethodInfo _clearCacheMethod = typeof(ReorderableList)
-            .GetMethod("ClearCache", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo _clearCacheMethod = 
+            typeof(ReorderableList).GetMethod("ClearCache", BindingFlags.Instance | BindingFlags.NonPublic) 
+            ?? typeof(ReorderableList).GetMethod("InvalidateCache", BindingFlags.Instance | BindingFlags.NonPublic); // the name of the method in newer Unity versions.
 
         private ReorderableList _list;
         private readonly Action _clearCache;
