@@ -2,10 +2,9 @@
 {
     using System;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
-    using UnityEditorInternal;
     using UnityEngine;
     using UnityEngine.Assertions;
 

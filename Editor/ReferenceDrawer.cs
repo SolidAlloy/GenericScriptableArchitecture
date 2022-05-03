@@ -13,7 +13,7 @@
     internal class ReferenceDrawer : PropertyDrawer
     {
         private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
-        
+
         private static GUIStyle _buttonStyle;
         private static GUIStyle ButtonStyle => _buttonStyle ??= new GUIStyle(GUI.skin.GetStyle("PaneOptions"))
         {
@@ -131,7 +131,7 @@
                 GetInlineEditor(ObjectReference).OnInspectorGUI();
             }
         }
-        
+
         private void DrawValueProperty(SerializedProperty mainProperty, Rect valueRect, Rect totalRect, int indentLevel)
         {
             if (ExposedProperty.propertyType == SerializedPropertyType.Generic)

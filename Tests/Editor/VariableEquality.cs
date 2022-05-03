@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using GenericUnityObjects;
-using NUnit.Framework;
-
 namespace GenericScriptableArchitecture.EditorTests
 {
+    using System.Collections.Generic;
+    using GenericUnityObjects;
+    using NUnit.Framework;
+
     public class VariableEquality
     {
         [Test]
