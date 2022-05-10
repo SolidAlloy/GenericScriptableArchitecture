@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.2...1.3.3) (2022-05-08)
+
+
+### Bug Fixes
+
+* Fixed the ReorderableList.ClearCache method not being found through reflection ([afcd012](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/afcd012da5e75d19102d732a269e6dd4ee1d4d6e))
+
 ## [1.3.2](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.1...1.3.2) (2022-02-13)
 
 
