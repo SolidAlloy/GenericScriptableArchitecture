@@ -11,6 +11,10 @@
         [SerializeField] private float _max;
         [SerializeField] private float _value;
 
+        public float Min => _min;
+
+        public float Max => _max;
+
         public float Value
         {
             get => _value;

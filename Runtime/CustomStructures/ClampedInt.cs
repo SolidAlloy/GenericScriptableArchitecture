@@ -12,6 +12,10 @@
 
         [SerializeField] private int _value;
 
+        public int Min => _min;
+
+        public int Max => _max;
+
         public int Value
         {
             get => _value;
