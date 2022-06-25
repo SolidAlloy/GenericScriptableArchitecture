@@ -1,29 +1,39 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System;
+    using System.Collections.Generic;
     using EasyButtons.Editor;
+    using SolidUtilities.Editor;
     using UnityEditor;
+    using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
     internal class ScriptableEventEditor : PlayModeUpdatableEditor, IRepaintable
     {
         private ButtonsDrawer _buttonsDrawer;
-        private FoldoutList<UnityEngine.Object> _listenersList;
+        private FoldoutList<Object> _listenersList;
         private SerializedProperty _description;
         private StackTraceDrawer _stackTrace;
         private BaseScriptableEvent _typedTarget;
+        private SerializedProperty _argNamesProperty;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            _buttonsDrawer = new ButtonsDrawer(target);
             _typedTarget = (BaseScriptableEvent) target;
 
             var responseTargetsExpanded = serializedObject.FindProperty(nameof(BaseScriptableEvent.ListenersExpanded));
-            _listenersList = new FoldoutList<UnityEngine.Object>(_typedTarget.Listeners, responseTargetsExpanded, "Listeners");
+            _listenersList = new FoldoutList<Object>(_typedTarget.Listeners, responseTargetsExpanded, "Listeners");
 
             _description = serializedObject.FindProperty("_description");
 
             _stackTrace = new StackTraceDrawer(_typedTarget, this);
+
+            var genericArgCount = GetGenericArgumentsCountOfType(target);
+            _argNamesProperty = GetArgNamesProperty(serializedObject, genericArgCount);
+
+            var getArgNames = GetArgNamesFuncArray(_argNamesProperty);
+            _buttonsDrawer = new ButtonsDrawer(target, new Dictionary<string, Func<string>[]> { { nameof(ScriptableEvent.Invoke), getArgNames } });
         }
 
         protected override void Update() => _listenersList.Update(_typedTarget.Listeners);
@@ -36,6 +46,12 @@
                 return;
 
             EditorGUILayout.PropertyField(_description);
+
+            for (int i = 0; i < _argNamesProperty.arraySize; i++)
+            {
+                EditorGUILayout.PropertyField(_argNamesProperty.GetArrayElementAtIndex(i), GUIContentHelper.Temp($"Arg {i+1}"), null);
+            }
+
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _buttonsDrawer.DrawButtons(targets);
 
@@ -46,6 +62,58 @@
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
             _listenersList.DoLayoutList();
+        }
+
+        private static int GetGenericArgumentsCountOfType(Object obj)
+        {
+            if (obj == null)
+                return 0;
+
+            var baseType = obj.GetType().BaseType;
+
+            // ReSharper disable once PossibleNullReferenceException
+            if (!baseType.IsGenericType)
+                return 0;
+
+            return baseType.GetGenericArguments().Length;
+        }
+
+        private static SerializedProperty GetArgNamesProperty(SerializedObject serializedObject, int genericArgCount)
+        {
+            var argNamesProperty = serializedObject.FindProperty(nameof(BaseScriptableEvent._argNames));
+
+            if (argNamesProperty.arraySize != genericArgCount)
+            {
+                InitializeArgNames(argNamesProperty, genericArgCount);
+            }
+
+            return argNamesProperty;
+        }
+
+        private static void InitializeArgNames(SerializedProperty argNamesProperty, int argsCount)
+        {
+            argNamesProperty.arraySize = argsCount;
+
+            for (int i = 0; i < argsCount; i++)
+            {
+                var argNameProperty = argNamesProperty.GetArrayElementAtIndex(i);
+                argNameProperty.stringValue = $"Arg {i+1}";
+            }
+
+            argNamesProperty.serializedObject.ApplyModifiedProperties();
+        }
+
+        private static Func<string>[] GetArgNamesFuncArray(SerializedProperty argNamesProperty)
+        {
+            var getArgNames = new Func<string>[argNamesProperty.arraySize];
+
+            for (int i = 0; i < getArgNames.Length; i++)
+            {
+                int capturedI = i;
+                getArgNames[i] = () => argNamesProperty.GetArrayElementAtIndex(capturedI).stringValue;
+            }
+
+            return getArgNames;
         }
     }
 }

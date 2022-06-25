@@ -17,6 +17,7 @@
         [SerializeField] internal bool ListenersExpanded;
         [SerializeField] private bool _stackTraceEnabled;
         [SerializeField] private bool _stackTraceExpanded;
+        [SerializeField] internal string[] _argNames;
 
         [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
 
