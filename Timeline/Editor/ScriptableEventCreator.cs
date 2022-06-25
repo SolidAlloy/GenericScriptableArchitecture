@@ -12,6 +12,7 @@
     using TypeReferences;
     using UnityEditor;
     using UnityEditor.Timeline.Actions;
+    using UnityEngine;
     using UnityEngine.Timeline;
     using Object = UnityEngine.Object;
 
@@ -69,7 +70,7 @@
                     PersistentStorage.SaveData(FindEventKey, findEvent);
                     PersistentStorage.ExecuteOnScriptsReload(FinishEmitterCreation);
 
-                    ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(emitterTypeWithoutArgs, genericArgs);
+                    ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(emitterTypeWithoutArgs, genericArgs);
                     AssetDatabase.Refresh();
                 }
             });

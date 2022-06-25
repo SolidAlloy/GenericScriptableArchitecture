@@ -4,6 +4,7 @@
     using GenericUnityObjects;
     using GenericUnityObjects.Editor.Util;
     using UnityEditor;
+    using UnityEngine;
 
     [InitializeOnLoad]
     public static class EmitterGenerator
@@ -18,12 +19,12 @@
 
         static EmitterGenerator()
         {
-            ConcreteClassCreator<GenericScriptableObject>.ConcreteClassAdded += (typeWithoutArgs, genericArgs) =>
+            ConcreteClassCreator<ScriptableObject>.ConcreteClassAdded += (typeWithoutArgs, genericArgs) =>
             {
                 var emitterType = GetMatchingEmitterType(typeWithoutArgs);
 
                 if (emitterType != null)
-                    ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(emitterType, genericArgs);
+                    ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(emitterType, genericArgs);
             };
         }
 
