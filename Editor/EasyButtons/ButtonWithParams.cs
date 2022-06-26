@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Utils;
@@ -62,16 +63,7 @@
                 _guiContent = getCustomLabel != null ? new GUIContent() : null;
             }
 
-            public object Value
-            {
-                get
-                {
-                    // Every time modified properties are applied, the "No script asset for ..." warning appears.
-                    // Saving only once before invoking the button minimizes those warnings.
-                    _editor.serializedObject.ApplyModifiedProperties();
-                    return _fieldInfo.GetValue(_scriptableObj);
-                }
-            }
+            public object Value => _fieldInfo.GetValue(_scriptableObj);
 
             public void Draw()
             {
@@ -87,6 +79,8 @@
 
                 EditorGUILayout.PropertyField(_paramProperty, _guiContent);
                 _editor.serializedObject.ApplyModifiedProperties();
+
+                LogHelper.RemoveLogEntriesByMode(LogModes.NoScriptAssetWarning);
             }
         }
     }
