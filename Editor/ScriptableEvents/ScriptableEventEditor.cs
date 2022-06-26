@@ -10,7 +10,7 @@
     [CustomEditor(typeof(BaseScriptableEvent), true)]
     internal class ScriptableEventEditor : PlayModeUpdatableEditor, IRepaintable
     {
-        private ButtonsDrawer _buttonsDrawer;
+        private Button _methodDrawer;
         private FoldoutList<Object> _listenersList;
         private SerializedProperty _description;
         private StackTraceDrawer _stackTrace;
@@ -33,7 +33,9 @@
             _argNamesProperty = GetArgNamesProperty(serializedObject, genericArgCount);
 
             var getArgNames = GetArgNamesFuncArray(_argNamesProperty);
-            _buttonsDrawer = new ButtonsDrawer(target, new Dictionary<string, Func<string>[]> { { nameof(ScriptableEvent.Invoke), getArgNames } });
+            var invokeMethod = target.GetType().GetMethod("Invoke");
+            _methodDrawer = Button.Create(invokeMethod, getArgNames);
+
         }
 
         protected override void Update() => _listenersList.Update(_typedTarget.Listeners);
@@ -53,7 +55,7 @@
             }
 
             EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
-            _buttonsDrawer.DrawButtons(targets);
+            _methodDrawer.Draw(targets);
 
             _stackTrace.Draw();
 

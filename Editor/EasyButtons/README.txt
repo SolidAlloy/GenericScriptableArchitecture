@@ -1,0 +1,1 @@
+This is a stripped-down and slightly modified version of the EasyButtons package from madsbangh https://github.com/madsbangh/EasyButtons/
