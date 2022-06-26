@@ -22,7 +22,7 @@ Have you ever heard of advantages of ECS? That data-driven architecture is good 
 ## Requirements
 
 - Unity 2020.2 or higher
-- .NET 4.x :heavy_exclamation_mark:
+- .NET 4.x :heavy_exclamation_mark: (when using Unity 2021.1 or lower)
 
 ## How To Install
 
@@ -48,7 +48,6 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
         "com.solidalloy.unity-dropdown",
         "com.solidalloy.type.references",
         "com.solidalloy.generic-unity-objects",
-        "com.madsbangh.easybuttons",
         "com.solidalloy.extevents",
         "com.solidalloy.generic-scriptable-architecture",
         "com.openupm"
@@ -72,7 +71,6 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 4. Do the same with four more packages:
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unit
    - https://github.com/SolidAlloy/GenericUnityObjects.git
-   - https://github.com/madsbangh/EasyButtons.git
    - https://github.com/SolidAlloy/ExtEvents.git
    - https://github.com/SolidAlloy/GenericScriptableArchitecture.git
 
@@ -408,6 +406,18 @@ ScriptableEvents can be subscribed to in multiple ways:
   ```
   
   The cool thing about UniRx is that you don't have to create a separate method that perfectly matches the passed arguments to be able to subscribe to events. You can pass a lambda method and use only part of the arguments passed, but you will still be able to unsubscribe from the event.
+
+#### Named event arguments
+
+You can name the arguments of a scriptable event:
+
+![named-argument-example](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/named-argument-example.png)
+
+It not only changes the label of the argument in the **Invoke** section of the event inspector, but also simplifies the event usage with ScriptableEventListeners.
+
+![ext-event-named-argument](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/ext-event-named-argument.png)
+
+In this example, we can see which argument is passed by the event to the response method. If there were multiple arguments of the same type, we could choose between them based on their names.
 
 ### Variable
 
