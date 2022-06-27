@@ -1,9 +1,11 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
+    using System.Collections.Generic;
     using GenericUnityObjects.Editor;
     using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
+    using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
@@ -16,13 +18,19 @@
         private const string ListenerTypeKey = "ListenerEditor_ListenerType";
         private const string EventKey = "ListenerEditor_EventReference";
 
+        private static readonly List<GameObject> _debuggedGameObjects = new List<GameObject>();
+
         private ScriptableEventListener _target;
         private ScriptableEventListenerEditor _componentEditor;
         private BaseScriptableEventListener _component;
+        private bool _showGeneratedComponents;
 
         private void OnEnable()
         {
             _target = (ScriptableEventListener) target;
+
+            if (_target != null)
+                _showGeneratedComponents = _debuggedGameObjects.Contains(_target.gameObject);
         }
 
         private void OnDisable()
@@ -35,9 +43,42 @@
 
         public override void OnInspectorGUI()
         {
+            serializedObject.UpdateIfRequiredOrScript();
             CreateComponentEditorIfNeeded();
             DrawObjectField();
             DrawUnityEvent();
+            DrawDebugFlag();
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawDebugFlag()
+        {
+            bool newValue = EditorGUILayout.Toggle("Show generated components", _showGeneratedComponents);
+
+            if (_showGeneratedComponents == newValue)
+                return;
+
+            if (_showGeneratedComponents && !newValue) // hide components
+            {
+                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.HideInInspector);
+                _debuggedGameObjects.Remove(_target.gameObject);
+            }
+            else if (!_showGeneratedComponents && newValue) // show components
+            {
+                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.None);
+                _debuggedGameObjects.Add(_target.gameObject);
+            }
+
+            _showGeneratedComponents = newValue;
+        }
+
+        private static void SetHideFlagsForComponents(IEnumerable<Component> components, HideFlags flags)
+        {
+            foreach (var component in components)
+            {
+                var editor = CreateEditor(component);
+                SetHideFlagsPersistently(editor.serializedObject, flags);
+            }
         }
 
         private void CreateComponentEditorIfNeeded()
@@ -51,21 +92,25 @@
                 return;
 
             _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_component, typeof(ScriptableEventListenerEditor));
-            SetHideFlags(_componentEditor.serializedObject);
+            // _componentEditor.ShowEventField = false;
+
+            if (!_showGeneratedComponents)
+                SetHideFlagsPersistently(_componentEditor.serializedObject, HideFlags.HideInInspector);
+
             // It is necessary to change DrawObjectField after HideFlags because serializedObject.ApplyModifiedProperties() inside SetHideFlags discards the changed value of DrawObjectField
-            _component.DrawObjectField = false;
+            _component.DrawObjectField = _showGeneratedComponents; // TODO: for debug, we want to draw object field in normal editors, but still not draw them in inlined ones
         }
 
-        private void SetHideFlags(SerializedObject componentSerializedObject)
+        private static void SetHideFlagsPersistently(SerializedObject serializedObject, HideFlags flags)
         {
             // The only way to set the hide flags persistently.
-            var hideFlagsProp = componentSerializedObject.FindProperty("m_ObjectHideFlags");
-            const int hideInInspector = (int) HideFlags.HideInInspector;
+            var hideFlagsProp = serializedObject.FindProperty("m_ObjectHideFlags");
+            int flagsValue = (int) flags;
 
-            if (hideFlagsProp.intValue != hideInInspector)
+            if (hideFlagsProp.intValue != flagsValue)
             {
-                hideFlagsProp.intValue = hideInInspector;
-                componentSerializedObject.ApplyModifiedProperties();
+                hideFlagsProp.intValue = flagsValue;
+                serializedObject.ApplyModifiedProperties();
             }
         }
 
