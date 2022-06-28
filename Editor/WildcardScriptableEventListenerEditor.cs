@@ -5,7 +5,6 @@
     using GenericUnityObjects.Editor;
     using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
-    using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
@@ -23,14 +22,24 @@
         private ScriptableEventListener _target;
         private ScriptableEventListenerEditor _componentEditor;
         private BaseScriptableEventListener _component;
+        private SerializedProperty _componentProperty;
         private bool _showGeneratedComponents;
+        private GUIContent _showGeneratedLabel;
+        private bool _debugFoldoutOpen;
 
         private void OnEnable()
         {
+            _showGeneratedLabel = new GUIContent("Show generated components",
+                "Show auto-generated components attached to this game object that are hidden by default. Use this if the component goes missing for some reason.");
+
             _target = (ScriptableEventListener) target;
 
             if (_target != null)
+            {
                 _showGeneratedComponents = _debuggedGameObjects.Contains(_target.gameObject);
+                _debugFoldoutOpen = _showGeneratedComponents;
+                _componentProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._component));
+            }
         }
 
         private void OnDisable()
@@ -43,8 +52,19 @@
 
         public override void OnInspectorGUI()
         {
+            if (_target == null)
+            {
+                var scriptProperty = serializedObject.FindProperty("m_Script");
+                if (scriptProperty != null) EditorGUILayout.PropertyField(scriptProperty);
+                return;
+            }
+
             serializedObject.UpdateIfRequiredOrScript();
             CreateComponentEditorIfNeeded();
+
+            if (_showGeneratedComponents)
+                EditorGUILayout.PropertyField(_componentProperty);
+
             DrawObjectField();
             DrawUnityEvent();
             DrawDebugFlag();
@@ -53,7 +73,12 @@
 
         private void DrawDebugFlag()
         {
-            bool newValue = EditorGUILayout.Toggle("Show generated components", _showGeneratedComponents);
+            _debugFoldoutOpen = EditorGUILayout.Foldout(_debugFoldoutOpen, "Debug", true);
+
+            if (!_debugFoldoutOpen)
+                return;
+
+            bool newValue = EditorGUILayout.Toggle(_showGeneratedLabel, _showGeneratedComponents);
 
             if (_showGeneratedComponents == newValue)
                 return;
@@ -92,13 +117,13 @@
                 return;
 
             _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_component, typeof(ScriptableEventListenerEditor));
-            // _componentEditor.ShowEventField = false;
+            _componentEditor.ShowEventField = false;  // for debug, we want to draw object field in normal editors, but still not draw them in inlined ones
 
             if (!_showGeneratedComponents)
                 SetHideFlagsPersistently(_componentEditor.serializedObject, HideFlags.HideInInspector);
 
             // It is necessary to change DrawObjectField after HideFlags because serializedObject.ApplyModifiedProperties() inside SetHideFlags discards the changed value of DrawObjectField
-            _component.DrawObjectField = _showGeneratedComponents; // TODO: for debug, we want to draw object field in normal editors, but still not draw them in inlined ones
+            _component.DrawObjectField = _showGeneratedComponents;
         }
 
         private static void SetHideFlagsPersistently(SerializedObject serializedObject, HideFlags flags)

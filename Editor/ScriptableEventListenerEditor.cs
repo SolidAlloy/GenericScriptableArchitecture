@@ -15,6 +15,8 @@
         private bool _initialized;
         private BaseScriptableEventListener _target;
 
+        public bool ShowEventField = true;
+
         private void OnEnable()
         {
             // The targets length is 0 or the first target is null for a couple frames after the domains reload.
@@ -48,7 +50,7 @@
             if (guiWrapper.HasMissingScript)
                 return;
 
-            if (_eventProperty.propertyType != SerializedPropertyType.ObjectReference || _target.DrawObjectField)
+            if (ShowEventField && (_eventProperty.propertyType != SerializedPropertyType.ObjectReference || _target.DrawObjectField))
                 EditorGUILayout.PropertyField(_eventProperty);
 
             // Set custom names for the dynamic arguments of ExtEvent.
