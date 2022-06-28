@@ -71,41 +71,6 @@
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DrawDebugFlag()
-        {
-            _debugFoldoutOpen = EditorGUILayout.Foldout(_debugFoldoutOpen, "Debug", true);
-
-            if (!_debugFoldoutOpen)
-                return;
-
-            bool newValue = EditorGUILayout.Toggle(_showGeneratedLabel, _showGeneratedComponents);
-
-            if (_showGeneratedComponents == newValue)
-                return;
-
-            if (_showGeneratedComponents && !newValue) // hide components
-            {
-                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.HideInInspector);
-                _debuggedGameObjects.Remove(_target.gameObject);
-            }
-            else if (!_showGeneratedComponents && newValue) // show components
-            {
-                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.None);
-                _debuggedGameObjects.Add(_target.gameObject);
-            }
-
-            _showGeneratedComponents = newValue;
-        }
-
-        private static void SetHideFlagsForComponents(IEnumerable<Component> components, HideFlags flags)
-        {
-            foreach (var component in components)
-            {
-                var editor = CreateEditor(component);
-                SetHideFlagsPersistently(editor.serializedObject, flags);
-            }
-        }
-
         private void CreateComponentEditorIfNeeded()
         {
             if (_component == _target._component)
@@ -150,6 +115,47 @@
 
             if (newEvent != oldEvent)
                 ChangeEvent(newEvent);
+        }
+
+        private void DrawDebugFlag()
+        {
+            var wildcardComponentsCount = _target.GetComponents<ScriptableEventListener>().Length;
+            var genericComponentsCount = _target.GetComponents<BaseScriptableEventListener>().Length;
+
+            if (genericComponentsCount > wildcardComponentsCount)
+                EditorGUILayout.HelpBox("The game object has more generated listeners than wildcard listener components (the visible ones). Tick 'Show Generated Components' checkbox in Debug to resolve the issue and remove invalid generated components.", MessageType.Warning);
+
+            _debugFoldoutOpen = EditorGUILayout.Foldout(_debugFoldoutOpen, "Debug", true);
+
+            if (!_debugFoldoutOpen)
+                return;
+
+            bool newValue = EditorGUILayout.Toggle(_showGeneratedLabel, _showGeneratedComponents);
+
+            if (_showGeneratedComponents == newValue)
+                return;
+
+            if (_showGeneratedComponents && !newValue) // hide components
+            {
+                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.HideInInspector);
+                _debuggedGameObjects.Remove(_target.gameObject);
+            }
+            else if (!_showGeneratedComponents && newValue) // show components
+            {
+                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.None);
+                _debuggedGameObjects.Add(_target.gameObject);
+            }
+
+            _showGeneratedComponents = newValue;
+        }
+
+        private static void SetHideFlagsForComponents(IEnumerable<Component> components, HideFlags flags)
+        {
+            foreach (var component in components)
+            {
+                var editor = CreateEditor(component);
+                SetHideFlagsPersistently(editor.serializedObject, flags);
+            }
         }
 
         private void ChangeEvent(Object newEvent)
