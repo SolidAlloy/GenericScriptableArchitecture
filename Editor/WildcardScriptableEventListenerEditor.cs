@@ -73,7 +73,7 @@
 
         private void CreateComponentEditorIfNeeded()
         {
-            if (_component == _target._component)
+            if (_component == _target._component && _componentEditor != null)
                 return;
 
             _component = _target._component;
