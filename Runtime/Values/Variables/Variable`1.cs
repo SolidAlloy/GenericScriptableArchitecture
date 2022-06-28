@@ -27,6 +27,8 @@
 
         private EventHelperWithDefaultValue<T> _eventHelper;
 
+        public T InitialValue => _initialValue;
+
         public T Value
         {
             get => _value;
