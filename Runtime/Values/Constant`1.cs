@@ -16,7 +16,7 @@
 
         protected override void InitializeValues()
         {
-            _value = _initialValue.DeepCopyInEditor();
+            _value = SerializedCopyInEditor(_initialValue);
         }
 
         public static implicit operator T(Constant<T> variable) => variable.Value;

@@ -69,7 +69,7 @@
 
         protected override void InitializeValues()
         {
-            _value = _initialValue.DeepCopyInEditor();
+            _value = SerializedCopyInEditor(_initialValue);
         }
 
         protected virtual void SetValue(T value)

@@ -54,5 +54,14 @@
 #endif
 
         protected abstract void InitializeValues();
+
+        protected static T SerializedCopyInEditor<T>(T originalValue)
+        {
+#if UNITY_EDITOR
+            return SerializationHelper.CreateCopy(originalValue);
+#else
+            return value;
+#endif
+        }
     }
 }
