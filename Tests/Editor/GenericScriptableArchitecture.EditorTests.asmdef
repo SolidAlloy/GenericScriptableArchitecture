@@ -2,8 +2,8 @@
     "name": "GenericScriptableArchitecture.EditorTests",
     "rootNamespace": "GenericScriptableArchitecture.EditorTests",
     "references": [
-        "GUID:9168b41b563c2d84b94cfe84212541a9",
-        "GUID:4cf0b59bfc01ab3409b5f5c1d2888de4"
+        "GenericUnityObjects",
+        "GenericScriptableArchitecture"
     ],
     "includePlatforms": [
         "Editor"

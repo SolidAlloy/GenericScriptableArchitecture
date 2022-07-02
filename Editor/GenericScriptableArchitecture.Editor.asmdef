@@ -2,15 +2,15 @@
     "name": "GenericScriptableArchitecture.Editor",
     "rootNamespace": "GenericScriptableArchitecture.Editor",
     "references": [
-        "GUID:4cf0b59bfc01ab3409b5f5c1d2888de4",
-        "GUID:2e5fb71161fa6f74f958f989fbdbb839",
-        "GUID:9168b41b563c2d84b94cfe84212541a9",
-        "GUID:b73ef07971851e14fa74ae50b76f8225",
-        "GUID:49818357e697641afb75d2f8acaf1861",
-        "GUID:ea6a6314f279f814facc8c48a7d3c9f1",
-        "GUID:34b1251e2e34f984c9cb42350fca1bed",
-        "GUID:0a4d547e5130ac2478632a149c923b66",
-        "GUID:48d58eaab94e1de429344393b7653b1f"
+        "GenericScriptableArchitecture",
+        "GenericUnityObjects.Editor",
+        "GenericUnityObjects",
+        "SolidUtilities",
+        "Unity.Settings.Editor",
+        "TypeReferences",
+        "ExtEvents",
+        "ExtEvents.Editor",
+        "SolidUtilities.Editor"
     ],
     "includePlatforms": [
         "Editor"
