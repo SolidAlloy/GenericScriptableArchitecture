@@ -219,15 +219,11 @@ Project supports Unity Package Manager. To install the project as a Git package 
    }
    ```
 
-6. In this example, we will connect methods through the `ScriptableEventListener` component. Let's add one to the balloon, and one to the air pump. You can find `ScriptableEventListener<T>` in the Add Component menu
+6. In this example, we will connect methods through the `ScriptableEventListener` component. Let's add one to the balloon, and one to the air pump. You can find `ScriptableEventListener` in the Add Component menu
    
    ![Scriptable Event Listener Add](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-add.png)
    
-   Then choose the `float` type for it
-   
-   ![Scriptable Event Listener Choose Type](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-choose-type.png)
-
-7. Voila! We can assign the scriptable event to it and choose the `Balloon.Pop()` method inside.
+7. Once you assign a scriptable event to it, it will show a response of the appropriate type automatically. Choose the `Balloon.Pop()` method inside.
    
    ![Scriptable Event Inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-inspector.png)
    
