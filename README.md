@@ -28,15 +28,13 @@ Have you ever heard of advantages of ECS? That data-driven architecture is good 
 
 :heavy_exclamation_mark: Before installing the package, please disable the **Assembly Version Validation** option in **Player Settings**.
 
-### OpenUPM
+### Install with OpenUPM
 
-Once you have the OpenUPM cli, run the following command:
+Once you have the [OpenUPM cli](https://github.com/openupm/openupm-cli#installation), run the following command:
 
-```
-openupm install com.solidalloy.generic-scriptable-architecture
-```
+```openupm install com.solidalloy.generic-scriptable-architecture```
 
-Or if you don't have it, add the scoped registry to manifest.json with the desired dependency semantic version:
+Or if you don't have it, add the scoped registry to manifest.json with the desired dependency semantic version: 
 
 ```json
   "scopedRegistries": [
@@ -44,35 +42,34 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "com.solidalloy.util",
-        "com.solidalloy.unity-dropdown",
-        "com.solidalloy.type.references",
-        "com.solidalloy.generic-unity-objects",
-        "com.solidalloy.extevents",
-        "com.solidalloy.generic-scriptable-architecture",
-        "com.openupm"
+        "com.solidalloy",
+        "com.openupm",
+        "org.nuget"
       ]
     }
   ],
   "dependencies": {
-    "com.solidalloy.generic-scriptable-architecture": "1.0.0"
+    "com.solidalloy.generic-scriptable-architecture": "1.3.3"
   },
+
 ```
 
+### Install via Package Manager
 
+Project supports Unity Package Manager. To install the project as a Git package do the following:
 
-### Git URL
-
-Project supports Unity Package Manager. To install it as a Git package do the following:
-
-1. In Unity, open **Window** -> **Package Manager**.
-2. Press the **+** button, choose "**Add package from git URL...**"
-3. Enter "https://github.com/SolidAlloy/SolidUtilities.git" and press **Add**.
-4. Do the same with four more packages:
-   - https://github.com/SolidAlloy/ClassTypeReference-for-Unit
-   - https://github.com/SolidAlloy/GenericUnityObjects.git
-   - https://github.com/SolidAlloy/ExtEvents.git
-   - https://github.com/SolidAlloy/GenericScriptableArchitecture.git
+1. In Unity, open **Project Settings** -> **Package Manager**.
+2. Add a new scoped registry with the following details:
+   - **Name**: package.openupm.com
+   - **URL**: https://package.openupm.com
+   - Scope(s):
+     - com.openupm
+     - com.solidalloy
+     - org.nuget
+3. Hit **Apply**.
+4. Go to **Window** -> **Package Manager**.
+5. Press the **+** button, *Add package from git URL*.
+6. Enter **com.solidalloy.generic-scriptable-architecture**, press **Add**.
 
 ## Quick Start
 
