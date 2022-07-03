@@ -9,7 +9,7 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
-    [CustomPropertyDrawer(typeof(ReferenceBase), true)]
+    [CustomPropertyDrawer(typeof(Reference), true)]
     internal class ReferenceDrawer : PropertyDrawer
     {
         private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
@@ -38,9 +38,9 @@
             {
                 return ValueType switch
                 {
-                    ReferenceBase.ValueTypes.Constant => _constant,
-                    ReferenceBase.ValueTypes.Value => _value,
-                    ReferenceBase.ValueTypes.Variable => _variable,
+                    Reference.ValueTypes.Constant => _constant,
+                    Reference.ValueTypes.Value => _value,
+                    Reference.ValueTypes.Variable => _variable,
                     _ => throw new ArgumentOutOfRangeException(nameof(ExposedProperty), "Unknown value type in the reference.")
                 };
             }
@@ -48,7 +48,7 @@
 
         private static readonly string[] _popupOptions = { "Value", "Constant", "Variable" };
 
-        private ReferenceBase.ValueTypes ValueType => (ReferenceBase.ValueTypes) PopupValue;
+        private Reference.ValueTypes ValueType => (Reference.ValueTypes) PopupValue;
 
         private Object ObjectReference => ExposedProperty.objectReferenceValue;
 
@@ -56,7 +56,7 @@
         {
             FindProperties(property);
 
-            if (ValueType != ReferenceBase.ValueTypes.Value || ! property.isExpanded)
+            if (ValueType != Reference.ValueTypes.Value || ! property.isExpanded)
                 return EditorGUIUtility.singleLineHeight;
 
             // If a property has a custom property drawer, it will be drown inside a foldout anyway, so we account for
@@ -85,12 +85,12 @@
         {
             switch (ValueType)
             {
-                case ReferenceBase.ValueTypes.Constant:
-                case ReferenceBase.ValueTypes.Variable:
+                case Reference.ValueTypes.Constant:
+                case Reference.ValueTypes.Variable:
                     DrawObjectReference(valueRect, property, indentLevel);
                     break;
 
-                case ReferenceBase.ValueTypes.Value:
+                case Reference.ValueTypes.Value:
                     DrawValueProperty(property, valueRect, totalRect, indentLevel);
                     break;
 
@@ -113,7 +113,7 @@
         private void FindProperties(SerializedProperty property)
         {
             _mainProperty = property;
-            _valueType = _mainProperty.FindPropertyRelative("ValueType");
+            _valueType = _mainProperty.FindPropertyRelative($"<{nameof(Reference.ValueType)}>k__BackingField");
             _value = _mainProperty.FindPropertyRelative("_value");
             _variable = _mainProperty.FindPropertyRelative("_variable");
             _constant = _mainProperty.FindPropertyRelative("_constant");
@@ -146,7 +146,7 @@
 
         private void DrawLabel(SerializedProperty property, Rect totalRect, Rect labelRect, GUIContent label)
         {
-            if (ValueType != ReferenceBase.ValueTypes.Value && ObjectReference != null || _value.propertyType == SerializedPropertyType.Generic)
+            if (ValueType != Reference.ValueTypes.Value && ObjectReference != null || _value.propertyType == SerializedPropertyType.Generic)
             {
                 property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
             }

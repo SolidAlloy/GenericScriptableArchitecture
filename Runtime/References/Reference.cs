@@ -4,9 +4,9 @@
     using UnityEngine;
 
     [Serializable]
-    public abstract class ReferenceBase
+    public abstract class Reference
     {
-        [SerializeField] protected ValueTypes ValueType = ValueTypes.Value;
+        [field: SerializeField] public ValueTypes ValueType { get; protected set; }
 
         public enum ValueTypes { Value, Constant, Variable }
     }

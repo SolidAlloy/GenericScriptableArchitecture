@@ -4,12 +4,11 @@
     using UnityEngine;
 
     [Serializable]
-    public class Reference<T> : ReferenceBase, IEquatable<Reference<T>>, IEquatable<T>
+    public class Reference<T> : Reference, IEquatable<Reference<T>>, IEquatable<T>
     {
         [SerializeField] private T _value;
         [SerializeField] private Variable<T> _variable;
         [SerializeField] private Constant<T> _constant;
-
 
         public Reference(T value)
         {
@@ -60,6 +59,36 @@
                     default:
                         throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Returns a variable assigned to the reference if the <seealso cref="Reference.ValueType"/> is Variable, otherwise throws an exception.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Variable.</exception>
+        public Variable<T> VariableValue
+        {
+            get
+            {
+                if (ValueType == ValueTypes.Variable)
+                    return _variable;
+
+                throw new InvalidOperationException($"Tried to get a variable value of reference but the value type was {ValueType}.");
+            }
+        }
+
+        /// <summary>
+        /// Returns a constant assigned to the reference if the <seealso cref="Reference.ValueType"/> is Constant, otherwise throws an exception.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Constant.</exception>
+        public Constant<T> ConstantValue
+        {
+            get
+            {
+                if (ValueType == ValueTypes.Constant)
+                    return _constant;
+
+                throw new InvalidOperationException($"Tried to get a constant value of reference but the value type was {ValueType}.");
             }
         }
 
