@@ -1,14 +1,196 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
-    using System.Collections.Generic;
+    using System.Linq;
     using GenericUnityObjects.Editor;
     using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
+    using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
+
+    [CustomEditor(typeof(VariableInstancer))]
+    public class WildcardVariableInstancerEditor : Editor
+    {
+        private VariableInstancer _target;
+        private BaseVariableInstancer _component;
+        private GeneratedComponentsDebugDrawer _debugDrawer;
+
+        private void OnEnable()
+        {
+            _target = (VariableInstancer) target;
+            if (target == null) return;
+
+            var componentProperty = serializedObject.FindProperty(nameof(VariableInstancer._component));
+            _debugDrawer = new GeneratedComponentsDebugDrawer(componentProperty, _target.gameObject,
+                () => _target.GetComponents<VariableInstancer>(),
+                () => _target.GetComponents<BaseVariableInstancer>());
+        }
+
+        private void OnDisable()
+        {
+            if (target == null)
+            {
+                RemoveComponent(_component);
+            }
+        }
+
+        private void RemoveComponent(Component component)
+        {
+            if (component == null)
+                return;
+
+            Undo.DestroyObjectImmediate(component);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            if (_target == null)
+            {
+                var scriptProperty = serializedObject.FindProperty("m_Script");
+                if (scriptProperty != null) EditorGUILayout.PropertyField(scriptProperty);
+                return;
+            }
+
+            serializedObject.UpdateIfRequiredOrScript();
+
+            _debugDrawer.DrawComponentProperty();
+
+            // TODO: when reassigning variable in play mode, invoke the setter properly
+            // What if component references VariableInstancer explicitly? We can't use wildcard then, but we can add the + button.
+            DrawObjectField();
+
+
+            DrawObjectField();
+            // draw variable in foldout
+            _debugDrawer.DrawDebugFlag();
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        #region similar code
+
+        private const string WildcardListenerKey = "ListenerEditor_WildcardListener";
+        private const string ListenerTypeKey = "ListenerEditor_ListenerType";
+        private const string EventKey = "ListenerEditor_EventReference";
+
+        private void DrawObjectField()
+        {
+            var component = _target._component;
+            var oldVariable = component == null ? null : component.Variable;
+
+            if (_target._component != null)
+                Undo.RecordObject(_target._component, "Changed variable field");
+
+            var newVariable = GenericObjectDrawer.ObjectField("Variable", oldVariable, typeof(BaseVariable), false);
+
+            if (newVariable != oldVariable)
+                ChangeVariable(newVariable);
+        }
+
+        private void ChangeVariable(Object newVariable)
+        {
+            RemoveComponent(_target._component);
+
+            var listenerType = GetGenericComponentType(newVariable);
+
+            if (listenerType.GenericTypeDefinition == null)
+                return;
+
+            var component = AddComponent(listenerType.GenericTypeDefinition, listenerType.GenericArgs, out bool reloadRequired) as BaseVariableInstancer;
+
+            if (reloadRequired)
+            {
+                PersistentStorage.SaveData(WildcardListenerKey, _target);
+                PersistentStorage.SaveData(ListenerTypeKey, new TypeReference(listenerType.GenericTypeDefinition.MakeGenericType(listenerType.GenericArgs)));
+                PersistentStorage.SaveData(EventKey, newVariable);
+                PersistentStorage.ExecuteOnScriptsReload(OnAfterComponentAdded);
+                AssetDatabase.Refresh();
+            }
+            else
+            {
+                ChangeHiddenComponent(_target, component, newVariable as BaseVariable);
+            }
+        }
+
+        private Component AddComponent(Type genericTypeDefinition, Type[] genericArgs, out bool reloadRequired)
+        {
+            if (genericArgs == null)
+            {
+                reloadRequired = false;
+                return Undo.AddComponent(_target.gameObject, genericTypeDefinition);
+            }
+
+            return GenericBehaviourCreator.AddComponent(null, _target.gameObject, genericTypeDefinition, genericArgs, out reloadRequired);
+        }
+
+        private static void OnAfterComponentAdded()
+        {
+            try
+            {
+                var thisListener = PersistentStorage.GetData<VariableInstancer>(WildcardListenerKey);
+                var componentType = PersistentStorage.GetData<TypeReference>(ListenerTypeKey).Type;
+                var variable = PersistentStorage.GetData<Object>(EventKey) as BaseVariable;
+
+                var component = thisListener.gameObject.GetComponent(componentType) as BaseVariableInstancer;
+
+                ChangeHiddenComponent(thisListener, component, variable);
+            }
+            finally
+            {
+                PersistentStorage.DeleteData(WildcardListenerKey);
+                PersistentStorage.DeleteData(ListenerTypeKey);
+                PersistentStorage.DeleteData(EventKey);
+            }
+        }
+
+        private static void ChangeHiddenComponent(VariableInstancer wildcardComponent, BaseVariableInstancer genericComponent, BaseVariable variable)
+        {
+            // The flags are set persistently only through serializedObject, we do it when an editor is created.
+            // However, if we don't set the flags here, the component will appear for a frame and we don't want that.
+            genericComponent.hideFlags = HideFlags.HideInInspector;
+
+            Undo.RecordObject(wildcardComponent, "Change component");
+            wildcardComponent._component = genericComponent;
+
+            Undo.RecordObject(genericComponent, "Change event");
+            genericComponent.Variable = variable; // this is not same
+
+            PrefabUtility.RecordPrefabInstancePropertyModifications(genericComponent);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(wildcardComponent);
+        }
+
+        #endregion
+
+        private (Type GenericTypeDefinition, Type[] GenericArgs) GetGenericComponentType(Object newVariable)
+        {
+            if (newVariable == null)
+                return (null, null);
+
+            var concreteVariableType = newVariable.GetType();
+            var genericVariableType = concreteVariableType.BaseType;
+
+            return (genericVariableType.GetGenericTypeDefinition(), genericVariableType.GenericTypeArguments);
+        }
+
+        private void CreateVariableEditorIfNeeded()
+        {
+            if (_component == _target._component && _componentEditor != null)
+                return;
+
+            _component = _target._component;
+
+            if (_component == null)
+                return;
+
+            _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_component, typeof(ScriptableEventListenerEditor));
+            _componentEditor.ShowEventField = false;  // for debug, we want to draw object field in normal editors, but still not draw them in inlined ones
+
+            if (!_showGeneratedComponents)
+                SetHideFlagsPersistently(_componentEditor.serializedObject, HideFlags.HideInInspector);
+        }
+    }
 
     [CustomEditor(typeof(ScriptableEventListener))]
     public class WildcardScriptableEventListenerEditor : Editor
@@ -17,28 +199,21 @@
         private const string ListenerTypeKey = "ListenerEditor_ListenerType";
         private const string EventKey = "ListenerEditor_EventReference";
 
-        private static readonly List<GameObject> _debuggedGameObjects = new List<GameObject>();
-
         private ScriptableEventListener _target;
         private ScriptableEventListenerEditor _componentEditor;
         private BaseScriptableEventListener _component;
-        private SerializedProperty _componentProperty;
-        private bool _showGeneratedComponents;
-        private GUIContent _showGeneratedLabel;
-        private bool _debugFoldoutOpen;
+        private GeneratedComponentsDebugDrawer _debugDrawer;
 
         private void OnEnable()
         {
-            _showGeneratedLabel = new GUIContent("Show generated components",
-                "Show auto-generated components attached to this game object that are hidden by default. Use this if the component goes missing for some reason.");
-
             _target = (ScriptableEventListener) target;
 
             if (_target != null)
             {
-                _showGeneratedComponents = _debuggedGameObjects.Contains(_target.gameObject);
-                _debugFoldoutOpen = _showGeneratedComponents;
-                _componentProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._component));
+                var componentProperty = serializedObject.FindProperty(nameof(ScriptableEventListener._component));
+                _debugDrawer = new GeneratedComponentsDebugDrawer(componentProperty, _target.gameObject,
+                    () => _target.GetComponents<ScriptableEventListener>(),
+                    () => _target.GetComponents<BaseScriptableEventListener>());
             }
         }
 
@@ -60,14 +235,12 @@
             }
 
             serializedObject.UpdateIfRequiredOrScript();
+
+            _debugDrawer.DrawComponentProperty();
             CreateComponentEditorIfNeeded();
-
-            if (_showGeneratedComponents)
-                EditorGUILayout.PropertyField(_componentProperty);
-
             DrawObjectField();
             DrawUnityEvent();
-            DrawDebugFlag();
+            _debugDrawer.DrawDebugFlag();
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -84,24 +257,11 @@
             _componentEditor = (ScriptableEventListenerEditor) CreateEditor(_component, typeof(ScriptableEventListenerEditor));
             _componentEditor.ShowEventField = false;  // for debug, we want to draw object field in normal editors, but still not draw them in inlined ones
 
-            if (!_showGeneratedComponents)
-                SetHideFlagsPersistently(_componentEditor.serializedObject, HideFlags.HideInInspector);
+            if (!_debugDrawer.ShowGeneratedComponents)
+                _componentEditor.serializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
 
             // It is necessary to change DrawObjectField after HideFlags because serializedObject.ApplyModifiedProperties() inside SetHideFlags discards the changed value of DrawObjectField
-            _component.DrawObjectField = _showGeneratedComponents;
-        }
-
-        private static void SetHideFlagsPersistently(SerializedObject serializedObject, HideFlags flags)
-        {
-            // The only way to set the hide flags persistently.
-            var hideFlagsProp = serializedObject.FindProperty("m_ObjectHideFlags");
-            int flagsValue = (int) flags;
-
-            if (hideFlagsProp.intValue != flagsValue)
-            {
-                hideFlagsProp.intValue = flagsValue;
-                serializedObject.ApplyModifiedProperties();
-            }
+            _component.DrawObjectField = _debugDrawer.ShowGeneratedComponents;
         }
 
         private void DrawObjectField()
@@ -115,47 +275,6 @@
 
             if (newEvent != oldEvent)
                 ChangeEvent(newEvent);
-        }
-
-        private void DrawDebugFlag()
-        {
-            var wildcardComponentsCount = _target.GetComponents<ScriptableEventListener>().Length;
-            var genericComponentsCount = _target.GetComponents<BaseScriptableEventListener>().Length;
-
-            if (genericComponentsCount > wildcardComponentsCount)
-                EditorGUILayout.HelpBox("The game object has more generated listeners than wildcard listener components (the visible ones). Tick 'Show Generated Components' checkbox in Debug to resolve the issue and remove invalid generated components.", MessageType.Warning);
-
-            _debugFoldoutOpen = EditorGUILayout.Foldout(_debugFoldoutOpen, "Debug", true);
-
-            if (!_debugFoldoutOpen)
-                return;
-
-            bool newValue = EditorGUILayout.Toggle(_showGeneratedLabel, _showGeneratedComponents);
-
-            if (_showGeneratedComponents == newValue)
-                return;
-
-            if (_showGeneratedComponents && !newValue) // hide components
-            {
-                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.HideInInspector);
-                _debuggedGameObjects.Remove(_target.gameObject);
-            }
-            else if (!_showGeneratedComponents && newValue) // show components
-            {
-                SetHideFlagsForComponents(_target.GetComponents<BaseScriptableEventListener>(), HideFlags.None);
-                _debuggedGameObjects.Add(_target.gameObject);
-            }
-
-            _showGeneratedComponents = newValue;
-        }
-
-        private static void SetHideFlagsForComponents(IEnumerable<Component> components, HideFlags flags)
-        {
-            foreach (var component in components)
-            {
-                var editor = CreateEditor(component);
-                SetHideFlagsPersistently(editor.serializedObject, flags);
-            }
         }
 
         private void ChangeEvent(Object newEvent)
