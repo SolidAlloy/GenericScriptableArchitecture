@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableArchitecture
+namespace GenericScriptableArchitecture
 {
     using System;
     using System.Collections.Generic;
@@ -13,10 +13,7 @@
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
-    public class Variable<T> : BaseVariable, IEquatable<Variable<T>>, IEquatable<T>, IEvent<T>
-#if UNIRX
-        , IReactiveProperty<T>
-#endif
+    public class Variable<T> : BaseVariable, IVariable<T>
     {
         public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
         private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
@@ -25,7 +22,7 @@
         [SerializeField] internal T _value;
         [SerializeField] internal bool ListenersExpanded;
 
-        private EventHelperWithDefaultValue<T> _eventHelper;
+        internal EventHelperWithDefaultValue<T> _eventHelper;
 
         public T InitialValue => _initialValue;
 
@@ -93,7 +90,7 @@
 
         public override string ToString() => $"Variable{{{Value}}}";
 
-        public bool Equals(Variable<T> other)
+        public bool Equals(IVariable<T> other)
         {
             if (ReferenceEquals(other, null))
                 return false;
@@ -101,12 +98,15 @@
             if (ReferenceEquals(this, other))
                 return true;
 
-            return _value.Equals(other._value);
+            return _value.Equals(other.Value);
         }
 
         public bool Equals(T other)
         {
-            return ! (other is null) && Value.Equals(other);
+            if (ReferenceEquals(_value, other))
+                return true;
+
+            return Value.Equals(other);
         }
 
         public override bool Equals(object obj)
@@ -117,7 +117,7 @@
             if (ReferenceEquals(this, obj))
                 return true;
 
-            if (obj is Variable<T> typedObj)
+            if (obj is IVariable<T> typedObj)
                 return Equals(typedObj);
 
             if (obj is T tObj)
@@ -147,7 +147,7 @@
                 return (Object)rhs == null;
             }
 
-            return lhs.Equals(rhs);
+            return lhs.Equals((IVariable<T>)rhs);
         }
 
         public static bool operator !=(Variable<T> lhs, Variable<T> rhs)
