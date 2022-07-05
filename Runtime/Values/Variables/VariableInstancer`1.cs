@@ -5,8 +5,7 @@
     using UnityEngine;
 
     [Serializable]
-    [AddComponentMenu("")]
-    public class VariableInstancer<T> : BaseVariableInstancer, IVariable<T>
+    public class VariableInstancer<T> : MonoBehaviour, IVariable<T>
     {
         // TODO: in edit mode, this needs to draw object reference and initial value
         // In play mode, draw only the object reference.
@@ -56,12 +55,6 @@
                 _variableInstance += _eventHelper.NotifyListeners;
                 _variableInstance.EqualityComparer = equalityComparer;
             }
-        }
-
-        internal override BaseVariable Variable
-        {
-            get => _variableReference;
-            set => _variableReference = (Variable<T>) value;
         }
 
         private void Awake()
