@@ -22,7 +22,7 @@ namespace GenericScriptableArchitecture
         [SerializeField] internal T _value;
         [SerializeField] internal bool ListenersExpanded;
 
-        internal EventHelperWithDefaultValue<T> _eventHelper;
+        private EventHelperWithDefaultValue<T> _eventHelper;
 
         public T InitialValue => _initialValue;
 

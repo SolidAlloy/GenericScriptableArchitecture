@@ -1,7 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
-    using System.Collections.Generic;
     using SolidUtilities;
     using SolidUtilities.Editor;
     using SolidUtilities.UnityEditorInternals;
@@ -12,8 +11,6 @@
     [CustomPropertyDrawer(typeof(Reference), true)]
     internal class ReferenceDrawer : PropertyDrawer
     {
-        private static readonly Dictionary<Object, Editor> _editorCache = new Dictionary<Object, Editor>();
-
         private static GUIStyle _buttonStyle;
         private static GUIStyle ButtonStyle => _buttonStyle ??= new GUIStyle(GUI.skin.GetStyle("PaneOptions"))
         {
@@ -99,17 +96,6 @@
             }
         }
 
-        private static Editor GetInlineEditor(Object variable)
-        {
-            if ( ! _editorCache.TryGetValue(variable, out Editor editor))
-            {
-                editor = EditorHelper.CreateEditor<VariableInlineEditor>(variable);
-                _editorCache.Add(variable, editor);
-            }
-
-            return editor;
-        }
-
         private void FindProperties(SerializedProperty property)
         {
             _mainProperty = property;
@@ -128,7 +114,7 @@
 
             using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
             {
-                GetInlineEditor(ObjectReference).OnInspectorGUI();
+                InlineEditorCache.GetInlineEditor<VariableInlineEditor>(ObjectReference).OnInspectorGUI();
             }
         }
 

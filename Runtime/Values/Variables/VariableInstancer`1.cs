@@ -1,20 +1,16 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using JetBrains.Annotations;
     using UniRx;
     using UnityEngine;
 
     [Serializable]
-    public class VariableInstancer<T> : MonoBehaviour, IVariable<T>
+    public class VariableInstancer<T> : BaseVariableInstancer, IVariable<T>
     {
-        // TODO: in edit mode, this needs to draw object reference and initial value
-        // In play mode, draw only the object reference.
         [SerializeField] internal Variable<T> _variableReference;
 
-        // TODO: in edit mode, this is null and not drawn.
-        // In play mode, this needs to draw the current value.
-        internal Variable<T> _variableInstance;
-
+        private Variable<T> _variableInstance;
         private EventHelperWithDefaultValue<T> _eventHelper;
 
         public T InitialValue => _variableInstance == null ? default : _variableInstance._initialValue;
@@ -25,6 +21,7 @@
             set { if (_variableInstance != null) _variableInstance.Value = value; }
         }
 
+        [PublicAPI]
         public Variable<T> VariableReference
         {
             get => _variableReference;
@@ -57,6 +54,17 @@
             }
         }
 
+        internal override BaseVariable VariableInstance => _variableInstance;
+
+        internal override BaseVariable BaseVariableReference
+        {
+            get => _variableReference;
+            set => VariableReference = (Variable<T>) value;
+        }
+
+        private bool _initialized;
+        internal override bool Initialized => _initialized;
+
         private void Awake()
         {
             _eventHelper = new EventHelperWithDefaultValue<T>(this, () => Value);
@@ -66,6 +74,16 @@
                 _variableInstance = Instantiate(_variableReference);
                 _variableInstance += _eventHelper.NotifyListeners;
             }
+
+            _initialized = true;
+        }
+
+        private void OnDestroy()
+        {
+            if (_variableInstance != null)
+                Destroy(_variableInstance);
+
+            _eventHelper.Dispose();
         }
 
         public bool Equals(T other)
