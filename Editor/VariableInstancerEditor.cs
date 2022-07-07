@@ -11,11 +11,10 @@
     {
         private bool _initialized;
         private SerializedProperty _variableReferenceProperty;
-        private Editor _variableInstanceEditor;
         private BaseVariableInstancer _target;
-
         private Editor _referenceEditor;
         private SerializedProperty _referenceInitialValueProperty;
+        private SerializedProperty _valueProperty;
 
         private void OnEnable()
         {
@@ -25,6 +24,7 @@
                 return;
 
             _variableReferenceProperty = serializedObject.FindProperty(nameof(VariableInstancer<int>._variableReference));
+            _valueProperty = serializedObject.FindProperty(nameof(VariableInstancer<int>._value));
             _target = (BaseVariableInstancer) target;
             _initialized = true;
         }
@@ -53,11 +53,8 @@
             DrawLabel(labelRect, _variableReferenceProperty, GUIContentHelper.Temp("Base"));
             DrawObjectReference(valueRect, _variableReferenceProperty, 0);
 
-            if (ApplicationUtil.InEditMode || _target.VariableInstance == null)
-                return;
-
-            _variableInstanceEditor ??= InlineEditorCache.GetInlineEditor<VariableInlineEditor>(_target.VariableInstance);
-            _variableInstanceEditor.OnInspectorGUI();
+            if (ApplicationUtil.InPlayMode && _target.BaseVariableReference != null)
+                EditorGUILayout.PropertyField(_valueProperty, GUIContentHelper.Temp("Current Value"));
         }
 
         private void DrawLabel(Rect rect, SerializedProperty property, GUIContent label)
@@ -85,7 +82,7 @@
 
                 if (ApplicationUtil.InPlayMode && _target.BaseVariableReference != variableProperty.objectReferenceValue && _target.Initialized)
                 {
-                    // Reassigning the variable reference through property setter since there is logic that replaced variable instance there.
+                    // Reassigning the variable reference through property setter since there is logic that notifies listeners there.
                     _target.BaseVariableReference = (BaseVariable) variableProperty.objectReferenceValue;
                 }
             }

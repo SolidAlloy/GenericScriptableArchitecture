@@ -3,6 +3,7 @@
     using System;
     using JetBrains.Annotations;
     using UniRx;
+    using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -11,15 +12,24 @@
     {
         [SerializeField] internal Variable<T> _variableReference;
 
-        private Variable<T> _variableInstance;
         private EventHelperWithDefaultValue<T> _eventHelper;
 
-        public T InitialValue => _variableInstance == null ? default : _variableInstance._initialValue;
+        public T InitialValue => _variableReference == null ? default : _variableReference._initialValue;
 
+        [SerializeField] internal T _value;
         public T Value
         {
-            get => _variableInstance == null ? default : _variableInstance._value;
-            set { if (_variableInstance != null) _variableInstance.Value = value; }
+            get => _value;
+            set
+            {
+                if (_variableReference == null)
+                    return;
+
+                if (_variableReference.EqualityComparer.Equals(_value, value))
+                    return;
+
+                SetValue(value);
+            }
         }
 
         [PublicAPI]
@@ -28,34 +38,24 @@
             get => _variableReference;
             set
             {
-                _variableReference = value;
+                var newVariableReference = value; // just for better naming clarity.
 
-                _variableInstance -= _eventHelper.NotifyListeners;
+                T oldValue = _value;
+                T newValue = newVariableReference != null ? newVariableReference._value : default;
 
-                T oldValue = _variableInstance != null ? _variableInstance._value : default;
-                T newValue = _variableReference != null ? _variableReference._value : default;
-                var equalityComparer = _variableReference?.EqualityComparer // use new equality comparer if possible
-                                       ?? _variableInstance?.EqualityComparer // use old equality comparer if new is not accessible
+                var equalityComparer = newVariableReference?.EqualityComparer // use new equality comparer if possible
+                                       ?? _variableReference?.EqualityComparer // use old equality comparer if new is not accessible
                                        ?? UnityEqualityComparer.GetDefault<T>(); // finally, default back to default comparer
 
-                // publish the new value to old listeners if it is different in the new variable reference.
-                // For listeners, it will look like the value changed, and the won't know anything about variable references change.
+                // publish the new value to listeners if it is different in the new variable reference.
+                // For listeners, it will look like the value changed, and they won't know anything about variable references change.
                 if (!equalityComparer.Equals(oldValue, newValue))
                     _eventHelper.NotifyListeners(newValue);
 
-                if (_variableReference == null)
-                {
-                    _variableInstance = null;
-                    return;
-                }
-
-                _variableInstance = Instantiate(_variableReference);
-                _variableInstance += _eventHelper.NotifyListeners;
-                _variableInstance.EqualityComparer = equalityComparer;
+                _variableReference = newVariableReference;
+                _value = newValue;
             }
         }
-
-        internal override BaseVariable VariableInstance => _variableInstance;
 
         internal override BaseVariable BaseVariableReference
         {
@@ -72,8 +72,7 @@
 
             if (_variableReference != null)
             {
-                _variableInstance = Instantiate(_variableReference);
-                _variableInstance += _eventHelper.NotifyListeners;
+                _value = _variableReference._initialValue;
             }
 
             _initialized = true;
@@ -81,38 +80,49 @@
 
         private void OnDestroy()
         {
-            if (_variableInstance != null)
-                Destroy(_variableInstance);
-
             _eventHelper.Dispose();
         }
 
         public void SetValueAndForceNotify(T value)
         {
-            if (_variableInstance != null) _variableInstance.SetValueAndForceNotify(value);
+            if (_variableReference == null)
+                return;
+
+            SetValue(value);
+        }
+
+        private void SetValue(T value)
+        {
+            _value = value;
+
+            // No stack trace here like in variable but should we add it?
+            if ( ! CanBeInvoked())
+                return;
+
+            _eventHelper.NotifyListeners(_value);
+        }
+
+        protected bool CanBeInvoked()
+        {
+#if UNITY_EDITOR
+            if ( ! EditorApplication.isPlaying)
+            {
+                Debug.LogError($"Tried to change the {name} variable in edit mode. This is not allowed.");
+                return false;
+            }
+#endif
+            return true;
         }
 
         #region Adding Removing Listeners
 
-        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false)
-        {
-            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
-        }
+        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void RemoveListener(IListener<T> listener)
-        {
-            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
-        }
+        public void RemoveListener(IListener<T> listener) => _eventHelper.RemoveListener(listener);
 
-        public void AddListener(Action<T> listener, bool notifyCurrentValue = false)
-        {
-            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
-        }
+        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
 
-        public void RemoveListener(Action<T> listener)
-        {
-            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
-        }
+        public void RemoveListener(Action<T> listener) => _eventHelper.RemoveListener(listener);
 
         #endregion
 
@@ -124,15 +134,10 @@
 
         public bool Equals(T other)
         {
-            if (_variableInstance == null)
-            {
-                return other == null || other.Equals(default);
-            }
-
-            if (ReferenceEquals(_variableInstance._value, other))
+            if (ReferenceEquals(_value, other))
                 return true;
 
-            return _variableInstance._value.Equals(other);
+            return Value.Equals(other);
         }
 
         public bool Equals(IVariable<T> other)
@@ -143,7 +148,7 @@
             if (ReferenceEquals(this, other))
                 return true;
 
-            return _variableInstance._value.Equals(other.Value);
+            return _value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
@@ -264,12 +269,9 @@
         #endregion
 
 #if UNIRX
-        public IDisposable Subscribe(IObserver<T> observer)
-        {
-            return _variableInstance == null ? Disposable.Empty : _variableInstance.Subscribe(observer);
-        }
+        public IDisposable Subscribe(IObserver<T> observer) => _eventHelper.Subscribe(observer);
 
-        bool IReadOnlyReactiveProperty<T>.HasValue => _variableInstance != null;
+        bool IReadOnlyReactiveProperty<T>.HasValue => _variableReference != null;
 #endif
     }
 }
