@@ -4,6 +4,7 @@
     using GenericUnityObjects.Editor;
     using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
+    using JetBrains.Annotations;
     using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
@@ -101,15 +102,15 @@
 
             var listenerType = GetListenerComponentType(newEvent);
 
-            if (listenerType.GenericTypeDefinition == null)
+            if (listenerType == null)
                 return;
 
-            var component = AddComponent(listenerType.GenericTypeDefinition, listenerType.GenericArgs, out bool reloadRequired) as BaseScriptableEventListener;
+            var component = AddComponentHelper.AddComponent(_target.gameObject, listenerType, out bool reloadRequired) as BaseScriptableEventListener;
 
             if (reloadRequired)
             {
                 PersistentStorage.SaveData(WildcardListenerKey, _target);
-                PersistentStorage.SaveData(ListenerTypeKey, new TypeReference(listenerType.GenericTypeDefinition.MakeGenericType(listenerType.GenericArgs)));
+                PersistentStorage.SaveData(ListenerTypeKey, new TypeReference(listenerType));
                 PersistentStorage.SaveData(EventKey, newEvent);
                 PersistentStorage.ExecuteOnScriptsReload(OnAfterComponentAdded);
                 AssetDatabase.Refresh();
@@ -178,24 +179,10 @@
             return component == null ? null : component.Event;
         }
 
-        private Component AddComponent(Type genericTypeDefinition, Type[] genericArgs, out bool reloadRequired)
-        {
-            if (genericArgs == null)
-            {
-                reloadRequired = false;
-                return Undo.AddComponent(_target.gameObject, genericTypeDefinition);
-            }
-
-            return GenericBehaviourCreator.AddComponent(null, _target.gameObject, genericTypeDefinition, genericArgs, out reloadRequired);
-        }
-
-        private (Type GenericTypeDefinition, Type[] GenericArgs) GetListenerComponentType(Object newEvent)
+        private Type GetListenerComponentType(Object newEvent)
         {
             if (newEvent == null)
-                return (null, null);
-
-            Type definition = null;
-            Type[] genericArgs = null;
+                return null;
 
             var concreteEventType = newEvent.GetType();
 
@@ -203,12 +190,11 @@
             {
                 if (concreteEventType == typeof(ScriptableEvent))
                 {
-                    definition = typeof(VoidScriptableEventListener);
-                    return (definition, genericArgs);
+                    return typeof(VoidScriptableEventListener);
                 }
 
                 Debug.LogError($"The type is not a known type: {concreteEventType}");
-                return (definition, genericArgs);
+                return null;
             }
 
             var eventType = concreteEventType.BaseType.IsGenericType ? concreteEventType.BaseType : concreteEventType;
@@ -220,27 +206,23 @@
             }
             else if (eventTypeDefinition == typeof(VariableWithHistory<>))
             {
-                definition = typeof(ScriptableEventListener<,>);
                 var genericArg = eventType.GenericTypeArguments[0];
-                genericArgs = new [] { genericArg, genericArg };
+                return typeof(ScriptableEventListener<,>).MakeGenericType(genericArg, genericArg);
             }
             else if (eventTypeDefinition == typeof(Variable<>) || eventTypeDefinition == typeof(ScriptableEvent<>))
             {
-                definition = typeof(ScriptableEventListener<>);
-                genericArgs = eventType.GenericTypeArguments;
+                return typeof(ScriptableEventListener<>).MakeGenericType(eventType.GenericTypeArguments);
             }
             else if (eventTypeDefinition == typeof(ScriptableEvent<,>))
             {
-                definition = typeof(ScriptableEventListener<,>);
-                genericArgs = eventType.GenericTypeArguments;
+                return typeof(ScriptableEventListener<,>).MakeGenericType(eventType.GenericTypeArguments);
             }
             else if (eventTypeDefinition == typeof(ScriptableEvent<,,>))
             {
-                definition = typeof(ScriptableEventListener<,,>);
-                genericArgs = eventType.GenericTypeArguments;
+                return typeof(ScriptableEventListener<,,>).MakeGenericType(eventType.GenericTypeArguments);
             }
 
-            return (definition, genericArgs);
+            return null;
         }
     }
 }
