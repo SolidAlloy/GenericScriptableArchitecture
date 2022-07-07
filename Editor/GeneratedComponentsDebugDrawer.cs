@@ -24,7 +24,8 @@
             _showGeneratedLabel = new GUIContent("Show generated components",
                 "Show auto-generated components attached to this game object that are hidden by default. Use this if the component goes missing for some reason.");
 
-            ShowGeneratedComponents = _debuggedGameObjects.Contains(targetGameObject);
+            _targetGameObject = targetGameObject;
+            ShowGeneratedComponents = _debuggedGameObjects.Contains(_targetGameObject);
             _debugFoldoutOpen = ShowGeneratedComponents;
             _componentProperty = componentProperty;
             _getWildcardComponents = getWildcardComponents;
