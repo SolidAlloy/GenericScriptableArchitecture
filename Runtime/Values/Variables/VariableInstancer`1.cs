@@ -4,6 +4,7 @@
     using JetBrains.Annotations;
     using UniRx;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     [Serializable]
     public class VariableInstancer<T> : BaseVariableInstancer, IVariable<T>
@@ -86,6 +87,41 @@
             _eventHelper.Dispose();
         }
 
+        public void SetValueAndForceNotify(T value)
+        {
+            if (_variableInstance != null) _variableInstance.SetValueAndForceNotify(value);
+        }
+
+        #region Adding Removing Listeners
+
+        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false)
+        {
+            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
+        }
+
+        public void RemoveListener(IListener<T> listener)
+        {
+            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
+        }
+
+        public void AddListener(Action<T> listener, bool notifyCurrentValue = false)
+        {
+            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
+        }
+
+        public void RemoveListener(Action<T> listener)
+        {
+            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
+        }
+
+        #endregion
+
+        #region Operator Overloads
+
+        public static implicit operator T(VariableInstancer<T> variable) => variable.Value;
+
+        public override string ToString() => $"VariableInstancer{{{Value}}}";
+
         public bool Equals(T other)
         {
             if (_variableInstance == null)
@@ -110,30 +146,122 @@
             return _variableInstance._value.Equals(other.Value);
         }
 
-        public void SetValueAndForceNotify(T value)
+        public override bool Equals(object obj)
         {
-            if (_variableInstance != null) _variableInstance.SetValueAndForceNotify(value);
+            if (ReferenceEquals(obj, null))
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj is IVariable<T> typedObj)
+                return Equals(typedObj);
+
+            if (obj is T tObj)
+                return Equals(tObj);
+
+            return false;
         }
 
-        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false)
+        /// <summary>
+        /// Use with caution. The value contained by a VariableInstancer instance can be changed through inspector.
+        /// </summary>
+        /// <returns>Hash code of the instance.</returns>
+        public override int GetHashCode()
         {
-            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + Value?.GetHashCode() ?? 0;
+                return hash;
+            }
         }
 
-        public void RemoveListener(IListener<T> listener)
+        public static bool operator ==(VariableInstancer<T> lhs, VariableInstancer<T> rhs)
         {
-            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
+            if ((Object)lhs == null)
+            {
+                return (Object)rhs == null;
+            }
+
+            return lhs.Equals((IVariable<T>)rhs);
         }
 
-        public void AddListener(Action<T> listener, bool notifyCurrentValue = false)
+        public static bool operator !=(VariableInstancer<T> lhs, VariableInstancer<T> rhs)
         {
-            if (_variableInstance != null) _variableInstance.AddListener(listener, notifyCurrentValue);
+            return ! (lhs == rhs);
         }
 
-        public void RemoveListener(Action<T> listener)
+        public static bool operator ==(VariableInstancer<T> lhs, T rhs)
         {
-            if (_variableInstance != null) _variableInstance.RemoveListener(listener);
+            if ((Object)lhs == null)
+            {
+                return rhs is null;
+            }
+
+            return lhs.Equals(rhs);
         }
+
+        public static bool operator !=(VariableInstancer<T> lhs, T rhs)
+        {
+            return ! (lhs == rhs);
+        }
+
+        public static VariableInstancer<T> operator +(VariableInstancer<T> variableInstancer, Action<T> listener)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.AddListener(listener);
+            return variableInstancer;
+        }
+
+        public static VariableInstancer<T> operator +(VariableInstancer<T> variableInstancer, (Action<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.AddListener(args.Listener, args.NotifyCurrentValue);
+            return variableInstancer;
+        }
+
+        public static VariableInstancer<T> operator -(VariableInstancer<T> variableInstancer, Action<T> listener)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.RemoveListener(listener);
+            return variableInstancer;
+        }
+
+        public static VariableInstancer<T> operator +(VariableInstancer<T> variableInstancer, IListener<T> listener)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.AddListener(listener);
+            return variableInstancer;
+        }
+
+        public static VariableInstancer<T> operator +(VariableInstancer<T> variableInstancer, (IListener<T> Listener, bool NotifyCurrentValue) args)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.AddListener(args.Listener, args.NotifyCurrentValue);
+            return variableInstancer;
+        }
+
+        public static VariableInstancer<T> operator -(VariableInstancer<T> variableInstancer, IListener<T> listener)
+        {
+            if (variableInstancer == null)
+                return null;
+
+            variableInstancer.RemoveListener(listener);
+            return variableInstancer;
+        }
+
+        #endregion
 
 #if UNIRX
         public IDisposable Subscribe(IObserver<T> observer)
