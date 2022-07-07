@@ -10,9 +10,12 @@
 
     public readonly struct EventHolderDrawerUtil
     {
+        public const string NotifyCurrentValueLabel = "Fire current value on enable";
+
         private readonly SerializedProperty _mainProperty;
         private readonly SerializedProperty _event;
         private readonly SerializedProperty _variable;
+        private readonly SerializedProperty _variableInstancer;
         private readonly SerializedProperty _type;
         private readonly SerializedProperty _notifyCurrentValue;
         private readonly int _argsCount;
@@ -22,10 +25,11 @@
         {
             _mainProperty = property;
             _argsCount = argsCount;
-            _event = _mainProperty.FindPropertyRelative(nameof(_event));
-            _variable = _mainProperty.FindPropertyRelative(nameof(_variable));
-            _type = _mainProperty.FindPropertyRelative(nameof(_type));
-            _notifyCurrentValue = _mainProperty.FindPropertyRelative(nameof(_notifyCurrentValue));
+            _event = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>._event));
+            _variable = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>._variable));
+            _variableInstancer = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>._variableInstancer));
+            _type = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>._type));
+            _notifyCurrentValue = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>._notifyCurrentValue));
             _drawObjectField = _mainProperty.FindPropertyRelative(nameof(EventHolder<int>.DrawObjectField)).boolValue;
         }
 
@@ -43,6 +47,7 @@
                 {
                     EventTypes.ScriptableEvent => _event,
                     EventTypes.Variable => _variable,
+                    EventTypes.VariableInstancer => _variableInstancer,
                     _ => throw new ArgumentOutOfRangeException(nameof(EventType),
                         "Unknown enum value passed to event type")
                 };
@@ -72,12 +77,12 @@
                 EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
             }
 
-            if (EventType == EventTypes.Variable)
+            if (EventType.HasDefaultValue())
             {
                 if (_drawObjectField)
                     fieldRect.y += EditorGUIUtility.singleLineHeight;
 
-                EditorGUI.PropertyField(fieldRect, _notifyCurrentValue, GUIContentHelper.Temp("Fire current value on enable"));
+                EditorGUI.PropertyField(fieldRect, _notifyCurrentValue, GUIContentHelper.Temp(NotifyCurrentValueLabel));
             }
 
             EditorGUI.indentLevel = previousIndent;
@@ -95,7 +100,7 @@
         public float GetPropertyHeight()
         {
             int initialLinesCount = _drawObjectField ? 1 : 0;
-            return EditorGUIUtility.singleLineHeight * (initialLinesCount + (EventType == EventTypes.Variable ? 1 : 0));
+            return EditorGUIUtility.singleLineHeight * (initialLinesCount + (EventType.HasDefaultValue() ? 1 : 0));
         }
 
         private (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
@@ -124,7 +129,7 @@
                 imagePosition = ImagePosition.ImageOnly
             };
 
-            private static readonly string[] _popupOptionsOne = { "Scriptable Event", "Variable" };
+            private static readonly string[] _popupOptionsOne = { "Scriptable Event", "Variable", "Variable Instancer" };
             private static readonly string[] _popupOptionsTwo = { "Scriptable Event", "Variable With History" };
 
             public static float Width => _buttonStyle.fixedWidth;

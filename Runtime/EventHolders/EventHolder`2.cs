@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     internal class EventHolderBaseTwo { }
 
@@ -16,9 +17,9 @@
 
         public bool DrawObjectField = true;
 
-        public BaseEvent Event
+        public IBaseEvent Event
         {
-            get => _type == EventTypes.ScriptableEvent ? (BaseEvent) _event : (BaseEvent) _variable;
+            get => _type == EventTypes.ScriptableEvent ? _event : _variable;
             set
             {
                 if (value is ScriptableEvent<T1, T2> @event)

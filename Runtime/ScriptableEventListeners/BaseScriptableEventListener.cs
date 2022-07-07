@@ -30,9 +30,9 @@
 
         ICollection<StackTraceEntry> IStackTraceProvider.Entries => _stackTraceEntries;
 
-        public abstract BaseEvent Event { get; set; }
+        internal abstract IBaseEvent Event { get; set; }
 
-        public abstract bool DrawObjectField { get; set; }
+        internal abstract bool DrawObjectField { get; set; }
 
         [Conditional("UNITY_EDITOR")]
         protected void AddStackTrace(params object[] args)

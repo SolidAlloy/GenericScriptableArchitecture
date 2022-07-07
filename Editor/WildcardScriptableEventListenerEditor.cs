@@ -2,9 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Editor;
-    using GenericUnityObjects.Editor.MonoBehaviours;
     using GenericUnityObjects.Editor.Util;
-    using JetBrains.Annotations;
     using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
@@ -90,7 +88,7 @@
             if (_target._component != null)
                 Undo.RecordObject(_target._component, "Changed event field");
 
-            var newEvent = GenericObjectDrawer.ObjectField("Event", oldEvent, typeof(BaseEvent), true);
+            var newEvent = GenericObjectDrawer.ObjectField("Event", oldEvent, typeof(IBaseEvent), true);
 
             if (newEvent != oldEvent)
                 ChangeEvent(newEvent);
@@ -117,7 +115,7 @@
             }
             else
             {
-                ChangeHiddenComponent(_target, component, newEvent as BaseEvent);
+                ChangeHiddenComponent(_target, component, (IBaseEvent) newEvent);
             }
         }
 
@@ -127,7 +125,7 @@
             {
                 var thisListener = PersistentStorage.GetData<ScriptableEventListener>(WildcardListenerKey);
                 var componentType = PersistentStorage.GetData<TypeReference>(ListenerTypeKey).Type;
-                var @event = PersistentStorage.GetData<Object>(EventKey) as BaseEvent;
+                var @event = (IBaseEvent) PersistentStorage.GetData<Object>(EventKey);
 
                 var component = thisListener.gameObject.GetComponent(componentType) as BaseScriptableEventListener;
 
@@ -141,7 +139,7 @@
             }
         }
 
-        private static void ChangeHiddenComponent(ScriptableEventListener listener, BaseScriptableEventListener component, BaseEvent @event)
+        private static void ChangeHiddenComponent(ScriptableEventListener listener, BaseScriptableEventListener component, IBaseEvent @event)
         {
             // The flags are set persistently only through serializedObject, we do it when an editor is created.
             // However, if we don't set the flags here, the component will appear for a frame and we don't want that.
@@ -176,7 +174,7 @@
         private Object GetCurrentEvent()
         {
             var component = _target._component;
-            return component == null ? null : component.Event;
+            return component == null ? null : (Object) component.Event;
         }
 
         private Type GetListenerComponentType(Object newEvent)
@@ -186,7 +184,9 @@
 
             var concreteEventType = newEvent.GetType();
 
-            if (!concreteEventType.BaseType.IsGenericType)
+            var eventType = concreteEventType.BaseType;
+
+            if (!eventType.IsGenericType)
             {
                 if (concreteEventType == typeof(ScriptableEvent))
                 {
@@ -197,27 +197,31 @@
                 return null;
             }
 
-            var eventType = concreteEventType.BaseType.IsGenericType ? concreteEventType.BaseType : concreteEventType;
             var eventTypeDefinition = eventType.GetGenericTypeDefinition();
 
             if (eventTypeDefinition == typeof(Constant<>))
             {
                 Debug.LogWarning("Constants don't change, so the event listener will never receive an event from them.");
+                return null;
             }
-            else if (eventTypeDefinition == typeof(VariableWithHistory<>))
+
+            if (eventTypeDefinition == typeof(Variable<>) || eventTypeDefinition == typeof(ScriptableEvent<>) || eventTypeDefinition == typeof(VariableInstancer<>))
+            {
+                return typeof(ScriptableEventListener<>).MakeGenericType(eventType.GenericTypeArguments);
+            }
+
+            if (eventTypeDefinition == typeof(ScriptableEvent<,>))
+            {
+                return typeof(ScriptableEventListener<,>).MakeGenericType(eventType.GenericTypeArguments);
+            }
+
+            if (eventTypeDefinition == typeof(VariableWithHistory<>))
             {
                 var genericArg = eventType.GenericTypeArguments[0];
                 return typeof(ScriptableEventListener<,>).MakeGenericType(genericArg, genericArg);
             }
-            else if (eventTypeDefinition == typeof(Variable<>) || eventTypeDefinition == typeof(ScriptableEvent<>))
-            {
-                return typeof(ScriptableEventListener<>).MakeGenericType(eventType.GenericTypeArguments);
-            }
-            else if (eventTypeDefinition == typeof(ScriptableEvent<,>))
-            {
-                return typeof(ScriptableEventListener<,>).MakeGenericType(eventType.GenericTypeArguments);
-            }
-            else if (eventTypeDefinition == typeof(ScriptableEvent<,,>))
+
+            if (eventTypeDefinition == typeof(ScriptableEvent<,,>))
             {
                 return typeof(ScriptableEventListener<,,>).MakeGenericType(eventType.GenericTypeArguments);
             }

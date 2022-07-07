@@ -3,6 +3,7 @@
     using System;
     using ExtEvents;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     [Serializable]
     [AddComponentMenu("")]
@@ -11,7 +12,7 @@
         [SerializeField] internal ScriptableEvent _event;
         [SerializeField] internal ExtEvent _response;
 
-        public override BaseEvent Event
+        internal override IBaseEvent Event
         {
             get => _event;
             set
@@ -21,7 +22,7 @@
             }
         }
 
-        public override bool DrawObjectField { get; set; }
+        internal override bool DrawObjectField { get; set; }
 
         private void OnEnable()
         {

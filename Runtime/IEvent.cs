@@ -1,12 +1,14 @@
 ﻿namespace GenericScriptableArchitecture
 {
-    using System;
+    public interface IBaseEvent { }
 
-    public interface IEvent { }
+    public interface IEvent : IBaseEvent { }
 
-    public interface IEvent<T> { }
+    public interface IEventOne : IBaseEvent { }
 
-    public interface IEvent<T1, T2> { }
+    public interface IEvent<T> : IBaseEvent { }
 
-    public interface IEvent<T1, T2, T3> { }
+    public interface IEvent<T1, T2> : IBaseEvent { }
+
+    public interface IEvent<T1, T2, T3> : IBaseEvent { }
 }

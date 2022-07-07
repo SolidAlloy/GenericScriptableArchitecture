@@ -3,22 +3,33 @@
     using System;
     using System.IO;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     internal class EventHolderBaseOne { }
 
     [Serializable]
     internal class EventHolder<T> : EventHolderBaseOne
     {
-        [SerializeField] private ScriptableEvent<T> _event;
-        [SerializeField] private Variable<T> _variable;
-        [SerializeField] private EventTypes _type = EventTypes.ScriptableEvent;
-        [SerializeField] private bool _notifyCurrentValue;
+        [SerializeField] internal ScriptableEvent<T> _event;
+        [SerializeField] internal Variable<T> _variable;
+        [SerializeField] internal VariableInstancer<T> _variableInstancer;
+        [SerializeField] internal EventTypes _type = EventTypes.ScriptableEvent;
+        [SerializeField] internal bool _notifyCurrentValue;
 
         public bool DrawObjectField = true;
 
-        public BaseEvent Event
+        public IBaseEvent Event
         {
-            get => _type == EventTypes.ScriptableEvent ? (BaseEvent) _event : (BaseEvent) _variable;
+            get
+            {
+                return _type switch
+                    {
+                        EventTypes.ScriptableEvent => _event,
+                        EventTypes.Variable => _variable,
+                        EventTypes.VariableInstancer => _variableInstancer,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+            }
             set
             {
                 if (value is ScriptableEvent<T> @event)
@@ -30,6 +41,11 @@
                 {
                     _type = EventTypes.Variable;
                     _variable = variable;
+                }
+                else if (value is VariableInstancer<T> variableInstancer)
+                {
+                    _type = EventTypes.VariableInstancer;
+                    _variableInstancer = variableInstancer;
                 }
                 else
                 {
@@ -50,9 +66,12 @@
                     _variable?.AddListener(listener, _notifyCurrentValue);
                     break;
 
+                case EventTypes.VariableInstancer:
+                    _variableInstancer?.AddListener(listener, _notifyCurrentValue);
+                    break;
+
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(listener),
-                        "Unknown enum value when adding listener to the event holder.");
+                    throw new ArgumentOutOfRangeException(nameof(listener), "Unknown enum value when adding listener to the event holder.");
             }
         }
 
@@ -68,9 +87,12 @@
                     _variable?.RemoveListener(listener);
                     break;
 
+                case EventTypes.VariableInstancer:
+                    _variableInstancer?.RemoveListener(listener);
+                    break;
+
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(listener),
-                        "Unknown enum value when adding listener to the event holder.");
+                    throw new ArgumentOutOfRangeException(nameof(listener), "Unknown enum value when adding listener to the event holder.");
             }
         }
     }

@@ -3,6 +3,7 @@
     using System;
     using ExtEvents.Editor;
     using GenericUnityObjects.Editor;
+    using SolidUtilities.Editor;
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEventListener), true)]
@@ -50,8 +51,7 @@
             if (guiWrapper.HasMissingScript)
                 return;
 
-            if (ShowEventField && (_eventProperty.propertyType != SerializedPropertyType.ObjectReference || _target.DrawObjectField))
-                EditorGUILayout.PropertyField(_eventProperty);
+            DrawEventField(_eventProperty);
 
             // Set custom names for the dynamic arguments of ExtEvent.
             if (_argNames.Length != 0)
@@ -65,6 +65,30 @@
             _stackTrace.Draw();
         }
 
+        private void DrawEventField(SerializedProperty eventProperty)
+        {
+            if (ShowEventField && (_eventProperty.propertyType != SerializedPropertyType.ObjectReference || _target.DrawObjectField))
+            {
+                EditorGUILayout.PropertyField(eventProperty);
+                return;
+            }
+
+            if (_target.Event is BaseScriptableEvent)
+                return;
+
+            // If it is not a scriptable event, it means it is an event holder.
+            // Since we shouldn't draw an object field, we only need to draw the notifyCurrentValue bool field if it is required.
+            var eventTypeProperty = eventProperty.FindPropertyRelative(nameof(EventHolder<int>._type));
+            var eventType = (EventTypes) eventTypeProperty.enumValueIndex;
+
+            if (eventType.HasDefaultValue())
+            {
+                EditorGUILayout.PropertyField(
+                    eventProperty.FindPropertyRelative(nameof(EventHolder<int>._notifyCurrentValue)),
+                    GUIContentHelper.Temp(EventHolderDrawerUtil.NotifyCurrentValueLabel));
+            }
+        }
+
         private static string[] GetArgNames(SerializedProperty eventProperty)
         {
             // case: field is ScriptableEvent
@@ -72,24 +96,27 @@
                 return GetArgNamesFromScriptableEvent(eventProperty);
 
             // case: field is EventHolder. Check its type;
-            var eventType = eventProperty.FindPropertyRelative("_type");
+            var eventTypeProperty = eventProperty.FindPropertyRelative(nameof(EventHolder<int>._type));
+            var eventType = (EventTypes) eventTypeProperty.enumValueIndex;
 
-            if (eventType.enumValueIndex == (int) EventTypes.ScriptableEvent)
+            switch (eventType)
             {
-                // case: type of EventHolder is scriptable event. Get the field of scriptable event from event holder and do the same operation on it.
-                eventProperty = eventProperty.FindPropertyRelative("_event");
-                return GetArgNamesFromScriptableEvent(eventProperty);
+                case EventTypes.ScriptableEvent:
+                    eventProperty = eventProperty.FindPropertyRelative(nameof(EventHolder<int>._event));
+                    return GetArgNamesFromScriptableEvent(eventProperty);
+
+                case EventTypes.Variable:
+                    var variableProperty = eventProperty.FindPropertyRelative(nameof(EventHolder<int>._variable));
+
+                    return variableProperty.type.StartsWith("VariableWithHistory")
+                        ? new[] { "Previous Value", "Value" }
+                        : new[] { "Value" };
+
+                case EventTypes.VariableInstancer:
+                    return new[] { "Value" };
             }
 
-            // case: type of EventHolder is a variable.
-            var variableProperty = eventProperty.FindPropertyRelative("_variable");
-
-            // case: type of variable is VariableWithHistory.
-            if (variableProperty.type.StartsWith("VariableWithHistory"))
-                return new[] { "Previous Value", "Value" };
-
-            // case: type of variable is Variable.
-            return new[] { "Value" };
+            return Array.Empty<string>();
         }
 
         private static string[] GetArgNamesFromScriptableEvent(SerializedProperty scriptableEventProperty)
