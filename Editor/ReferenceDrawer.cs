@@ -19,9 +19,10 @@
 
         private SerializedProperty _mainProperty;
         private SerializedProperty _valueType;
+        private SerializedProperty _constant;
         private SerializedProperty _value;
         private SerializedProperty _variable;
-        private SerializedProperty _constant;
+        private SerializedProperty _variableInstancer;
 
         private int PopupValue
         {
@@ -38,12 +39,13 @@
                     Reference.ValueTypes.Constant => _constant,
                     Reference.ValueTypes.Value => _value,
                     Reference.ValueTypes.Variable => _variable,
+                    Reference.ValueTypes.VariableInstancer => _variableInstancer,
                     _ => throw new ArgumentOutOfRangeException(nameof(ExposedProperty), "Unknown value type in the reference.")
                 };
             }
         }
 
-        private static readonly string[] _popupOptions = { "Value", "Constant", "Variable" };
+        private static readonly string[] _popupOptions = { "Value", "Constant", "Variable", "Variable Instancer" };
 
         private Reference.ValueTypes ValueType => (Reference.ValueTypes) PopupValue;
 
@@ -84,6 +86,7 @@
             {
                 case Reference.ValueTypes.Constant:
                 case Reference.ValueTypes.Variable:
+                case Reference.ValueTypes.VariableInstancer:
                     DrawObjectReference(valueRect, property, indentLevel);
                     break;
 
@@ -100,9 +103,10 @@
         {
             _mainProperty = property;
             _valueType = _mainProperty.FindPropertyRelative($"<{nameof(Reference.ValueType)}>k__BackingField");
-            _value = _mainProperty.FindPropertyRelative("_value");
-            _variable = _mainProperty.FindPropertyRelative("_variable");
-            _constant = _mainProperty.FindPropertyRelative("_constant");
+            _value = _mainProperty.FindPropertyRelative(nameof(Reference<int>._value));
+            _constant = _mainProperty.FindPropertyRelative(nameof(Reference<int>._constant));
+            _variable = _mainProperty.FindPropertyRelative(nameof(Reference<int>._variable));
+            _variableInstancer = _mainProperty.FindPropertyRelative(nameof(Reference<int>._variableInstancer));
         }
 
         private void DrawObjectReference(Rect valueRect, SerializedProperty property, int indentLevel)

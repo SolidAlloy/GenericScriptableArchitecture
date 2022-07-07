@@ -1,14 +1,16 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+    using JetBrains.Annotations;
     using UnityEngine;
 
     [Serializable]
     public class Reference<T> : Reference, IEquatable<Reference<T>>, IEquatable<T>
     {
-        [SerializeField] private T _value;
-        [SerializeField] private Variable<T> _variable;
-        [SerializeField] private Constant<T> _constant;
+        [SerializeField] internal T _value;
+        [SerializeField] internal Variable<T> _variable;
+        [SerializeField] internal Constant<T> _constant;
+        [SerializeField] internal VariableInstancer<T> _variableInstancer;
 
         public Reference(T value)
         {
@@ -37,6 +39,7 @@
                     ValueTypes.Constant => _constant == null ? default : _constant.Value,
                     ValueTypes.Value => _value,
                     ValueTypes.Variable => _variable == null ? default : _variable.Value,
+                    ValueTypes.VariableInstancer => _variableInstancer == null ? default : _variableInstancer.Value,
                     _ => throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.")
                 };
             }
@@ -56,6 +59,10 @@
                         _variable.Value = value;
                         break;
 
+                    case ValueTypes.VariableInstancer:
+                        _variableInstancer.Value = value;
+                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.");
                 }
@@ -66,6 +73,7 @@
         /// Returns a variable assigned to the reference if the <seealso cref="Reference.ValueType"/> is Variable, otherwise throws an exception.
         /// </summary>
         /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Variable.</exception>
+        [PublicAPI]
         public Variable<T> VariableValue
         {
             get
@@ -81,6 +89,7 @@
         /// Returns a constant assigned to the reference if the <seealso cref="Reference.ValueType"/> is Constant, otherwise throws an exception.
         /// </summary>
         /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Constant.</exception>
+        [PublicAPI]
         public Constant<T> ConstantValue
         {
             get
@@ -92,19 +101,37 @@
             }
         }
 
+        /// <summary>
+        /// Returns a variable instancer assigned to the reference if the <seealso cref="Reference.ValueType"/> is VariableInstancer, otherwise throws an exception.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Constant.</exception>
+        [PublicAPI]
+        public VariableInstancer<T> InstancerValue
+        {
+            get
+            {
+                if (ValueType == ValueTypes.VariableInstancer)
+                    return _variableInstancer;
+
+                throw new InvalidOperationException($"Tried to get a variable instancer value of reference but the value type was {ValueType}.");
+            }
+        }
+
         public static implicit operator T(Reference<T> reference) => reference.Value;
 
         public static implicit operator Reference<T>(T value) => new Reference<T>(value);
 
         public override string ToString()
         {
-            return ValueType switch
+            // ReSharper disable once UseStringInterpolation
+            return string.Format("Reference{{{0}}}", ValueType switch
             {
                 ValueTypes.Constant => _constant.ToString(),
                 ValueTypes.Value => _value.ToString(),
                 ValueTypes.Variable => _variable.ToString(),
+                ValueTypes.VariableInstancer => _variableInstancer.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.")
-            };
+            });
         }
 
         public bool Equals(Reference<T> other)

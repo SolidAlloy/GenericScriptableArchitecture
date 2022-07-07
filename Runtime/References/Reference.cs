@@ -8,6 +8,6 @@
     {
         [field: SerializeField] public ValueTypes ValueType { get; protected set; }
 
-        public enum ValueTypes { Value, Constant, Variable }
+        public enum ValueTypes { Value, Constant, Variable, VariableInstancer }
     }
 }
