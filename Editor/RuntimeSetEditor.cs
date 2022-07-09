@@ -43,7 +43,7 @@
 
         public override void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(this);
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
 
             if (guiWrapper.HasMissingScript)
                 return;

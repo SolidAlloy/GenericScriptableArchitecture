@@ -21,7 +21,7 @@
 
         public static implicit operator T(Constant<T> variable) => variable.Value;
 
-        public override string ToString() => $"Constant{{{Value}}}";
+        public override string ToString() => $"Constant '{name}' {{{Value}}}";
 
         public bool Equals(Constant<T> other)
         {

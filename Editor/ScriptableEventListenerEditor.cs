@@ -7,7 +7,7 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEventListener), true)]
-    public class ScriptableEventListenerEditor : Editor, IRepaintable
+    public class ScriptableEventListenerEditor : Editor
     {
         private SerializedProperty _eventProperty;
         private SerializedProperty _responseProperty;
@@ -29,7 +29,7 @@
             _eventProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._event));
             _responseProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._response));
             _argNames = GetArgNames(_eventProperty);
-            _stackTrace = new StackTraceDrawer((IStackTraceProvider) target, this);
+            _stackTrace = new StackTraceDrawer(_target._stackTrace.Entries, serializedObject.FindProperty(nameof(BaseScriptableEventListener._stackTrace)), Repaint);
             _initialized = true;
         }
 
@@ -46,7 +46,7 @@
                 return;
             }
 
-            using var guiWrapper = new InspectorGUIWrapper(this);
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
 
             if (guiWrapper.HasMissingScript)
                 return;

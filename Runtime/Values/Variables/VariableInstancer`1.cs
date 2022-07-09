@@ -3,32 +3,29 @@
     using System;
     using JetBrains.Annotations;
     using UniRx;
-    using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
-    [Serializable]
+    // Such an execution order allows the instance to be awaken before all the default classes including those predefined in execution order by Unity (like EventSystem with -1000 order).
+    // It's ok that instancers are awaken even before EventSystem because they don't depend on any of those classes.
+    [Serializable, DefaultExecutionOrder(-2000)]
     public class VariableInstancer<T> : BaseVariableInstancer, IVariable<T>
     {
         [SerializeField] internal Variable<T> _variableReference;
-
-        private EventHelperWithDefaultValue<T> _eventHelper;
+        [SerializeField] internal VariableHelper<T> _variableHelper;
 
         public T InitialValue => _variableReference == null ? default : _variableReference._initialValue;
 
-        [SerializeField] internal T _value;
         public T Value
         {
-            get => _value;
+            get => _variableHelper.Value;
             set
             {
                 if (_variableReference == null)
                     return;
 
-                if (_variableReference.EqualityComparer.Equals(_value, value))
-                    return;
-
-                SetValue(value);
+                if (!_variableReference.EqualityComparer.Equals(_variableHelper.Value, value))
+                    SetValue(value);
             }
         }
 
@@ -40,8 +37,8 @@
             {
                 var newVariableReference = value; // just for better naming clarity.
 
-                T oldValue = _value;
-                T newValue = newVariableReference != null ? newVariableReference._value : default;
+                T oldValue = _variableHelper.Value;
+                T newValue = newVariableReference != null ? newVariableReference.Value : default;
 
                 var equalityComparer = newVariableReference?.EqualityComparer // use new equality comparer if possible
                                        ?? _variableReference?.EqualityComparer // use old equality comparer if new is not accessible
@@ -50,10 +47,9 @@
                 // publish the new value to listeners if it is different in the new variable reference.
                 // For listeners, it will look like the value changed, and they won't know anything about variable references change.
                 if (!equalityComparer.Equals(oldValue, newValue))
-                    _eventHelper.NotifyListeners(newValue);
+                    SetValue(newValue);
 
                 _variableReference = newVariableReference;
-                _value = newValue;
             }
         }
 
@@ -66,63 +62,43 @@
         private bool _initialized;
         internal override bool Initialized => _initialized;
 
-        private void Awake()
+        VariableHelper IVariable.VariableHelper => _variableHelper;
+
+        protected virtual void Awake()
         {
-            _eventHelper = new EventHelperWithDefaultValue<T>(this, () => Value);
-
-            if (_variableReference != null)
-            {
-                _value = _variableReference._initialValue;
-            }
-
+            _variableHelper.Initialize(this, name, "variable instancer");
+            if (_variableReference != null) _variableHelper.Value = _variableReference._initialValue;
             _initialized = true;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            _eventHelper.Dispose();
+            _variableHelper.Event.Dispose();
         }
 
         public void SetValueAndForceNotify(T value)
         {
-            if (_variableReference == null)
-                return;
-
-            SetValue(value);
+            if (_variableReference != null)
+                SetValue(value);
         }
 
-        private void SetValue(T value)
-        {
-            _value = value;
-
-            // No stack trace here like in variable but should we add it?
-            if ( ! CanBeInvoked())
-                return;
-
-            _eventHelper.NotifyListeners(_value);
-        }
-
-        protected bool CanBeInvoked()
-        {
-#if UNITY_EDITOR
-            if ( ! EditorApplication.isPlaying)
-            {
-                Debug.LogError($"Tried to change the {name} variable in edit mode. This is not allowed.");
-                return false;
-            }
-#endif
-            return true;
-        }
+        protected virtual void SetValue(T value) => _variableHelper.SetValue(value);
 
         #region Adding Removing Listeners
 
-        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
+        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false)
+        {
+            if (!_initialized)
+                Debug.LogError("Tried to add a listener before the instancer was awaken.");
 
-        public void RemoveListener(IListener<T> listener) => _eventHelper.RemoveListener(listener);
+            _variableHelper.Event.AddListener(listener, notifyCurrentValue);
+        }
 
-        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
+        public void RemoveListener(IListener<T> listener) => _variableHelper.Event.RemoveListener(listener);
 
-        public void RemoveListener(Action<T> listener) => _eventHelper.RemoveListener(listener);
+        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _variableHelper.Event.AddListener(listener, notifyCurrentValue);
+
+        public void RemoveListener(Action<T> listener) => _variableHelper.Event.RemoveListener(listener);
 
         #endregion
 
@@ -130,11 +106,11 @@
 
         public static implicit operator T(VariableInstancer<T> variable) => variable.Value;
 
-        public override string ToString() => $"VariableInstancer{{{Value}}}";
+        public override string ToString() => $"VariableInstancer '{name}' {{{Value}}}";
 
         public bool Equals(T other)
         {
-            if (ReferenceEquals(_value, other))
+            if (ReferenceEquals(_variableHelper.Value, other))
                 return true;
 
             return Value.Equals(other);
@@ -148,7 +124,7 @@
             if (ReferenceEquals(this, other))
                 return true;
 
-            return _value.Equals(other.Value);
+            return _variableHelper.Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
@@ -269,7 +245,7 @@
         #endregion
 
 #if UNIRX
-        public IDisposable Subscribe(IObserver<T> observer) => _eventHelper.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<T> observer) => _variableHelper.Event.Subscribe(observer);
 
         bool IReadOnlyReactiveProperty<T>.HasValue => _variableReference != null;
 #endif

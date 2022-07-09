@@ -2,93 +2,140 @@ namespace GenericScriptableArchitecture
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using GenericUnityObjects;
-    using SolidUtilities;
+    using UnityEditor;
     using UnityEngine;
+    using Debug = UnityEngine.Debug;
     using Object = UnityEngine.Object;
 
 #if UNIRX
     using UniRx;
 #endif
 
+    // Variable has one eventHelper for one-arg listeners
+    // VariableWithHistory has a second eventHelper for two-arg listeners
+    // Both event helpers have public property that exposes listeners to editors
+    // How can we conveniently access them from editor without inheritance?
+    // IVariable can have EventHelper internal property, where we can further access the helper properties, etc.
+
+    [Serializable]
+    internal abstract class VariableHelper
+    {
+        [SerializeField] public StackTraceProvider StackTrace;
+
+        public abstract EventHelperWithDefaultValue EventHelper { get; }
+
+        // TODO: Placing it here for now but we might want to change the location.
+        public static bool CanBeInvoked(string objectName, string typeName)
+        {
+#if UNITY_EDITOR
+            if ( ! EditorApplication.isPlaying)
+            {
+                Debug.LogError($"Tried to change the {objectName} {typeName} in edit mode. This is not allowed.");
+                return false;
+            }
+#endif
+            return true;
+        }
+
+        public abstract void InvokeValueChangedEvents();
+    }
+
+    [Serializable]
+    internal class VariableHelper<T> : VariableHelper
+    {
+        public static readonly IEqualityComparer<T> DefaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
+
+        [SerializeField] public T Value;
+        [SerializeField] public bool ListenersExpanded;
+
+        public EventHelperWithDefaultValue<T> Event;
+
+        public override EventHelperWithDefaultValue EventHelper => Event;
+
+        private string _objectName;
+        private string _typeName;
+
+        public void Initialize(IVariable<T> parentEvent, string objectName, string typeName)
+        {
+            _objectName = objectName;
+            _typeName = typeName;
+            Event = new EventHelperWithDefaultValue<T>(parentEvent, () => Value);
+        }
+
+        public void SetValue(T value)
+        {
+            Value = value;
+            StackTrace.AddStackTrace(Value);
+            InvokeValueChangedEvents();
+        }
+
+        public override void InvokeValueChangedEvents()
+        {
+            if ( ! CanBeInvoked(_objectName, _typeName))
+                return;
+
+            Event.NotifyListeners(Value);
+        }
+    }
+
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable", MenuName = Config.PackageName + "Variable")]
     public class Variable<T> : BaseVariable, IVariable<T>
     {
-        public IEqualityComparer<T> EqualityComparer = _defaultEqualityComparer;
-        private static readonly IEqualityComparer<T> _defaultEqualityComparer = UnityEqualityComparer.GetDefault<T>();
-
         [SerializeField] internal T _initialValue;
-        [SerializeField] internal T _value;
-        [SerializeField] internal bool ListenersExpanded;
+        [SerializeField] internal VariableHelper<T> _variableHelper;
 
-        private EventHelperWithDefaultValue<T> _eventHelper;
+        public IEqualityComparer<T> EqualityComparer = VariableHelper<T>.DefaultEqualityComparer;
 
         public T InitialValue => _initialValue;
 
         public T Value
         {
-            get => _value;
+            get => _variableHelper.Value;
             set
             {
-                if (!EqualityComparer.Equals(_value, value))
+                if ( ! EqualityComparer.Equals(Value, value))
                     SetValue(value);
             }
         }
 
-        internal override List<Object> Listeners => _eventHelper?.Listeners ?? ListHelper.Empty<Object>();
+        VariableHelper IVariable.VariableHelper => _variableHelper;
 
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            _eventHelper = new EventHelperWithDefaultValue<T>(this, () => _value);
-        }
+        protected virtual void SetValue(T value) => _variableHelper.SetValue(value);
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            _eventHelper.Dispose();
+            _variableHelper.Event?.Dispose();
         }
 
-        public void SetValueAndForceNotify(T value) => SetValue(value);
-
-        #region Adding Removing Listeners
-
-        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(IListener<T> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(Action<T> listener) => _eventHelper.RemoveListener(listener);
-
-        #endregion
+        public void SetValueAndForceNotify(T value) => _variableHelper.SetValue(value);
 
         protected override void InitializeValues()
         {
-            _value = SerializedCopyInEditor(_initialValue);
+            _variableHelper.Initialize(this, name, "variable");
+            _variableHelper.Value = SerializedCopyInEditor(_initialValue);
         }
 
-        protected virtual void SetValue(T value)
-        {
-            _value = value;
-            AddStackTrace(_value);
-            InvokeValueChangedEvents();
-        }
+        #region Adding Removing Listeners
 
-        internal override void InvokeValueChangedEvents()
-        {
-            if ( ! CanBeInvoked())
-                return;
+        public void AddListener(IListener<T> listener, bool notifyCurrentValue = false) => _variableHelper.Event.AddListener(listener, notifyCurrentValue);
 
-            _eventHelper.NotifyListeners(_value);
-        }
+        public void RemoveListener(IListener<T> listener) => _variableHelper.Event.RemoveListener(listener);
+
+        public void AddListener(Action<T> listener, bool notifyCurrentValue = false) => _variableHelper.Event.AddListener(listener, notifyCurrentValue);
+
+        public void RemoveListener(Action<T> listener) => _variableHelper.Event.RemoveListener(listener);
+
+        #endregion
 
         #region Operator Overloads
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
 
-        public override string ToString() => $"Variable{{{Value}}}";
+        public override string ToString() => $"Variable '{name}' {{{Value}}}";
 
         public bool Equals(IVariable<T> other)
         {
@@ -98,12 +145,12 @@ namespace GenericScriptableArchitecture
             if (ReferenceEquals(this, other))
                 return true;
 
-            return _value.Equals(other.Value);
+            return _variableHelper.Value.Equals(other.Value);
         }
 
         public bool Equals(T other)
         {
-            if (ReferenceEquals(_value, other))
+            if (ReferenceEquals(_variableHelper.Value, other))
                 return true;
 
             return Value.Equals(other);
@@ -135,7 +182,7 @@ namespace GenericScriptableArchitecture
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + _value?.GetHashCode() ?? 0;
+                hash = hash * 23 + _variableHelper.Value?.GetHashCode() ?? 0;
                 return hash;
             }
         }
@@ -229,7 +276,7 @@ namespace GenericScriptableArchitecture
 #if UNIRX
         bool IReadOnlyReactiveProperty<T>.HasValue => true;
 
-        public IDisposable Subscribe(IObserver<T> observer) => _eventHelper.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<T> observer) => _variableHelper.Event.Subscribe(observer);
 #endif
     }
 }

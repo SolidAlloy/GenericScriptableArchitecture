@@ -35,6 +35,7 @@
             if ( ! CanBeInvoked())
                 return;
 
+            _stackTrace.AddStackTrace(arg0, arg1);
             _response.Invoke(arg0, arg1);
         }
     }

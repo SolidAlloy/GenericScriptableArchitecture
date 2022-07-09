@@ -177,7 +177,7 @@
         internal override List<Object> AddListeners => _addEvent.Listeners;
 
         private EventHelperWithDefaultValue<int> _countChangeEvent;
-        public IEventHelperWithDefaultValue<int> CountChangeEvent => _countChangeEvent;
+        public EventHelperWithDefaultValue<int> CountChangeEvent => _countChangeEvent;
         internal override List<Object> CountChangeListeners => _countChangeEvent?.Listeners;
 
         private readonly EventHelper<(int OldIndex, int NewIndex, TUnityObject Item)> _moveEvent = new EventHelper<(int OldIndex, int NewIndex, TUnityObject Item)>();

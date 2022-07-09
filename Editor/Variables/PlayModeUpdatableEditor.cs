@@ -3,7 +3,7 @@
     using GenericUnityObjects.Editor;
     using UnityEditor;
 
-    internal abstract class PlayModeUpdatableEditor : Editor
+    public abstract class PlayModeUpdatableEditor : Editor
     {
         private const int UpdateFrameCount = 20;
         private int _frameCounter;

@@ -41,7 +41,7 @@
             if ( ! CanBeInvoked())
                 return;
 
-            AddStackTrace();
+            _stackTrace.AddStackTrace();
             _response.Invoke();
         }
     }

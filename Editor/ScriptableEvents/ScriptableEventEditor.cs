@@ -8,7 +8,7 @@
     using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
-    internal class ScriptableEventEditor : PlayModeUpdatableEditor, IRepaintable
+    internal class ScriptableEventEditor : PlayModeUpdatableEditor
     {
         private Button _methodDrawer;
         private FoldoutList<Object> _listenersList;
@@ -27,7 +27,7 @@
 
             _description = serializedObject.FindProperty("_description");
 
-            _stackTrace = new StackTraceDrawer(_typedTarget, this);
+            _stackTrace = new StackTraceDrawer(_typedTarget._stackTrace.Entries, serializedObject.FindProperty(nameof(BaseScriptableEvent._stackTrace)), Repaint);
 
             var genericArgCount = GetGenericArgumentsCountOfType(target);
             _argNamesProperty = GetArgNamesProperty(serializedObject, genericArgCount);
@@ -42,7 +42,7 @@
 
         public override void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(this);
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
 
             if (guiWrapper.HasMissingScript)
                 return;

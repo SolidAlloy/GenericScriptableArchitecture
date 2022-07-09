@@ -29,7 +29,7 @@
             if ( ! CanBeInvoked())
                 return;
 
-            AddStackTrace(arg0);
+            _stackTrace.AddStackTrace(arg0);
             _response.Invoke(arg0);
         }
     }

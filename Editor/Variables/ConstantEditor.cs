@@ -3,24 +3,58 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseValue), true)]
-    internal class ConstantEditor : VariableEditorBase
+    internal class ConstantEditor : Editor, IInlineDrawer
     {
         private SerializedProperty _description;
+        private SerializedProperty _initialValue;
+        private SerializedProperty _currentValue;
+        private bool _initialValueEnabled;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
-            _description = serializedObject.FindProperty("_description");
+            try
+            {
+                _description = serializedObject.FindProperty(nameof(BaseValue._description));
+            }
+            catch // SerializedObjectNotCreatableException can be thrown but it is internal, so we can't catch it directly.
+            {
+                return;
+            }
+
+            _initialValue = serializedObject.FindProperty(nameof(Constant<int>._initialValue));
+            _currentValue = serializedObject.FindProperty(nameof(Constant<int>._value));
         }
 
-        protected override void DrawFields()
+        public override void OnInspectorGUI()
         {
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+
+            if (guiWrapper.HasMissingScript)
+                return;
+
             EditorGUILayout.PropertyField(_description);
 
-            DrawInitialValue();
+            _initialValueEnabled = GenericVariableEditor.DrawInitialValue(_initialValue, _initialValueEnabled);
 
             if (EditorApplication.isPlayingOrWillChangePlaymode)
-                DrawCurrentValue();
+                EditorGUILayout.PropertyField(_currentValue, VariableHelperDrawer.CurrentValueLabel);
+        }
+
+        public void OnInlineGUI()
+        {
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+
+            if (guiWrapper.HasMissingScript)
+                return;
+
+            if (ApplicationUtil.InEditMode)
+            {
+                _initialValueEnabled = GenericVariableEditor.DrawInitialValue(_initialValue, _initialValueEnabled);
+            }
+            else
+            {
+                EditorGUILayout.PropertyField(_currentValue, VariableHelperDrawer.CurrentValueLabel);
+            }
         }
     }
 }

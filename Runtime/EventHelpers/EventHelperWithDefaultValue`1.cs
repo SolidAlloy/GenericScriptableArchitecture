@@ -11,9 +11,14 @@
     using UniRx;
 #endif
 
-    public class EventHelperWithDefaultValue<T> : IEventHelperWithDefaultValue<T>, IDisposable
+    public abstract class EventHelperWithDefaultValue
+    {
+        public abstract List<Object> Listeners { get; }
+    }
+
+    public class EventHelperWithDefaultValue<T> : EventHelperWithDefaultValue, IEvent<T>, IDisposable
 #if UNIRX
-        , IObserverLinkedList<T>
+        , IObservable<T>, IObserverLinkedList<T>
 #endif
     {
         private readonly IEvent<T> _parentEvent;
@@ -23,7 +28,7 @@
         private readonly List<Action<T>> _responses = new List<Action<T>>();
         private readonly Func<T> _getCurrentValue;
 
-        public List<Object> Listeners => _responses
+        public override List<Object> Listeners => _responses
             .Select(response => response.Target)
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)

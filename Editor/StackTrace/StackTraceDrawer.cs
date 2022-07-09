@@ -1,20 +1,22 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;
-    using Object = UnityEngine.Object;
 
     internal class StackTraceDrawer
     {
-        private readonly IStackTraceProvider _target;
-        private readonly IRepaintable _editor;
+        private readonly StackCollection<StackTraceEntry> _entries;
+        private readonly SerializedProperty _stackTraceProperty;
+        private readonly SerializedProperty _enabled;
+        private readonly Action _repaint;
 
         private StackTraceEntry _selectedTrace;
 
@@ -24,10 +26,44 @@
         private float _windowsHeightRatio = 0.6f;
         private bool _resizeMouseDown;
 
-        public StackTraceDrawer([NotNull] IStackTraceProvider target, [NotNull] IRepaintable editor)
+        // can't use Object as key in dictionary, have to use instance id instead.
+        private static readonly Dictionary<(int instanceId, string propertyPath), (bool enabled, bool expanded)> _stackTraceProperties
+            = new Dictionary<(int instanceId, string propertyPath), (bool enabled, bool expanded)>();
+
+        static StackTraceDrawer()
         {
-            _target = target;
-            _editor = editor;
+            EditorApplication.playModeStateChanged += OnPlayModeChanged;
+        }
+
+        private static void OnPlayModeChanged(PlayModeStateChange stateChange)
+        {
+            if (stateChange != PlayModeStateChange.EnteredEditMode)
+                return;
+
+            foreach ((var key, var value) in _stackTraceProperties)
+            {
+                var targetObject = EditorUtility.InstanceIDToObject(key.instanceId);
+
+                if (targetObject == null)
+                    continue;
+
+                var serializedObject = new SerializedObject(targetObject);
+                var property = serializedObject.FindProperty(key.propertyPath);
+                property.isExpanded = value.expanded;
+
+                var enabledProp = property.FindPropertyRelative(nameof(StackTraceProvider.Enabled));
+                enabledProp.boolValue = value.enabled;
+
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        public StackTraceDrawer(StackCollection<StackTraceEntry> entries, SerializedProperty stackTraceProperty, [NotNull] Action repaint)
+        {
+            _entries = entries;
+            _stackTraceProperty = stackTraceProperty;
+            _enabled = _stackTraceProperty.FindPropertyRelative(nameof(StackTraceProvider.Enabled));
+            _repaint = repaint;
         }
 
         public void Draw()
@@ -44,11 +80,12 @@
             }
             else
             {
-                if ( ! _target.Enabled)
+                if ( ! _enabled.boolValue)
                 {
                     if (GUILayout.Button("Enable stack trace"))
                     {
-                        SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider) target).Enabled = true);
+                        _enabled.boolValue = true;
+                        SaveEnabledValue();
                     }
 
                     return;
@@ -58,7 +95,7 @@
                 {
                     if (GUILayout.Button("Disable stack trace"))
                     {
-                        _target.Enabled = false;
+                        _enabled.boolValue = false;
                     }
 
                     return;
@@ -74,16 +111,41 @@
             DrawContent(contentRect);
         }
 
-        private void SaveChange(string fieldName, Action<Object> action)
+        private void SaveEnabledValue()
         {
-            if (_target is Component component)
+            SaveStackTraceProperty(properties =>
             {
-                PlayModeSaver.SaveChange(component, fieldName, action);
+                properties.enabled = _enabled.boolValue;
+                return properties;
+            });
+        }
+
+        private void SaveExpandedValue()
+        {
+            SaveStackTraceProperty(properties =>
+            {
+                properties.expanded = _stackTraceProperty.isExpanded;
+                return properties;
+            });
+        }
+
+        private void SaveStackTraceProperty(Func<(bool enabled, bool expanded), (bool enabled, bool expanded)> changeProperties)
+        {
+            if (!(_stackTraceProperty.serializedObject.targetObject is Component component) || PrefabUtility.IsPartOfPrefabAsset(component))
+                return;
+
+            var key = (component.GetInstanceID(), _stackTraceProperty.propertyPath);
+
+            if (_stackTraceProperties.TryGetValue(key, out var properties))
+            {
+                properties = changeProperties(properties);
             }
             else
             {
-                action((Object) _target);
+                properties = (_enabled.boolValue, _stackTraceProperty.isExpanded);
             }
+
+            _stackTraceProperties[key] = properties;
         }
 
         private Rect GetHeaderRect()
@@ -97,7 +159,7 @@
         {
             const float contentRectWidth = 10f;
             const float contentRectHeight = 400f;
-            return GUILayoutUtility.GetRect(contentRectWidth, _target.Expanded ? contentRectHeight : 0f, GUILayout.ExpandWidth(true));
+            return GUILayoutUtility.GetRect(contentRectWidth, _stackTraceProperty.isExpanded ? contentRectHeight : 0f, GUILayout.ExpandWidth(true));
         }
 
         private void DrawHeader(Rect headerRect)
@@ -127,11 +189,12 @@
             DrawDisableButton(shiftedRightHeaderRect, buttonWidth);
             DrawClearButton(shiftedRightHeaderRect, buttonWidth);
 
-            bool expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _target.Expanded, "Stack Trace", true);
+            bool expanded = EditorGUI.Foldout(shiftedRightHeaderRect, _stackTraceProperty.isExpanded, "Stack Trace", true);
 
-            if (_target.Expanded != expanded)
+            if (_stackTraceProperty.isExpanded != expanded)
             {
-                SaveChange(nameof(_target.Expanded), target => ((IStackTraceProvider)target).Expanded = expanded);
+                _stackTraceProperty.isExpanded = expanded;
+                SaveExpandedValue();
             }
         }
 
@@ -146,7 +209,8 @@
 
             if (GUI.Button(disableButton, "Disable"))
             {
-                SaveChange(nameof(_target.Enabled), target => ((IStackTraceProvider)target).Enabled = false);
+                _enabled.boolValue = false;
+                SaveEnabledValue();
             }
         }
 
@@ -156,7 +220,7 @@
 
             if (GUI.Button(clearButton, "Clear"))
             {
-                _target.Entries.Clear();
+                _entries.Clear();
                 _selectedTrace = null;
             }
         }
@@ -173,7 +237,7 @@
 
         private void DrawContent(Rect contentRect)
         {
-            if (!_target.Expanded)
+            if (!_stackTraceProperty.isExpanded)
                 return;
 
             if (Event.current.type == EventType.Repaint)
@@ -201,13 +265,13 @@
             const float scrollWidth = 20f;
 
             var scrollRect = new Rect(0f, 0f, _lastContentRect.width, _lastContentRect.height - contentRect.height);
-            var listRect = new Rect(0f, 0f, scrollRect.width - scrollWidth, _target.Entries.Count * lineHeight);
+            var listRect = new Rect(0f, 0f, scrollRect.width - scrollWidth, _entries.Count * lineHeight);
 
             using var scrollViewBlock = GUIHelper.ScrollViewBlock(scrollRect, ref _listScrollPos, listRect);
 
             int i = 0;
 
-            foreach (var stackTraceEntry in _target.Entries)
+            foreach (var stackTraceEntry in _entries)
             {
                 string currentText = GetFirstLine(stackTraceEntry);
 
@@ -216,7 +280,7 @@
                 if (Event.current.type == EventType.MouseDown && elementRect.Contains(Event.current.mousePosition))
                 {
                     _selectedTrace = stackTraceEntry;
-                    Repaint();
+                    _repaint();
                 }
                 else if (Event.current.type == EventType.Repaint)
                 {
@@ -294,7 +358,7 @@
             else if (_resizeMouseDown)
             {
                 _windowsHeightRatio = currentEvent.mousePosition.y / _lastContentRect.height;
-                Repaint();
+                _repaint();
             }
         }
 
@@ -302,8 +366,6 @@
         {
             return Regex.Match(value, @".*?(\r|\n)").Value;
         }
-
-        private void Repaint() => _editor.Repaint();
 
         private static class Styles
         {

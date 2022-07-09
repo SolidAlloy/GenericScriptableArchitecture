@@ -3,7 +3,12 @@
     using System;
     using UniRx;
 
-    public interface IVariable<T> : IEquatable<T>, IEvent<T>, IEquatable<IVariable<T>>
+    public interface IVariable
+    {
+        internal VariableHelper VariableHelper { get; }
+    }
+
+    public interface IVariable<T> : IVariable, IEquatable<T>, IEvent<T>, IEquatable<IVariable<T>>
 #if UNIRX
         , IReactiveProperty<T>
 #endif

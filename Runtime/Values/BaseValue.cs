@@ -11,7 +11,7 @@
     public abstract class BaseValue : BaseEvent
     {
 #if UNITY_EDITOR
-        [SerializeField, ResizableTextArea, UsedImplicitly] private string _description;
+        [SerializeField, ResizableTextArea, UsedImplicitly] internal string _description;
 
         private bool _subscribedToPlayMode;
 #endif

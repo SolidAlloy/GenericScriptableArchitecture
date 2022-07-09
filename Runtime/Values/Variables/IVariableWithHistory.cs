@@ -2,11 +2,18 @@
 {
     using System;
 
-    public interface IEventHelperWithHistory<T> : IEvent<T, T>
+    public interface IVariableWithHistory : IVariable
+    {
+        internal VariableHelperWithHistory VariableHelperWithHistory { get; }
+    }
+
+    public interface IVariableWithHistory<T> : IVariableWithHistory, IEvent<T, T>
 #if UNIRX
-        , IObservable<(T Previous, T Current)>
+        , IReactivePropertyWithHistory<T>
 #endif
     {
+        bool HasPreviousValue { get; }
+
         void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false);
 
         void RemoveListener(IListener<T, T> listener);

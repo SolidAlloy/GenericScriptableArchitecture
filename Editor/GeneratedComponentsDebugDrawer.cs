@@ -74,8 +74,7 @@
         {
             foreach (var component in components)
             {
-                var editor = Editor.CreateEditor(component);
-                editor.serializedObject.SetHideFlagsPersistently(flags);
+                new SerializedObject(component).SetHideFlagsPersistently(flags);
             }
         }
     }

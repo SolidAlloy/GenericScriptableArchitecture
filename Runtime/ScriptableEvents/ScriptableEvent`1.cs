@@ -27,7 +27,7 @@
             if ( ! CanBeInvoked())
                 return;
 
-            AddStackTrace(arg0);
+            _stackTrace.AddStackTrace(arg0);
             _eventHelper.NotifyListeners(arg0);
         }
 

@@ -1,98 +1,129 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
-    using System.Collections.Generic;
     using GenericUnityObjects;
     using JetBrains.Annotations;
-    using SolidUtilities;
     using UnityEngine;
 
-    using Object = UnityEngine.Object;
+    [Serializable]
+    internal abstract class VariableHelperWithHistory
+    {
+        [SerializeField] public bool ListenersWithHistoryExpanded;
+        [NonSerialized] public bool HasPreviousValue;
+
+        public abstract EventHelperWithHistory EventHelper { get; }
+
+        public abstract void SetPreviousValue(object value);
+
+        public abstract void InvokeValueChangedEvents(object currentValue);
+    }
+
+    [Serializable]
+    internal class VariableHelperWithHistory<T> : VariableHelperWithHistory
+    {
+        [SerializeField] public T PreviousValue;
+
+        public EventHelperWithHistory<T> Event;
+
+        public override EventHelperWithHistory EventHelper => Event;
+
+        private string _objectName;
+        private string _typeName;
+
+        public void Initialize(IVariableWithHistory<T> variable, string objectName, string typeName, Func<T> getCurrentValue)
+        {
+            _objectName = objectName;
+            _typeName = typeName;
+            Event = new EventHelperWithHistory<T>(variable, () => HasPreviousValue, () => PreviousValue, getCurrentValue);
+        }
+
+        public override void InvokeValueChangedEvents(object currentValue)
+        {
+            InvokeValueChangedEvents((T) currentValue);
+        }
+
+        public void InvokeValueChangedEvents(T currentValue)
+        {
+            if ( ! VariableHelper.CanBeInvoked(_objectName, _typeName))
+                return;
+
+            Event.NotifyListeners(PreviousValue, currentValue);
+        }
+
+        public override void SetPreviousValue(object value)
+        {
+            PreviousValue = (T) value;
+        }
+
+        public void SetValue(VariableHelper<T> variableHelper, T value)
+        {
+            HasPreviousValue = true;
+            PreviousValue = variableHelper.Value;
+            variableHelper.Value = value;
+            variableHelper.StackTrace.AddStackTrace(PreviousValue, variableHelper.Value);
+            variableHelper.InvokeValueChangedEvents();
+            InvokeValueChangedEvents(value);
+        }
+    }
 
     [Serializable]
     [CreateGenericAssetMenu(FileName = "New Variable With History", MenuName = Config.PackageName + "Variable With History")]
-    public class VariableWithHistory<T> : Variable<T>, IEvent<T, T>
-#if UNIRX
-        , IReactivePropertyWithHistory<T>
-#endif
+    public class VariableWithHistory<T> : Variable<T>, IVariableWithHistory<T>
     {
-        [SerializeField] internal T _previousValue;
-        [SerializeField] internal bool ListenersWithHistoryExpanded;
+        [SerializeField] internal VariableHelperWithHistory<T> _variableHelperWithHistory;
 
-        private EventHelperWithHistory<T> _eventHelper;
-
-        public bool HasPreviousValue => HasPreviousValueInternal;
+        public bool HasPreviousValue => _variableHelperWithHistory.HasPreviousValue;
 
         [PublicAPI]
-        public T PreviousValue => _previousValue;
+        public T PreviousValue => _variableHelperWithHistory.PreviousValue;
 
-        internal override List<Object> ListenersWithHistory => _eventHelper?.Listeners ?? ListHelper.Empty<Object>();
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            _eventHelper = new EventHelperWithHistory<T>(this, () => HasPreviousValue, () => _previousValue, () => _value);
-        }
+        VariableHelperWithHistory IVariableWithHistory.VariableHelperWithHistory => _variableHelperWithHistory;
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            _eventHelper.Dispose();
+            _variableHelperWithHistory.Event?.Dispose();
         }
 
-        #region Adding Removing Listeners
-
-        public void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(IListener<T, T> listener) => _eventHelper.RemoveListener(listener);
-
-        public void AddListener(Action<T, T> listener, bool notifyCurrentValue = false) => _eventHelper.AddListener(listener, notifyCurrentValue);
-
-        public void RemoveListener(Action<T, T> listener) => _eventHelper.RemoveListener(listener);
-
-        #endregion
-
-        protected override void SetValue(T value)
-        {
-            HasPreviousValueInternal = true;
-            _previousValue = _value;
-            _value = value;
-            AddStackTrace(_previousValue, _value);
-            InvokeValueChangedEvents();
-        }
+        protected override void SetValue(T value) => _variableHelperWithHistory.SetValue(_variableHelper, value);
 
         protected override void InitializeValues()
         {
             base.InitializeValues();
-            HasPreviousValueInternal = false;
+
+            _variableHelperWithHistory.Initialize(this, name, "variable", () => _variableHelper.Value);
+            _variableHelperWithHistory.HasPreviousValue = false;
         }
 
-        internal override void InvokeValueChangedEvents()
-        {
-            if ( ! CanBeInvoked())
-                return;
+        #region Adding Removing Listeners
 
-            base.InvokeValueChangedEvents();
-            _eventHelper.NotifyListeners(_previousValue, _value);
-        }
+        public void AddListener(IListener<T, T> listener, bool notifyCurrentValue = false) => _variableHelperWithHistory.Event.AddListener(listener, notifyCurrentValue);
+
+        public void RemoveListener(IListener<T, T> listener) => _variableHelperWithHistory.Event.RemoveListener(listener);
+
+        public void AddListener(Action<T, T> listener, bool notifyCurrentValue = false) => _variableHelperWithHistory.Event.AddListener(listener, notifyCurrentValue);
+
+        public void RemoveListener(Action<T, T> listener) => _variableHelperWithHistory.Event.RemoveListener(listener);
+
+        #endregion
 
 #if UNIRX
         bool IReadOnlyReactivePropertyWithHistory<T>.HasValue => HasPreviousValue;
 
-        public IDisposable Subscribe(Action<T, T> onNext) => _eventHelper.Subscribe(onNext);
+        public IDisposable Subscribe(Action<T, T> onNext) => _variableHelperWithHistory.Event.Subscribe(onNext);
 
-        public IDisposable Subscribe(Action<T, T> onNext, Action<Exception> onError) => _eventHelper.Subscribe(onNext, onError);
+        public IDisposable Subscribe(Action<T, T> onNext, Action<Exception> onError) => _variableHelperWithHistory.Event.Subscribe(onNext, onError);
 
-        public IDisposable Subscribe(Action<T, T> onNext, Action onCompleted) => _eventHelper.Subscribe(onNext, onCompleted);
+        public IDisposable Subscribe(Action<T, T> onNext, Action onCompleted) => _variableHelperWithHistory.Event.Subscribe(onNext, onCompleted);
 
-        public IDisposable Subscribe(Action<T, T> onNext, Action<Exception> onError, Action onCompleted) => _eventHelper.Subscribe(onNext, onError, onCompleted);
+        public IDisposable Subscribe(Action<T, T> onNext, Action<Exception> onError, Action onCompleted) => _variableHelperWithHistory.Event.Subscribe(onNext, onError, onCompleted);
 
-        public IDisposable Subscribe(IObserver<(T Previous, T Current)> observer) => _eventHelper.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<(T Previous, T Current)> observer) => _variableHelperWithHistory.Event.Subscribe(observer);
 #endif
 
         #region Operator Overloads
 
-        public override string ToString() => $"VariableWithHistory{{{Value}}}";
+        public override string ToString() => $"VariableWithHistory '{name}' {{{Value}}}";
 
         public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, Action<T, T> listener)
         {
@@ -103,7 +134,7 @@
             return variableWithHistory;
         }
 
-        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (Action<T, T> Listener, bool NotifyCurrentValue) args)
+        public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, (Action<T, T> Listener, bool NotifyCurrentValue) args)
         {
             if (variableWithHistory == null)
                 return null;
@@ -130,7 +161,7 @@
             return variableWithHistory;
         }
 
-        public static Variable<T> operator +(VariableWithHistory<T> variableWithHistory, (IListener<T, T> Listener, bool NotifyCurrentValue) args)
+        public static VariableWithHistory<T> operator +(VariableWithHistory<T> variableWithHistory, (IListener<T, T> Listener, bool NotifyCurrentValue) args)
         {
             if (variableWithHistory == null)
                 return null;

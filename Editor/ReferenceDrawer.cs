@@ -118,7 +118,7 @@
 
             using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
             {
-                InlineEditorCache.GetInlineEditor<VariableInlineEditor>(ObjectReference).OnInspectorGUI();
+                InlineEditorCache.GetInlineDrawer(ObjectReference).OnInlineGUI();
             }
         }
 

@@ -11,9 +11,14 @@
     using UniRx;
 #endif
 
-    public class EventHelperWithHistory<T> : IEventHelperWithHistory<T>, IDisposable
+    public abstract class EventHelperWithHistory
+    {
+        public abstract List<Object> Listeners { get; }
+    }
+
+    public class EventHelperWithHistory<T> : EventHelperWithHistory, IEvent<T, T>, IDisposable
 #if UNIRX
-        , IObserverLinkedList<(T, T)>
+        , IObserverLinkedList<(T, T)>, IObservable<(T Previous, T Current)>
 #endif
     {
         private readonly IEvent<T, T> _parentEvent;
@@ -26,7 +31,7 @@
         private readonly Func<T> _getPreviousValue;
         private readonly Func<T> _getCurrentValue;
 
-        public List<Object> Listeners => _responses
+        public override List<Object> Listeners => _responses
             .Select(response => response.Target)
             .Concat(_scriptableListeners)
             .Concat(_singleEventListeners)

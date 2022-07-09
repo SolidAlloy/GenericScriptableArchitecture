@@ -5,20 +5,20 @@
 
     internal readonly struct InspectorGUIWrapper : IDisposable
     {
-        private readonly Editor _editor;
+        private readonly SerializedObject _serializedObject;
         public readonly bool HasMissingScript;
 
-        public InspectorGUIWrapper(Editor editor)
+        public InspectorGUIWrapper(SerializedObject serializedObject)
         {
-            _editor = editor;
+            _serializedObject = serializedObject;
 
-            HasMissingScript = _editor.target == null;
+            HasMissingScript = serializedObject.targetObject == null;
 
             if (HasMissingScript)
             {
                 using (new EditorGUI.DisabledScope(true))
                 {
-                    var scriptProperty = _editor.serializedObject.FindProperty("m_Script");
+                    var scriptProperty = serializedObject.FindProperty("m_Script");
 
                     if (scriptProperty != null)
                         EditorGUILayout.PropertyField(scriptProperty);
@@ -26,14 +26,14 @@
             }
             else
             {
-                _editor.serializedObject.UpdateIfRequiredOrScript();
+                serializedObject.UpdateIfRequiredOrScript();
             }
         }
 
         public void Dispose()
         {
             if ( ! HasMissingScript)
-                _editor.serializedObject.ApplyModifiedProperties();
+                _serializedObject.ApplyModifiedProperties();
         }
     }
 }

@@ -121,7 +121,7 @@
 
         private static void AssignVariable(Component instancerComponent, Object variable)
         {
-            var serializedObject = Editor.CreateEditor(instancerComponent).serializedObject;
+            var serializedObject = new SerializedObject(instancerComponent);
             serializedObject.FindProperty(nameof(VariableInstancer<int>._variableReference)).objectReferenceValue = variable;
             serializedObject.ApplyModifiedProperties();
         }

@@ -9,37 +9,13 @@
     using UnityEditor;
 #endif
 
-    public abstract class BaseScriptableEventListener : MonoBehaviour, IStackTraceProvider
+    public abstract class BaseScriptableEventListener : MonoBehaviour
     {
-        [SerializeField] private bool _stackTraceEnabled;
-        [SerializeField] private bool _stackTraceExpanded;
-
-        bool IStackTraceProvider.Enabled
-        {
-            get => _stackTraceEnabled;
-            set => _stackTraceEnabled = value;
-        }
-
-        bool IStackTraceProvider.Expanded
-        {
-            get => _stackTraceExpanded;
-            set => _stackTraceExpanded = value;
-        }
-
-        private readonly StackCollection<StackTraceEntry> _stackTraceEntries = new StackCollection<StackTraceEntry>();
-
-        ICollection<StackTraceEntry> IStackTraceProvider.Entries => _stackTraceEntries;
+        [SerializeField] internal StackTraceProvider _stackTrace;
 
         internal abstract IBaseEvent Event { get; set; }
 
         internal abstract bool DrawObjectField { get; set; }
-
-        [Conditional("UNITY_EDITOR")]
-        protected void AddStackTrace(params object[] args)
-        {
-            if (_stackTraceEnabled)
-                _stackTraceEntries.Push(new StackTraceEntry(args));
-        }
 
         protected bool CanBeInvoked()
         {
