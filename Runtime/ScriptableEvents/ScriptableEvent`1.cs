@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using EasyButtons;
     using GenericUnityObjects;
     using SolidUtilities;
 
@@ -21,7 +20,6 @@
 
         private void OnDisable() => _eventHelper.Dispose();
 
-        [Button(Mode = ButtonMode.EnabledInPlayMode, Expanded = true)]
         public void Invoke(T arg0)
         {
             if ( ! CanBeInvoked())

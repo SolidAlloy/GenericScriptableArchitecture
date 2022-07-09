@@ -2,7 +2,6 @@ namespace GenericScriptableArchitecture
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using GenericUnityObjects;
     using UnityEditor;
     using UnityEngine;
@@ -13,12 +12,6 @@ namespace GenericScriptableArchitecture
     using UniRx;
 #endif
 
-    // Variable has one eventHelper for one-arg listeners
-    // VariableWithHistory has a second eventHelper for two-arg listeners
-    // Both event helpers have public property that exposes listeners to editors
-    // How can we conveniently access them from editor without inheritance?
-    // IVariable can have EventHelper internal property, where we can further access the helper properties, etc.
-
     [Serializable]
     internal abstract class VariableHelper
     {
@@ -26,7 +19,7 @@ namespace GenericScriptableArchitecture
 
         public abstract EventHelperWithDefaultValue EventHelper { get; }
 
-        // TODO: Placing it here for now but we might want to change the location.
+        // TODO: Placing it here for now but we might want to change the location of the method.
         public static bool CanBeInvoked(string objectName, string typeName)
         {
 #if UNITY_EDITOR

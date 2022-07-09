@@ -3,7 +3,6 @@
     "rootNamespace": "GenericScriptableArchitecture",
     "references": [
         "GenericUnityObjects",
-        "EasyButtons",
         "SolidUtilities",
         "SolidUtilities.Editor",
         "Unity.Timeline",

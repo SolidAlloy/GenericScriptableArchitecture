@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using EasyButtons;
     using SolidUtilities;
     using UnityEngine;
 #if UNIRX
@@ -20,7 +19,6 @@
 
         internal override List<UnityEngine.Object> Listeners => _eventHelper?.Listeners ?? ListHelper.Empty<UnityEngine.Object>();
 
-        [Button(Mode = ButtonMode.EnabledInPlayMode)]
         public void Invoke()
         {
             if ( ! CanBeInvoked())

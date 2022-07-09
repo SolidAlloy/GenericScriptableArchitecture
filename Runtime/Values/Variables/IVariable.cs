@@ -1,7 +1,10 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
+
+#if UNIRX
     using UniRx;
+#endif
 
     public interface IVariable
     {
