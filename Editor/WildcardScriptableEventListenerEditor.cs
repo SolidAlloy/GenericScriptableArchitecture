@@ -215,7 +215,7 @@
                 return typeof(ScriptableEventListener<,>).MakeGenericType(eventType.GenericTypeArguments);
             }
 
-            if (eventTypeDefinition == typeof(VariableWithHistory<>))
+            if (eventTypeDefinition == typeof(VariableWithHistory<>) || eventTypeDefinition == typeof(VariableInstancerWithHistory<>))
             {
                 var genericArg = eventType.GenericTypeArguments[0];
                 return typeof(ScriptableEventListener<,>).MakeGenericType(genericArg, genericArg);
