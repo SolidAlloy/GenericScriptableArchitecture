@@ -1,21 +1,23 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
-    using GenericUnityObjects;
+    using JetBrains.Annotations;
     using UnityEngine;
 
-    [Serializable]
-    [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T>")]
-    public class ScriptableEvent<T> : BaseScriptableEvent, IScriptableEvent<T>
+    public class EventInstancer<T> : BaseEventInstancer, IScriptableEvent<T>
     {
+        [SerializeField] internal ScriptableEvent<T> _base;
+
+        // Setter would be of no use here since we only use base event reference for description and arg names, and it doesn't influence runtime execution.
+        [PublicAPI] public ScriptableEvent<T> EventReference => _base;
+
         [SerializeField] private ScriptableEventHelper<T> _scriptableEventHelper;
 
         internal override ScriptableEventHelper ScriptableEventHelper => _scriptableEventHelper;
 
-        // _scriptableEventHelper will be null the first time a scriptable object of this type is created.
-        private void OnEnable() => _scriptableEventHelper?.Initialize(this, name, "event");
+        private void Awake() => _scriptableEventHelper.Initialize(this, name, "event instancer");
 
-        private void OnDisable() => _scriptableEventHelper?.Event.Dispose();
+        private void OnDisable() => _scriptableEventHelper.Event.Dispose();
 
         public void Invoke(T arg0) => _scriptableEventHelper.Invoke(arg0);
 
@@ -37,7 +39,7 @@
 
         #region Operator Overloads
 
-        public static ScriptableEvent<T> operator +(ScriptableEvent<T> scriptableEvent, Action<T> listener)
+        public static EventInstancer<T> operator +(EventInstancer<T> scriptableEvent, Action<T> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -46,7 +48,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T> operator -(ScriptableEvent<T> scriptableEvent, Action<T> listener)
+        public static EventInstancer<T> operator -(EventInstancer<T> scriptableEvent, Action<T> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -55,7 +57,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T> operator +(ScriptableEvent<T> scriptableEvent, IListener<T> listener)
+        public static EventInstancer<T> operator +(EventInstancer<T> scriptableEvent, IListener<T> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -64,7 +66,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T> operator -(ScriptableEvent<T> scriptableEvent, IListener<T> listener)
+        public static EventInstancer<T> operator -(EventInstancer<T> scriptableEvent, IListener<T> listener)
         {
             if (scriptableEvent == null)
                 return null;

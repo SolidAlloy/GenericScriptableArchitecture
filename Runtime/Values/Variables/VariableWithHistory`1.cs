@@ -44,7 +44,7 @@
 
         public void InvokeValueChangedEvents(T currentValue)
         {
-            if ( ! VariableHelper.CanBeInvoked(_objectName, _typeName))
+            if ( ! BaseEvent.CanBeInvoked(_objectName, _typeName))
                 return;
 
             Event.NotifyListeners(PreviousValue, currentValue);

@@ -1,44 +1,37 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
-    using System.Collections.Generic;
-    using EasyButtons.Editor;
     using SolidUtilities.Editor;
     using UnityEditor;
-    using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
     internal class ScriptableEventEditor : PlayModeUpdatableEditor
     {
-        private Button _methodDrawer;
-        private FoldoutList<Object> _listenersList;
         private SerializedProperty _description;
-        private StackTraceDrawer _stackTrace;
         private BaseScriptableEvent _typedTarget;
         private SerializedProperty _argNamesProperty;
+
+        private ScriptableEventHelperDrawer _helperDrawer;
 
         protected override void OnEnable()
         {
             base.OnEnable();
+
+            // TODO: No handling of null target?
             _typedTarget = (BaseScriptableEvent) target;
 
-            var responseTargetsExpanded = serializedObject.FindProperty(nameof(BaseScriptableEvent.ListenersExpanded));
-            _listenersList = new FoldoutList<Object>(_typedTarget.Listeners, responseTargetsExpanded, "Listeners");
+            var helper = _typedTarget.ScriptableEventHelper;
+            var genericArgCount = ScriptableEventHelperDrawer.GetGenericArgumentsCountOfType(target);
+            _argNamesProperty = GetArgNamesProperty(serializedObject, genericArgCount);
+            var getArgNames = GetArgNamesFuncArray(_argNamesProperty);
+
+            var eventHelperProperty = serializedObject.FindProperty(nameof(ScriptableEvent._scriptableEventHelper));
+            _helperDrawer = new ScriptableEventHelperDrawer(eventHelperProperty, helper, Repaint, getArgNames);
 
             _description = serializedObject.FindProperty("_description");
-
-            _stackTrace = new StackTraceDrawer(_typedTarget._stackTrace.Entries, serializedObject.FindProperty(nameof(BaseScriptableEvent._stackTrace)), Repaint);
-
-            var genericArgCount = GetGenericArgumentsCountOfType(target);
-            _argNamesProperty = GetArgNamesProperty(serializedObject, genericArgCount);
-
-            var getArgNames = GetArgNamesFuncArray(_argNamesProperty);
-            var invokeMethod = target.GetType().GetMethod("Invoke");
-            _methodDrawer = Button.Create(invokeMethod, getArgNames);
-
         }
 
-        protected override void Update() => _listenersList.Update(_typedTarget.Listeners);
+        protected override void Update() => _helperDrawer.Update();
 
         public override void OnInspectorGUI()
         {
@@ -51,33 +44,13 @@
 
             for (int i = 0; i < _argNamesProperty.arraySize; i++)
             {
-                EditorGUILayout.PropertyField(_argNamesProperty.GetArrayElementAtIndex(i), GUIContentHelper.Temp($"Arg {i+1}"), null);
+                EditorGUILayout.PropertyField(_argNamesProperty.GetArrayElementAtIndex(i),
+                    GUIContentHelper.Temp($"Arg {i + 1}"), null);
             }
 
-            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
-            _methodDrawer.Draw(targets);
-
-            _stackTrace.Draw();
-
-            if (ApplicationUtil.InEditMode)
-                return;
-
-            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
-            _listenersList.DoLayoutList();
-        }
-
-        private static int GetGenericArgumentsCountOfType(Object obj)
-        {
-            if (obj == null)
-                return 0;
-
-            var baseType = obj.GetType().BaseType;
-
-            // ReSharper disable once PossibleNullReferenceException
-            if (!baseType.IsGenericType)
-                return 0;
-
-            return baseType.GetGenericArguments().Length;
+            _helperDrawer.DrawMethod(targets);
+            _helperDrawer.DrawStackTrace();
+            _helperDrawer.DrawListeners();
         }
 
         private static SerializedProperty GetArgNamesProperty(SerializedObject serializedObject, int genericArgCount)

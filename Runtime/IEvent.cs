@@ -4,8 +4,6 @@
 
     public interface IEvent : IBaseEvent { }
 
-    public interface IEventOne : IBaseEvent { }
-
     public interface IEvent<T> : IBaseEvent { }
 
     public interface IEvent<T1, T2> : IBaseEvent { }

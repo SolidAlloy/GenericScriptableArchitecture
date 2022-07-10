@@ -1,23 +1,26 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
-    using GenericUnityObjects;
+    using JetBrains.Annotations;
     using UnityEngine;
 
-    [Serializable]
-    [CreateGenericAssetMenu(MenuName = Config.PackageName + Config.Events + "ScriptableEvent<T1,T2,T3>")]
-    public class ScriptableEvent<T1, T2, T3> : BaseScriptableEvent, IScriptableEvent<T1, T2, T3>
+    public class EventInstancer<T1, T2, T3> : BaseEventInstancer, IScriptableEvent<T1, T2, T3>
     {
+        [SerializeField] internal ScriptableEvent<T1, T2, T3> _base;
+
+        // Setter would be of no use here since we only use base event reference for description and arg names, and it doesn't influence runtime execution.
+        [PublicAPI] public ScriptableEvent<T1, T2, T3> EventReference => _base;
+
         [SerializeField] private ScriptableEventHelper<T1, T2, T3> _scriptableEventHelper;
 
         internal override ScriptableEventHelper ScriptableEventHelper => _scriptableEventHelper;
 
-        private void OnEnable() => _scriptableEventHelper?.Initialize(this, name, "event");
+        private void Awake() => _scriptableEventHelper.Initialize(this, name, "event instancer");
 
-        private void OnDisable() => _scriptableEventHelper?.Event.Dispose();
+        private void OnDisable() => _scriptableEventHelper.Event.Dispose();
 
         public void Invoke(T1 arg0, T2 arg1, T3 arg2) => _scriptableEventHelper.Invoke(arg0, arg1, arg2);
-
+        
         #region Adding Removing Listeners
 
         public void AddListener(IListener<T1, T2, T3> listener) => _scriptableEventHelper.Event.AddListener(listener);
@@ -36,7 +39,7 @@
 
         #region Operator Overloads
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
+        public static EventInstancer<T1, T2, T3> operator +(EventInstancer<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -45,7 +48,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
+        public static EventInstancer<T1, T2, T3> operator -(EventInstancer<T1, T2, T3> scriptableEvent, Action<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -54,7 +57,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator +(ScriptableEvent<T1, T2, T3> scriptableEvent, IListener<T1, T2, T3> listener)
+        public static EventInstancer<T1, T2, T3> operator +(EventInstancer<T1, T2, T3> scriptableEvent, IListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
@@ -63,7 +66,7 @@
             return scriptableEvent;
         }
 
-        public static ScriptableEvent<T1, T2, T3> operator -(ScriptableEvent<T1, T2, T3> scriptableEvent, IListener<T1, T2, T3> listener)
+        public static EventInstancer<T1, T2, T3> operator -(EventInstancer<T1, T2, T3> scriptableEvent, IListener<T1, T2, T3> listener)
         {
             if (scriptableEvent == null)
                 return null;
