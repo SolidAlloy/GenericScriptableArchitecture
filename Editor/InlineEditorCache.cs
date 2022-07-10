@@ -7,6 +7,8 @@
 
     internal interface IInlineDrawer
     {
+        bool HasContent { get; }
+
         void OnInlineGUI();
     }
 
@@ -36,7 +38,15 @@
 
         private static IInlineDrawer CreateInlineDrawer(Object value)
         {
-            var genericType = value.GetType().BaseType;
+            var type = value.GetType();
+
+            if (value is BaseScriptableEvent)
+                return EditorHelper.CreateEditor<ScriptableEventEditor>(value);
+
+            if (value is BaseEventInstancer)
+                return EditorHelper.CreateEditor<EventInstancerEditor>(value);
+
+            var genericType = type.BaseType;
 
             if (!genericType.IsGenericType)
                 return null;

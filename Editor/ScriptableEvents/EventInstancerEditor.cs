@@ -5,7 +5,7 @@
     using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseEventInstancer), true)]
-    internal class EventInstancerEditor : PlayModeUpdatableEditor
+    internal class EventInstancerEditor : PlayModeUpdatableEditor, IInlineDrawer
     {
         private SerializedProperty _baseField;
         private SerializedProperty _argNamesProperty;
@@ -50,6 +50,18 @@
             _helperDrawer.DrawMethod(targets);
             _helperDrawer.DrawStackTrace();
             _helperDrawer.DrawListeners();
+        }
+
+        public bool HasContent => EditorApplication.isPlaying;
+
+        public void OnInlineGUI()
+        {
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+
+            if (guiWrapper.HasMissingScript)
+                return;
+
+            _helperDrawer.DrawMethod(targets);
         }
 
         private static SerializedProperty GetArgNamesProperty(Object scriptableEvent)

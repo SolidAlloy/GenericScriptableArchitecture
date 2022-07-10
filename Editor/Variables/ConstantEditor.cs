@@ -40,6 +40,8 @@
                 EditorGUILayout.PropertyField(_currentValue, VariableHelperDrawer.CurrentValueLabel);
         }
 
+        public bool HasContent => true;
+
         public void OnInlineGUI()
         {
             using var guiWrapper = new InspectorGUIWrapper(serializedObject);

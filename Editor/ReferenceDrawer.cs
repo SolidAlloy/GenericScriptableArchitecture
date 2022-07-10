@@ -8,6 +8,132 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    // TODO: merge duplicate code
+    // in edit mode, don't draw events in foldouts
+    // in play mode, draw foldouts
+    // Maybe add a bool property to IInlineDrawer checking if it should be drawn at all.
+    [CustomPropertyDrawer(typeof(BaseEventReference), true)]
+    internal class EventReferenceDrawer : PropertyDrawer
+    {
+        private static GUIStyle _buttonStyle;
+        private static GUIStyle ButtonStyle => _buttonStyle ??= new GUIStyle(GUI.skin.GetStyle("PaneOptions"))
+        {
+            imagePosition = ImagePosition.ImageOnly
+        };
+
+        private SerializedProperty _mainProperty;
+        private SerializedProperty _valueType;
+        private SerializedProperty _scriptableEvent;
+        private SerializedProperty _eventInstancer;
+
+        private SerializedProperty ExposedProperty
+        {
+            get
+            {
+                return ValueType switch
+                {
+                    BaseEventReference.EventType.ScriptableEvent => _scriptableEvent,
+                    BaseEventReference.EventType.EventInstancer => _eventInstancer,
+                    _ => throw new ArgumentOutOfRangeException(nameof(ExposedProperty), "Unknown value type in the reference.")
+                };
+            }
+        }
+
+        private static readonly string[] _popupOptions = { "Scriptable Event", "Event Instancer" };
+
+        private BaseEventReference.EventType ValueType => (BaseEventReference.EventType) _valueType.enumValueIndex;
+
+        private Object ObjectReference => ExposedProperty.objectReferenceValue;
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            FindProperties(property);
+
+            if (! property.isExpanded)
+                return EditorGUIUtility.singleLineHeight;
+
+            // If a property has a custom property drawer, it will be drown inside a foldout anyway, so we account for
+            // it by adding a single line height.
+            float additionalHeight = ExposedProperty.HasCustomPropertyDrawer() ? EditorGUIUtility.singleLineHeight : 0f;
+            return EditorGUI.GetPropertyHeight(ExposedProperty, GUIContent.none) + additionalHeight;
+        }
+
+        public override void OnGUI(Rect fieldRect, SerializedProperty property, GUIContent label)
+        {
+            FindProperties(property);
+            (Rect labelRect, Rect buttonRect, Rect valueRect) = GetLabelButtonValueRects(fieldRect);
+            DrawLabel(property, fieldRect, labelRect, label);
+
+            // The indent level must be made 0 for the button and value to be displayed normally, without any
+            // additional indent. Otherwise, the button will not be clickable, and the value will look shifted
+            // compared to other fields.
+            int previousIndent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
+            _valueType.enumValueIndex = DrawButton(buttonRect, _valueType.enumValueIndex);
+            DrawObjectReference(valueRect, property, previousIndent);
+            EditorGUI.indentLevel = previousIndent;
+        }
+
+        private void FindProperties(SerializedProperty property)
+        {
+            _mainProperty = property;
+            _valueType = _mainProperty.FindPropertyRelative(nameof(BaseEventReference._eventType));
+            _scriptableEvent = _mainProperty.FindPropertyRelative(nameof(EventReference<int>._event));
+            _eventInstancer = _mainProperty.FindPropertyRelative(nameof(EventReference<int>._eventInstancer));
+        }
+
+        private void DrawObjectReference(Rect valueRect, SerializedProperty property, int indentLevel)
+        {
+            EditorGUI.PropertyField(valueRect, ExposedProperty, GUIContent.none);
+
+            if ( ! property.isExpanded || ObjectReference == null)
+                return;
+
+            using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
+            {
+                var inlineDrawer = InlineEditorCache.GetInlineDrawer(ObjectReference);
+
+                if (inlineDrawer.HasContent)
+                    inlineDrawer.OnInlineGUI();
+            }
+        }
+
+        private void DrawLabel(SerializedProperty property, Rect totalRect, Rect labelRect, GUIContent label)
+        {
+            if (ObjectReference != null)
+            {
+                property.isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label, true);
+            }
+            else
+            {
+                EditorGUI.HandlePrefixLabel(totalRect, labelRect, label);
+            }
+        }
+
+        private static (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
+        {
+            const float indentWidth = 15f;
+            const float valueLeftIndent = 2f;
+
+            totalRect.height = EditorGUIUtility.singleLineHeight;
+
+            (Rect labelAndButtonRect, Rect valueRect) = totalRect.CutVertically(EditorGUIUtility.labelWidth);
+
+            labelAndButtonRect.xMin += EditorGUI.indentLevel * indentWidth;
+
+            (Rect labelRect, Rect buttonRect) =
+                labelAndButtonRect.CutVertically(ButtonStyle.fixedWidth, fromRightSide: true);
+
+            valueRect.xMin += valueLeftIndent;
+            return (labelRect, buttonRect, valueRect);
+        }
+
+        private int DrawButton(Rect buttonRect, int currentValue)
+        {
+            return EditorGUI.Popup(buttonRect, currentValue, _popupOptions, ButtonStyle);
+        }
+    }
+
     [CustomPropertyDrawer(typeof(Reference), true)]
     internal class ReferenceDrawer : PropertyDrawer
     {
@@ -118,7 +244,10 @@
 
             using (EditorGUIHelper.IndentLevelBlock(indentLevel + 1))
             {
-                InlineEditorCache.GetInlineDrawer(ObjectReference).OnInlineGUI();
+                var inlineDrawer = InlineEditorCache.GetInlineDrawer(ObjectReference);
+
+                if (inlineDrawer.HasContent)
+                    inlineDrawer.OnInlineGUI();
             }
         }
 
@@ -146,7 +275,7 @@
             }
         }
 
-        private (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
+        private static (Rect label, Rect button, Rect value) GetLabelButtonValueRects(Rect totalRect)
         {
             const float indentWidth = 15f;
             const float valueLeftIndent = 2f;

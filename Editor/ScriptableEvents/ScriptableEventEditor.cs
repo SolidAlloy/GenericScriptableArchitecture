@@ -5,7 +5,7 @@
     using UnityEditor;
 
     [CustomEditor(typeof(BaseScriptableEvent), true)]
-    internal class ScriptableEventEditor : PlayModeUpdatableEditor
+    internal class ScriptableEventEditor : PlayModeUpdatableEditor, IInlineDrawer
     {
         private SerializedProperty _description;
         private BaseScriptableEvent _typedTarget;
@@ -89,6 +89,18 @@
             }
 
             return getArgNames;
+        }
+
+        public bool HasContent => EditorApplication.isPlaying;
+
+        public void OnInlineGUI()
+        {
+            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+
+            if (guiWrapper.HasMissingScript)
+                return;
+
+            _helperDrawer.DrawMethod(targets);
         }
     }
 }

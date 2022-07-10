@@ -81,6 +81,8 @@
             _variableHelperDrawer.DrawListeners();
         }
 
+        public bool HasContent => true;
+
         public void OnInlineGUI()
         {
             using var guiWrapper = new InspectorGUIWrapper(_serializedObject);
