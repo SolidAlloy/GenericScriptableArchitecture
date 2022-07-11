@@ -2,18 +2,21 @@
 {
     using System;
     using JetBrains.Annotations;
+    using Sirenix.Serialization;
     using UnityEngine;
 
     [Serializable]
-    public abstract class Reference
+    public abstract class BaseReference
     {
-        [field: SerializeField] public ValueTypes ValueType { get; protected set; }
+        [SerializeField, PreviouslySerializedAs("ValueType")] internal ValueTypes _valueType;
+
+        public ValueTypes ValueType => _valueType;
 
         public enum ValueTypes { Value, Constant, Variable, VariableInstancer }
     }
 
     [Serializable]
-    public class Reference<T> : Reference, IEquatable<Reference<T>>, IEquatable<T>
+    public class Reference<T> : BaseReference, IEquatable<Reference<T>>, IEquatable<T>
     {
         [SerializeField] internal T _value;
         [SerializeField] internal Variable<T> _variable;
@@ -22,19 +25,19 @@
 
         public Reference(T value)
         {
-            ValueType = ValueTypes.Value;
+            _valueType = ValueTypes.Value;
             _value = value;
         }
 
         public Reference(Variable<T> variable)
         {
-            ValueType = ValueTypes.Variable;
+            _valueType = ValueTypes.Variable;
             _variable = variable;
         }
 
         public Reference(Constant<T> constant)
         {
-            ValueType = ValueTypes.Constant;
+            _valueType = ValueTypes.Constant;
             _constant = constant;
         }
 
@@ -78,9 +81,9 @@
         }
 
         /// <summary>
-        /// Returns a variable assigned to the reference if the <seealso cref="Reference.ValueType"/> is Variable, otherwise throws an exception.
+        /// Returns a variable assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is Variable, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Variable.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Variable.</exception>
         [PublicAPI]
         public Variable<T> VariableValue
         {
@@ -94,9 +97,9 @@
         }
 
         /// <summary>
-        /// Returns a constant assigned to the reference if the <seealso cref="Reference.ValueType"/> is Constant, otherwise throws an exception.
+        /// Returns a constant assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is Constant, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Constant.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Constant.</exception>
         [PublicAPI]
         public Constant<T> ConstantValue
         {
@@ -110,9 +113,9 @@
         }
 
         /// <summary>
-        /// Returns a variable instancer assigned to the reference if the <seealso cref="Reference.ValueType"/> is VariableInstancer, otherwise throws an exception.
+        /// Returns a variable instancer assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is VariableInstancer, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="Reference.ValueType"/> is not Constant.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Constant.</exception>
         [PublicAPI]
         public VariableInstancer<T> InstancerValue
         {

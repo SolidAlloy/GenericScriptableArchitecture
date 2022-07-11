@@ -28,6 +28,11 @@
             return drawer;
         }
 
+        public static bool HasInlineDrawer(Object value)
+        {
+            return value is BaseEvent || value is BaseEventInstancer || value is BaseVariableInstancer;
+        }
+
         [InitializeOnEnterPlayMode]
         private static void OnEnterPlayMode()
         {
