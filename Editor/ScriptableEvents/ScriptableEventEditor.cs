@@ -48,6 +48,7 @@
                     GUIContentHelper.Temp($"Arg {i + 1}"), null);
             }
 
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _helperDrawer.DrawMethod(targets);
             _helperDrawer.DrawStackTrace();
             _helperDrawer.DrawListeners();

@@ -15,6 +15,8 @@
 
         internal override ScriptableEventHelper ScriptableEventHelper => _scriptableEventHelper;
 
+        internal override BaseScriptableEvent Base => _base;
+
         private void Awake() => _scriptableEventHelper.Initialize(this, name, "event instancer");
 
         private void OnDisable() => _scriptableEventHelper.Event.Dispose();

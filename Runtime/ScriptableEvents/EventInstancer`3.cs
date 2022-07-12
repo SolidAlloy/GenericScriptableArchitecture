@@ -15,12 +15,14 @@
 
         internal override ScriptableEventHelper ScriptableEventHelper => _scriptableEventHelper;
 
+        internal override BaseScriptableEvent Base => _base;
+
         private void Awake() => _scriptableEventHelper.Initialize(this, name, "event instancer");
 
         private void OnDisable() => _scriptableEventHelper.Event.Dispose();
 
         public void Invoke(T1 arg0, T2 arg1, T3 arg2) => _scriptableEventHelper.Invoke(arg0, arg1, arg2);
-        
+
         #region Adding Removing Listeners
 
         public void AddListener(IListener<T1, T2, T3> listener) => _scriptableEventHelper.Event.AddListener(listener);

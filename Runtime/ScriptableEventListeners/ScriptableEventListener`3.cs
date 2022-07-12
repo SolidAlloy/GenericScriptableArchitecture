@@ -9,20 +9,8 @@
     [AddComponentMenu("")]
     public class ScriptableEventListener<T1, T2, T3> : BaseScriptableEventListener, IListener<T1, T2, T3>
     {
-        [SerializeField] private ScriptableEvent<T1, T2, T3> _event;
+        [SerializeField] private EventHolder<T1, T2, T3> _event;
         [SerializeField] private ExtEvent<T1, T2, T3> _response;
-
-        internal override IBaseEvent Event
-        {
-            get => _event;
-            set
-            {
-                if (value is ScriptableEvent<T1, T2, T3> scriptableEvent)
-                    _event = scriptableEvent;
-            }
-        }
-
-        internal override bool DrawObjectField { get; set; }
 
         protected virtual void OnEnable()
         {

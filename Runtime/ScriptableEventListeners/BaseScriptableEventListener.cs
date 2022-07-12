@@ -1,7 +1,5 @@
 ﻿namespace GenericScriptableArchitecture
 {
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using UnityEngine;
     using Debug = UnityEngine.Debug;
 
@@ -12,10 +10,6 @@
     public abstract class BaseScriptableEventListener : MonoBehaviour
     {
         [SerializeField] internal StackTraceProvider _stackTrace;
-
-        internal abstract IBaseEvent Event { get; set; }
-
-        internal abstract bool DrawObjectField { get; set; }
 
         protected bool CanBeInvoked()
         {

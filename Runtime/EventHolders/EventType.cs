@@ -1,6 +1,6 @@
 ﻿namespace GenericScriptableArchitecture
 {
-    public enum EventTypes
+    public enum EventType
     {
         ScriptableEvent,
         Variable,
@@ -10,12 +10,12 @@
 
     public static class EventTypesExtensions
     {
-        public static bool HasDefaultValue(this EventTypes eventType)
+        public static bool HasDefaultValue(this EventType eventType)
         {
             switch (eventType)
             {
-                case EventTypes.Variable:
-                case EventTypes.VariableInstancer:
+                case EventType.Variable:
+                case EventType.VariableInstancer:
                     return true;
                 default:
                     return false;

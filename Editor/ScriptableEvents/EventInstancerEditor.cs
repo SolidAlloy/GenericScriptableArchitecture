@@ -47,6 +47,7 @@
             if (!EditorApplication.isPlaying)
                 return;
 
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _helperDrawer.DrawMethod(targets);
             _helperDrawer.DrawStackTrace();
             _helperDrawer.DrawListeners();

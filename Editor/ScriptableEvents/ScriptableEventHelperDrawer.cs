@@ -31,7 +31,6 @@
 
         public void DrawMethod(IEnumerable<object> targets)
         {
-            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2);
             _methodDrawer.Draw(targets);
         }
 

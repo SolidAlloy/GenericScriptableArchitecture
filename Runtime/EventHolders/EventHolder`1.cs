@@ -3,20 +3,16 @@
     using System;
     using System.IO;
     using UnityEngine;
-    using Object = UnityEngine.Object;
-
-    internal class EventHolderBaseOne { }
 
     [Serializable]
-    internal class EventHolder<T> : EventHolderBaseOne
+    internal class EventHolder<T>
     {
         [SerializeField] internal ScriptableEvent<T> _event;
         [SerializeField] internal Variable<T> _variable;
         [SerializeField] internal VariableInstancer<T> _variableInstancer;
-        [SerializeField] internal EventTypes _type = EventTypes.ScriptableEvent;
+        [SerializeField] internal EventInstancer<T> _eventInstancer;
+        [SerializeField] internal EventType _type = EventType.ScriptableEvent;
         [SerializeField] internal bool _notifyCurrentValue;
-
-        public bool DrawObjectField = true;
 
         public IBaseEvent Event
         {
@@ -24,9 +20,10 @@
             {
                 return _type switch
                     {
-                        EventTypes.ScriptableEvent => _event,
-                        EventTypes.Variable => _variable,
-                        EventTypes.VariableInstancer => _variableInstancer,
+                        EventType.ScriptableEvent => _event,
+                        EventType.Variable => _variable,
+                        EventType.VariableInstancer => _variableInstancer,
+                        EventType.EventInstancer => _eventInstancer,
                         _ => throw new ArgumentOutOfRangeException()
                     };
             }
@@ -34,18 +31,23 @@
             {
                 if (value is ScriptableEvent<T> @event)
                 {
-                    _type = EventTypes.ScriptableEvent;
+                    _type = EventType.ScriptableEvent;
                     _event = @event;
                 }
                 else if (value is Variable<T> variable)
                 {
-                    _type = EventTypes.Variable;
+                    _type = EventType.Variable;
                     _variable = variable;
                 }
                 else if (value is VariableInstancer<T> variableInstancer)
                 {
-                    _type = EventTypes.VariableInstancer;
+                    _type = EventType.VariableInstancer;
                     _variableInstancer = variableInstancer;
+                }
+                else if (value is EventInstancer<T> eventInstancer)
+                {
+                    _type = EventType.EventInstancer;
+                    _eventInstancer = eventInstancer;
                 }
                 else
                 {
@@ -58,16 +60,20 @@
         {
             switch (_type)
             {
-                case EventTypes.ScriptableEvent:
+                case EventType.ScriptableEvent:
                     _event?.AddListener(listener);
                     break;
 
-                case EventTypes.Variable:
+                case EventType.Variable:
                     _variable?.AddListener(listener, _notifyCurrentValue);
                     break;
 
-                case EventTypes.VariableInstancer:
+                case EventType.VariableInstancer:
                     _variableInstancer?.AddListener(listener, _notifyCurrentValue);
+                    break;
+
+                case EventType.EventInstancer:
+                    _eventInstancer?.AddListener(listener);
                     break;
 
                 default:
@@ -79,15 +85,19 @@
         {
             switch (_type)
             {
-                case EventTypes.ScriptableEvent:
+                case EventType.ScriptableEvent:
                     _event?.RemoveListener(listener);
                     break;
 
-                case EventTypes.Variable:
+                case EventType.Variable:
                     _variable?.RemoveListener(listener);
                     break;
 
-                case EventTypes.VariableInstancer:
+                case EventType.VariableInstancer:
+                    _variableInstancer?.RemoveListener(listener);
+                    break;
+
+                case EventType.EventInstancer:
                     _variableInstancer?.RemoveListener(listener);
                     break;
 
