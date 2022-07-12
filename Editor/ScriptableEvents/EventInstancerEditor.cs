@@ -16,6 +16,9 @@
         {
             base.OnEnable();
 
+            if (target == null)
+                return;
+
             _baseField = serializedObject.FindProperty(nameof(EventInstancer._base));
 
             if (_baseField.objectReferenceValue != null)

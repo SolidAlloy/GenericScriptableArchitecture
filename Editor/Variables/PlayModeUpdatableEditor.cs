@@ -25,10 +25,7 @@
 
         private void OnUpdate()
         {
-            if (!EditorApplication.isPlayingOrWillChangePlaymode)
-                return;
-
-            if (_frameCounter++ < UpdateFrameCount)
+            if (!EditorApplication.isPlayingOrWillChangePlaymode || target == null || _frameCounter++ < UpdateFrameCount)
                 return;
 
             _frameCounter = 0;

@@ -43,14 +43,6 @@
                 _componentEditor.SerializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
         }
 
-        private void OnDisable()
-        {
-            if (target == null)
-            {
-                RemoveComponent(_componentProperty.objectReferenceValue);
-            }
-        }
-
         private static SerializedProperty GetComponentProperty(SerializedObject serializedObject) => serializedObject.FindProperty(nameof(ScriptableEventListener._component));
 
         public override void OnInspectorGUI()
