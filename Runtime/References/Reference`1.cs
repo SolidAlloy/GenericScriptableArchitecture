@@ -2,17 +2,17 @@
 {
     using System;
     using JetBrains.Annotations;
-    using Sirenix.Serialization;
     using UnityEngine;
+    using UnityEngine.Serialization;
 
     [Serializable]
     public abstract class BaseReference
     {
-        [SerializeField, PreviouslySerializedAs("ValueType")] internal ValueTypes _valueType;
+        [SerializeField, FormerlySerializedAs("ValueType")] internal ValueType _valueType;
 
-        public ValueTypes ValueType => _valueType;
+        public ValueType Type => _valueType;
 
-        public enum ValueTypes { Value, Constant, Variable, VariableInstancer }
+        public enum ValueType { Value, Constant, Variable, VariableInstancer }
     }
 
     [Serializable]
@@ -25,19 +25,19 @@
 
         public Reference(T value)
         {
-            _valueType = ValueTypes.Value;
+            _valueType = ValueType.Value;
             _value = value;
         }
 
         public Reference(Variable<T> variable)
         {
-            _valueType = ValueTypes.Variable;
+            _valueType = ValueType.Variable;
             _variable = variable;
         }
 
         public Reference(Constant<T> constant)
         {
-            _valueType = ValueTypes.Constant;
+            _valueType = ValueType.Constant;
             _constant = constant;
         }
 
@@ -45,32 +45,32 @@
         {
             get
             {
-                return ValueType switch
+                return Type switch
                 {
-                    ValueTypes.Constant => _constant == null ? default : _constant.Value,
-                    ValueTypes.Value => _value,
-                    ValueTypes.Variable => _variable == null ? default : _variable.Value,
-                    ValueTypes.VariableInstancer => _variableInstancer == null ? default : _variableInstancer.Value,
+                    ValueType.Constant => _constant == null ? default : _constant.Value,
+                    ValueType.Value => _value,
+                    ValueType.Variable => _variable == null ? default : _variable.Value,
+                    ValueType.VariableInstancer => _variableInstancer == null ? default : _variableInstancer.Value,
                     _ => throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.")
                 };
             }
 
             set
             {
-                switch (ValueType)
+                switch (Type)
                 {
-                    case ValueTypes.Constant:
+                    case ValueType.Constant:
                         throw new InvalidOperationException("Unable to change the value of a constant behind the reference");
 
-                    case ValueTypes.Value:
+                    case ValueType.Value:
                         _value = value;
                         break;
 
-                    case ValueTypes.Variable:
+                    case ValueType.Variable:
                         _variable.Value = value;
                         break;
 
-                    case ValueTypes.VariableInstancer:
+                    case ValueType.VariableInstancer:
                         _variableInstancer.Value = value;
                         break;
 
@@ -81,50 +81,50 @@
         }
 
         /// <summary>
-        /// Returns a variable assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is Variable, otherwise throws an exception.
+        /// Returns a variable assigned to the reference if the <seealso cref="BaseReference.Type"/> is Variable, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Variable.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.Type"/> is not Variable.</exception>
         [PublicAPI]
         public Variable<T> VariableValue
         {
             get
             {
-                if (ValueType == ValueTypes.Variable)
+                if (Type == ValueType.Variable)
                     return _variable;
 
-                throw new InvalidOperationException($"Tried to get a variable value of reference but the value type was {ValueType}.");
+                throw new InvalidOperationException($"Tried to get a variable value of reference but the value type was {Type}.");
             }
         }
 
         /// <summary>
-        /// Returns a constant assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is Constant, otherwise throws an exception.
+        /// Returns a constant assigned to the reference if the <seealso cref="BaseReference.Type"/> is Constant, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Constant.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.Type"/> is not Constant.</exception>
         [PublicAPI]
         public Constant<T> ConstantValue
         {
             get
             {
-                if (ValueType == ValueTypes.Constant)
+                if (Type == ValueType.Constant)
                     return _constant;
 
-                throw new InvalidOperationException($"Tried to get a constant value of reference but the value type was {ValueType}.");
+                throw new InvalidOperationException($"Tried to get a constant value of reference but the value type was {Type}.");
             }
         }
 
         /// <summary>
-        /// Returns a variable instancer assigned to the reference if the <seealso cref="BaseReference.ValueType"/> is VariableInstancer, otherwise throws an exception.
+        /// Returns a variable instancer assigned to the reference if the <seealso cref="BaseReference.Type"/> is VariableInstancer, otherwise throws an exception.
         /// </summary>
-        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.ValueType"/> is not Constant.</exception>
+        /// <exception cref="InvalidOperationException"><seealso cref="BaseReference.Type"/> is not Constant.</exception>
         [PublicAPI]
         public VariableInstancer<T> InstancerValue
         {
             get
             {
-                if (ValueType == ValueTypes.VariableInstancer)
+                if (Type == ValueType.VariableInstancer)
                     return _variableInstancer;
 
-                throw new InvalidOperationException($"Tried to get a variable instancer value of reference but the value type was {ValueType}.");
+                throw new InvalidOperationException($"Tried to get a variable instancer value of reference but the value type was {Type}.");
             }
         }
 
@@ -135,12 +135,12 @@
         public override string ToString()
         {
             // ReSharper disable once UseStringInterpolation
-            return string.Format("Reference{{{0}}}", ValueType switch
+            return string.Format("Reference{{{0}}}", Type switch
             {
-                ValueTypes.Constant => _constant.ToString(),
-                ValueTypes.Value => _value.ToString(),
-                ValueTypes.Variable => _variable.ToString(),
-                ValueTypes.VariableInstancer => _variableInstancer.ToString(),
+                ValueType.Constant => _constant.ToString(),
+                ValueType.Value => _value.ToString(),
+                ValueType.Variable => _variable.ToString(),
+                ValueType.VariableInstancer => _variableInstancer.ToString(),
                 _ => throw new ArgumentOutOfRangeException(nameof(Value), "Unknown value type in the reference.")
             });
         }

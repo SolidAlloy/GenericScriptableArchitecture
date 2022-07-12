@@ -57,14 +57,14 @@
 
         private static SerializedProperty GetChosenValueProperty(SerializedProperty mainProperty, int enumIndex)
         {
-            var valueType = (BaseReference.ValueTypes) enumIndex;
+            var valueType = (BaseReference.ValueType) enumIndex;
 
             return valueType switch
             {
-                BaseReference.ValueTypes.Value => mainProperty.FindPropertyRelative(nameof(Reference<int>._value)),
-                BaseReference.ValueTypes.Constant => mainProperty.FindPropertyRelative(nameof(Reference<int>._constant)),
-                BaseReference.ValueTypes.Variable => mainProperty.FindPropertyRelative(nameof(Reference<int>._variable)),
-                BaseReference.ValueTypes.VariableInstancer => mainProperty.FindPropertyRelative(nameof(Reference<int>._variableInstancer)),
+                BaseReference.ValueType.Value => mainProperty.FindPropertyRelative(nameof(Reference<int>._value)),
+                BaseReference.ValueType.Constant => mainProperty.FindPropertyRelative(nameof(Reference<int>._constant)),
+                BaseReference.ValueType.Variable => mainProperty.FindPropertyRelative(nameof(Reference<int>._variable)),
+                BaseReference.ValueType.VariableInstancer => mainProperty.FindPropertyRelative(nameof(Reference<int>._variableInstancer)),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
