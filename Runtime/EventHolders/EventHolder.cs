@@ -1,46 +1,14 @@
 ﻿namespace GenericScriptableArchitecture
 {
     using System;
-    using System.IO;
     using UnityEngine;
 
     [Serializable]
     internal class EventHolder
     {
-        [SerializeField] private ScriptableEvent _event;
-        [SerializeField] private EventInstancer _eventInstancer;
-        [SerializeField] private EventType _type = EventType.ScriptableEvent;
-
-        public IBaseEvent Event
-        {
-            get
-            {
-                return _type switch
-                {
-                    EventType.ScriptableEvent => _event,
-                    EventType.EventInstancer => _eventInstancer,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
-            set
-            {
-                if (value is ScriptableEvent @event)
-                {
-                    _type = EventType.ScriptableEvent;
-                    _event = @event;
-                }
-                else if (value is EventInstancer eventInstancer)
-                {
-                    _type = EventType.EventInstancer;
-                    _eventInstancer = eventInstancer;
-                }
-                else
-                {
-                    throw new InvalidDataException(
-                        $"Tried to set an event that is neither of EventTypes: {value.GetType()}");
-                }
-            }
-        }
+        [SerializeField] public ScriptableEvent _event;
+        [SerializeField] public EventInstancer _eventInstancer;
+        [SerializeField] public EventType _type = EventType.ScriptableEvent;
 
         public void AddListener(VoidScriptableEventListener listener)
         {
@@ -55,8 +23,7 @@
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(listener),
-                        "Unknown enum value when adding listener to the event holder.");
+                    throw new ArgumentOutOfRangeException(nameof(listener), "Unknown enum value when adding listener to the event holder.");
             }
         }
 
@@ -73,8 +40,30 @@
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(listener),
-                        "Unknown enum value when adding listener to the event holder.");
+                    throw new ArgumentOutOfRangeException(nameof(listener), "Unknown enum value when adding listener to the event holder.");
+            }
+        }
+
+        public enum EventType
+        {
+            ScriptableEvent,
+            Variable,
+            VariableInstancer,
+            EventInstancer // appending this type to the end of enum so that the serialization does not mess up when people upgrade the package.
+        }
+    }
+
+    internal static class EventTypesExtensions
+    {
+        public static bool HasDefaultValue(this EventHolder.EventType eventType)
+        {
+            switch (eventType)
+            {
+                case EventHolder.EventType.Variable:
+                case EventHolder.EventType.VariableInstancer:
+                    return true;
+                default:
+                    return false;
             }
         }
     }

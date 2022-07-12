@@ -9,19 +9,30 @@
     [AddComponentMenu("")]
     public class ScriptableEventListener<T1, T2, T3> : BaseScriptableEventListener, IListener<T1, T2, T3>
     {
-        [SerializeField] private EventHolder<T1, T2, T3> _event;
+        [SerializeField] private ScriptableEvent<T1, T2, T3> _event;
+        [SerializeField] private EventHolder<T1, T2, T3> _eventHolder;
         [SerializeField] private ExtEvent<T1, T2, T3> _response;
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
-            if (_event != null)
+            if (_event != null) // backwards compatibility
+            {
                 _event.AddListener(this);
+                return;
+            }
+
+            _eventHolder?.AddListener(this);
         }
 
-        protected virtual void OnDisable()
+        private void OnDisable()
         {
-            if (_event != null)
+            if (_event != null) // backwards compatibility
+            {
                 _event.RemoveListener(this);
+                return;
+            }
+
+            _eventHolder?.RemoveListener(this);
         }
 
         public void OnEventInvoked(T1 arg0, T2 arg1, T3 arg2)

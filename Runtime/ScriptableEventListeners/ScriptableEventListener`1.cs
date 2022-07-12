@@ -3,17 +3,18 @@
     using System;
     using ExtEvents;
     using UnityEngine;
+    using UnityEngine.Serialization;
 
     [Serializable]
     [AddComponentMenu("")]
     public class ScriptableEventListener<T> : BaseScriptableEventListener, IListener<T>
     {
-        [SerializeField] private EventHolder<T> _event = new EventHolder<T>();
+        [SerializeField, FormerlySerializedAs("_event")] private EventHolder<T> _eventHolder = new EventHolder<T>();
         [SerializeField] private ExtEvent<T> _response;
 
-        protected virtual void OnEnable() => _event?.AddListener(this);
+        private void OnEnable() => _eventHolder?.AddListener(this);
 
-        protected virtual void OnDisable() => _event?.RemoveListener(this);
+        private void OnDisable() => _eventHolder?.RemoveListener(this);
 
         public void OnEventInvoked(T arg0)
         {

@@ -6,7 +6,6 @@
     using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
-    using EventType = GenericScriptableArchitecture.EventType;
     using Object = UnityEngine.Object;
 
     public class ScriptableEventListenerEditorHelper
@@ -28,7 +27,7 @@
         public ScriptableEventListenerEditorHelper(SerializedObject serializedObject, BaseScriptableEventListener target, Action repaint)
         {
             SerializedObject = serializedObject;
-            _eventHolderProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._event));
+            _eventHolderProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._eventHolder));
             _eventTypeProperty = _eventHolderProperty.FindPropertyRelative(nameof(EventHolder<int>._type));
             _notifyValueProperty = _eventHolderProperty.FindPropertyRelative(nameof(EventHolder<int>._notifyCurrentValue));
             _responseProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._response));
@@ -40,6 +39,8 @@
 
             _argNames = GetArgNames(_eventTypeProperty);
             _stackTrace = new StackTraceDrawer(target._stackTrace.Entries, serializedObject.FindProperty(nameof(BaseScriptableEventListener._stackTrace)), repaint);
+
+            FixDeprecatedEventField(serializedObject, _eventTypeProperty, _eventProperty);
         }
 
         public Object GetCurrentEventValue() => GetEventValueProperty(_eventTypeProperty).objectReferenceValue;
@@ -84,22 +85,22 @@
         {
             if (eventValue is BaseScriptableEvent)
             {
-                _eventTypeProperty.enumValueIndex = (int) EventType.ScriptableEvent;
+                _eventTypeProperty.enumValueIndex = (int) EventHolder.EventType.ScriptableEvent;
                 _eventProperty.objectReferenceValue = eventValue;
             }
             else if (eventValue is BaseEventInstancer)
             {
-                _eventTypeProperty.enumValueIndex = (int) EventType.EventInstancer;
+                _eventTypeProperty.enumValueIndex = (int) EventHolder.EventType.EventInstancer;
                 _eventInstancerProperty.objectReferenceValue = eventValue;
             }
             else if (eventValue is BaseVariable)
             {
-                _eventTypeProperty.enumValueIndex = (int) EventType.Variable;
+                _eventTypeProperty.enumValueIndex = (int) EventHolder.EventType.Variable;
                 _variableProperty.objectReferenceValue = eventValue;
             }
             else if (eventValue is BaseVariableInstancer)
             {
-                _eventTypeProperty.enumValueIndex = (int) EventType.VariableInstancer;
+                _eventTypeProperty.enumValueIndex = (int) EventHolder.EventType.VariableInstancer;
                 _variableInstancerProperty.objectReferenceValue = eventValue;
             }
             else
@@ -111,16 +112,16 @@
             SerializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
         }
 
-        private static EventType GetEventType(SerializedProperty eventTypeProperty) => (EventType) eventTypeProperty.enumValueIndex;
+        private static EventHolder.EventType GetEventType(SerializedProperty eventTypeProperty) => (EventHolder.EventType) eventTypeProperty.enumValueIndex;
 
         private SerializedProperty GetEventValueProperty(SerializedProperty eventTypeProperty)
         {
             return GetEventType(eventTypeProperty) switch
             {
-                EventType.ScriptableEvent => _eventProperty,
-                EventType.EventInstancer => _eventInstancerProperty,
-                EventType.Variable => _variableProperty,
-                EventType.VariableInstancer => _variableInstancerProperty,
+                EventHolder.EventType.ScriptableEvent => _eventProperty,
+                EventHolder.EventType.EventInstancer => _eventInstancerProperty,
+                EventHolder.EventType.Variable => _variableProperty,
+                EventHolder.EventType.VariableInstancer => _variableInstancerProperty,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -129,18 +130,18 @@
         {
             switch (GetEventType(eventTypeProperty))
             {
-                case EventType.ScriptableEvent:
+                case EventHolder.EventType.ScriptableEvent:
                     return GetArgNamesFromScriptableEvent(_eventProperty);
 
-                case EventType.EventInstancer:
+                case EventHolder.EventType.EventInstancer:
                     return GetArgNamesFromEventInstancer(_eventInstancerProperty);
 
-                case EventType.Variable:
+                case EventHolder.EventType.Variable:
                     return _variableProperty.type.StartsWith("VariableWithHistory")
                         ? new[] { "Previous Value", "Value" }
                         : new[] { "Value" };
 
-                case EventType.VariableInstancer:
+                case EventHolder.EventType.VariableInstancer:
                     return _variableInstancerProperty.type.StartsWith("VariableInstancerWithHistory")
                         ? new[] { "Previous Value", "Value" }
                         : new[] { "Value" };
@@ -170,6 +171,24 @@
                 return Array.Empty<string>();
 
             return scriptableEvent._argNames;
+        }
+
+        // If the listener contains a deprecated scriptable event field and its value is not null, reassign it to the new event holder
+        private static void FixDeprecatedEventField(SerializedObject serializedObject, SerializedProperty eventTypeProperty, SerializedProperty eventProperty)
+        {
+            var scriptableEventProperty = serializedObject.FindProperty(nameof(VoidScriptableEventListener._event));
+            if (scriptableEventProperty == null || scriptableEventProperty.propertyType != SerializedPropertyType.ObjectReference)
+                return;
+
+            var scriptableEvent = scriptableEventProperty.objectReferenceValue;
+
+            if (scriptableEvent == null)
+                return;
+
+            eventTypeProperty.enumValueIndex = (int) EventHolder.EventType.ScriptableEvent;
+            eventProperty.objectReferenceValue = scriptableEvent;
+            scriptableEventProperty.objectReferenceValue = null;
+            serializedObject.ApplyModifiedProperties();
         }
     }
 
