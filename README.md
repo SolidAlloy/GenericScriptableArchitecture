@@ -526,19 +526,6 @@ The previous value can be seen in the variable inspector:
 
 Constant is a variable that can't be changed at runtime. It is set in Edit Mode, but no script can change it. It can't be subscribed to because it doesn't change. Use it when you need a constant value in the game but want the game designers to tweak it to their need. I left the value field editable in Play Mode, so you don't have to exit to Edit Mode every time you need to adjust it.
 
-### Reference
-
-Use Reference when you are not sure if the field is going to be Variable, Constant, or just a regular value. You can decide what variable type it represents in the inspector:
-
-```csharp
-public class Balloon : MonoBehaviour
-{
-    [SerializeField] private Reference<float> _size;
-}
-```
-
-![reference-inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/reference-inspector.png)
-
 ### Runtime Set
 
 The main purpose of RuntimeSet is to keep a collection of items grouped by some rule. If the set contains an item, it means it has some property e.g. it is one of enemies. It is a replacement for tags, but an item can have multiple tags because it can add itself to multiple runtime sets. The basic use of RuntimeSet is the following one:
@@ -643,6 +630,58 @@ public class Sentinel : MonoBehaviour
 
 As with variables and events, you can see all the current listeners to different runtime set events in the inspector.
 
+### Variable Instancer
+
+Variable Instancer is a MonoBehaviour that has all the same properties as a scriptable-object variable: value, subscription methods, etc. Use it instead of Variable in prefabs so that each prefab instance has its own variable. Variable Instancer requires a reference to a variable asset and takes the initial value from it, but each variable instancer has its own current value. Using it with Reference allows for writing highly decoupled and flexible components that can be used with scriptable-object Variables in single game objects (such as Player or Camera), as well as prefabs (Enemy, Tree).
+
+For instance, you can create the following component:
+
+```csharp
+public class HealthComponent : MonoBehaviour
+{
+    public Reference<int> Value;
+    
+    // ...
+}
+```
+
+Then the Health component in the Player game object will use a "Player Health" variable, but the same component on the Enemy prefab will reference a VariableInstancer component. The VariableInstancer component will be based on the Enemy Health variable meaning that it will receive its initial value, but each enemy game object will have its own current health value.
+
+Instancers have very convenient interactions:
+
+1. You can press the + button next to an instancer to add a component of the corresponding type to the game object.
+
+   ![add-variable-instancer](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/add-variable-instancer.gif)
+
+2. You can drag and drop a variable asset to the instancer field, and an instancer component will be automatically added to the game object with the dropped variable automatically assigned to it.
+
+   ![assign-variable-instancer](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/assign-variable-instancer.gif)
+
+### Variable Instancer With History
+
+It's the same as Variable Instancer but with history, so you can track the previous value of a variable, just like with VariableWithHistory. To start working with it, you only need a simple Variable asset because VariableInstancerWithHistory needs to know only the initial value to set at the start. Like with VariableInstancer, you can drag and drop a variable asset into its object field to create a VariableInstancerWithHistory component automatically.
+
+### Event Instancer
+
+Event Instancer is a MonoBehaviour component that acts just like ScriptableEvent but each prefab instance with EventInstancer component on it can be subscribed to individually. Use it through EventReference, and your component will more flexible, and you'll be able to use them with ScriptableEvents and EventInstancers alike. Like with VariableInstancer, you can drag and drop a ScriptableEvent asset into the object field, and an EventInstancer component will be automatically created with the dropped ScriptableEvent assigned.
+
+### Reference
+
+Use Reference when you are not sure if the field is going to be Variable, Constant, Variable Instancer, or just a regular value. You can decide what variable type it represents in the inspector:
+
+```csharp
+public class Balloon : MonoBehaviour
+{
+    [SerializeField] private Reference<float> _size;
+}
+```
+
+![reference-inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/reference-inspector.png)
+
+### Event Reference
+
+Use EventReference if you want to use both ScriptableEvents and EventInstancers with your component. You can choose which type of event to use through the dropdown.
+
 ## Debugging
 
 When a variable or event is used in lots of places, it can sometimes be hard to find what changed its value or why someone hasn't received the event. To debug such issues, you can enable stack traces on events, variables, and scriptable event listeners. Gathering stack traces from thousands of calls can be very taxing on the editor performance, so it is advised to enable it only on the variables/events you need to debug at the moment. Press the *Enable Stack Trace* button to start debugging an event:
@@ -669,9 +708,22 @@ Since the system is built on generics, it doesn't have a fancy custom inspector 
 
 ![clamped-float-inspector](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/clamped-float-inspector.png)
 
-The cool thing about this is that the value is also clamped when it is set through code, so you won't have situation when you clamped the variable in the inspector between 1 and 10, but someone has set it to 15 in a script.
+The cool thing about this is that the value is also clamped when it is set through code, so you won't have a situation when you clamped the variable in the inspector between 1 and 10, but someone has set it to 15 in a script.
 
 If you need to have a custom inspector for the variable of your type, just implement a custom property drawer for the type, and it will be drawn in the variable inspector.
+
+ExtEvents, used in ScriptableEventListeners, support implicit type conversions, so you can subscribe to `Variable<ClampedInt>` and respond with a method that takes in `int` argument:
+
+```csharp
+public class TestImplicitConversion : MonoBehaviour
+{
+    [SerializeField] Variable<ClampedInt> _clampedIntVariable;
+    
+    public void AcceptsInt(int value) => Debug.Log(value);
+}
+```
+
+![clamped-int-implicit-conversion](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/clamped-int-implicit-conversion.gif)
 
 I might support some decorator attributes on variables and events. Leave your suggestions in the issues.
 
