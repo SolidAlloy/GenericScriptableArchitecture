@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System;
     using UnityEditor;
     using UnityEngine;
 
@@ -29,7 +30,8 @@
             return eventType switch
             {
                 BaseEventReference.EventType.ScriptableEvent => mainProperty.FindPropertyRelative(nameof(EventReference._event)),
-                BaseEventReference.EventType.EventInstancer => mainProperty.FindPropertyRelative(nameof(EventReference._eventInstancer))
+                BaseEventReference.EventType.EventInstancer => mainProperty.FindPropertyRelative(nameof(EventReference._eventInstancer)),
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
     }
@@ -62,7 +64,8 @@
                 BaseReference.ValueTypes.Value => mainProperty.FindPropertyRelative(nameof(Reference<int>._value)),
                 BaseReference.ValueTypes.Constant => mainProperty.FindPropertyRelative(nameof(Reference<int>._constant)),
                 BaseReference.ValueTypes.Variable => mainProperty.FindPropertyRelative(nameof(Reference<int>._variable)),
-                BaseReference.ValueTypes.VariableInstancer => mainProperty.FindPropertyRelative(nameof(Reference<int>._variableInstancer))
+                BaseReference.ValueTypes.VariableInstancer => mainProperty.FindPropertyRelative(nameof(Reference<int>._variableInstancer)),
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
     }
