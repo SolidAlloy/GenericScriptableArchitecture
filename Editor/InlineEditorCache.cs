@@ -28,11 +28,6 @@
             return drawer;
         }
 
-        public static bool HasInlineDrawer(Object value)
-        {
-            return value is BaseEvent || value is BaseEventInstancer || value is BaseVariableInstancer;
-        }
-
         [InitializeOnEnterPlayMode]
         private static void OnEnterPlayMode()
         {
@@ -58,20 +53,26 @@
 
             var genericTypeDefinition = genericType.GetGenericTypeDefinition();
 
-            if (genericTypeDefinition == typeof(VariableWithHistory<>))
-                return new VariableWithHistoryEditor(new SerializedObject(value), (IVariableWithHistory) value, null);
-
-            if (genericTypeDefinition == typeof(Variable<>))
-                return new GenericVariableEditor(new SerializedObject(value), (IVariable) value, null);
-
             if (genericTypeDefinition == typeof(Constant<>))
                 return EditorHelper.CreateEditor<ConstantEditor>(value);
 
+            SerializedObject serializedObject;
+            try { serializedObject = new SerializedObject(value); }
+            catch { return null; }
+
+            var inspectorGUIHelper = new InspectorGUIHelper(serializedObject);
+
+            if (genericTypeDefinition == typeof(VariableWithHistory<>))
+                return new VariableWithHistoryEditor(inspectorGUIHelper, serializedObject, (IVariableWithHistory) value, null);
+
+            if (genericTypeDefinition == typeof(Variable<>))
+                return new GenericVariableEditor(inspectorGUIHelper, serializedObject, (IVariable) value, null);
+
             if (genericTypeDefinition == typeof(VariableInstancerWithHistory<>))
-                return new VariableInstancerWithHistoryEditor((IVariableWithHistory) value, new SerializedObject(value), null, null);
+                return new VariableInstancerWithHistoryEditor(inspectorGUIHelper, (IVariableWithHistory) value, serializedObject, null, null);
 
             if (genericTypeDefinition == typeof(VariableInstancer<>))
-                return new GenericVariableInstancerEditor((BaseVariableInstancer) value, new SerializedObject(value), null, null);
+                return new GenericVariableInstancerEditor(inspectorGUIHelper, (BaseVariableInstancer) value, serializedObject, null, null);
 
             return null;
         }

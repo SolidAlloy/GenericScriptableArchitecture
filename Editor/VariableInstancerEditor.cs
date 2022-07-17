@@ -8,14 +8,17 @@
     using UnityEngine;
 
     [CustomEditor(typeof(BaseVariableInstancer), true)]
-    public class VariableInstancerEditor : PlayModeUpdatableEditor
+    public class VariableInstancerEditor : Editor
     {
         private bool _initialized;
         private GenericVariableInstancerEditor _editor;
+        private InspectorGUIHelper _inspectorGUIHelper;
+        private PlayModeUpdateHelper _updateHelper;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
 
             // The targets length is 0 or the first target is null for a couple frames after the domains reload.
             // We need to avoid exceptions while the target is not set by Unity.
@@ -23,10 +26,16 @@
                 return;
 
             _editor = target is IVariableWithHistory variableWithHistory
-                ? new VariableInstancerWithHistoryEditor(variableWithHistory, serializedObject, Repaint, () => _initialized)
-                : new GenericVariableInstancerEditor((BaseVariableInstancer) target, serializedObject, Repaint, () => _initialized);
+                ? new VariableInstancerWithHistoryEditor(_inspectorGUIHelper, variableWithHistory, serializedObject, Repaint, () => _initialized)
+                : new GenericVariableInstancerEditor(_inspectorGUIHelper, (BaseVariableInstancer) target, serializedObject, Repaint, () => _initialized);
 
             _initialized = true;
+            _updateHelper = new PlayModeUpdateHelper(this, () =>_editor.Update());
+        }
+
+        private void OnDisable()
+        {
+            _updateHelper?.Dispose();
         }
 
         protected override void OnHeaderGUI()
@@ -34,17 +43,17 @@
             GenericHeaderUtility.OnHeaderGUI(this);
         }
 
-        protected override void Update()
-        {
-            if (targets.Length != 0 && target != null)
-                _editor.Update();
-        }
-
         public override void OnInspectorGUI()
         {
             if (!_initialized)
             {
                 OnEnable();
+                return;
+            }
+
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
                 return;
             }
 
@@ -57,27 +66,27 @@
         protected readonly BaseVariableInstancer _target;
         protected readonly VariableHelperDrawer _variableHelperDrawer;
         private readonly SerializedProperty _variableReferenceProperty;
-        private readonly SerializedObject _serializedObject;
+        protected readonly InspectorGUIHelper _inspectorGUIHelper;
 
         private SerializedObject _referenceSerializedObject;
         private SerializedProperty _referenceInitialValueProperty;
         private SerializedProperty _valueProperty;
 
-        public GenericVariableInstancerEditor(BaseVariableInstancer target, SerializedObject serializedObject, Action repaint, Func<bool> canDrawListeners)
+        public GenericVariableInstancerEditor(InspectorGUIHelper inspectorGUIHelper, BaseVariableInstancer target, SerializedObject serializedObject, Action repaint, Func<bool> canDrawListeners)
         {
             _variableReferenceProperty = serializedObject.FindProperty(nameof(VariableInstancer<int>._variableReference));
-            _serializedObject = serializedObject;
             _target = target;
             var variableHelper = ((IVariable) target).VariableHelper;
             var variableHelperProperty = serializedObject.FindProperty(nameof(VariableInstancer<int>._variableHelper));
             _variableHelperDrawer = new VariableHelperDrawer(variableHelper, variableHelperProperty, repaint, canDrawListeners);
+            _inspectorGUIHelper = inspectorGUIHelper;
         }
 
         public virtual void Update() => _variableHelperDrawer.Update();
 
         public void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(_serializedObject);
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;
@@ -101,7 +110,7 @@
 
         public void OnInlineGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(_serializedObject);
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;
@@ -184,8 +193,8 @@
     {
         private readonly VariableWithHistoryHelperDrawer _drawerWithHistory;
 
-        public VariableInstancerWithHistoryEditor(IVariableWithHistory target, SerializedObject serializedObject, Action repaint, Func<bool> canDrawListeners)
-            : base((BaseVariableInstancer) target, serializedObject, repaint, canDrawListeners)
+        public VariableInstancerWithHistoryEditor(InspectorGUIHelper inspectorGUIHelper, IVariableWithHistory target, SerializedObject serializedObject, Action repaint, Func<bool> canDrawListeners)
+            : base(inspectorGUIHelper, (BaseVariableInstancer) target, serializedObject, repaint, canDrawListeners)
         {
             var variableHelper = target.VariableHelperWithHistory;
             var variableHelperProperty = serializedObject.FindProperty(nameof(VariableWithHistory<int>._variableHelperWithHistory));
@@ -217,6 +226,11 @@
 
         protected override void DrawInlineGUI()
         {
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
+
+            if (guiWrapper.HasMissingScript)
+                return;
+
             if (ApplicationUtil.InEditMode)
             {
                 DrawBaseReference();

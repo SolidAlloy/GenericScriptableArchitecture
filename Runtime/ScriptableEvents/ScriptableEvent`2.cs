@@ -14,7 +14,7 @@
 
         private void OnEnable() => _scriptableEventHelper?.Initialize(this, name, "event");
 
-        private void OnDisable() => _scriptableEventHelper?.Event.Dispose();
+        private void OnDisable() => _scriptableEventHelper?.Event?.Dispose();
 
         public void Invoke(T1 arg0, T2 arg1) => _scriptableEventHelper.Invoke(arg0, arg1);
 

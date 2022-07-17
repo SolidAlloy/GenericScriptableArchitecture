@@ -9,25 +9,30 @@
         private SerializedProperty _initialValue;
         private SerializedProperty _currentValue;
         private bool _initialValueEnabled;
+        private InspectorGUIHelper _inspectorGUIHelper;
 
         private void OnEnable()
         {
-            try
-            {
-                _description = serializedObject.FindProperty(nameof(BaseValue._description));
-            }
-            catch // SerializedObjectNotCreatableException can be thrown but it is internal, so we can't catch it directly.
-            {
-                return;
-            }
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
 
+            if (target == null)
+                return;
+
+            _description = serializedObject.FindProperty(nameof(BaseValue._description));
             _initialValue = serializedObject.FindProperty(nameof(Constant<int>._initialValue));
             _currentValue = serializedObject.FindProperty(nameof(Constant<int>._value));
         }
 
         public override void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;
@@ -44,7 +49,13 @@
 
         public void OnInlineGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;

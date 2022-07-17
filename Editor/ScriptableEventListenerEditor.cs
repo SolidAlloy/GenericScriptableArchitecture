@@ -196,10 +196,14 @@
     public class ScriptableEventListenerEditor : Editor
     {
         private ScriptableEventListenerEditorHelper _drawer;
+        private InspectorGUIHelper _inspectorGUIHelper;
         private bool _initialized;
 
         private void OnEnable()
         {
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
+
             // The targets length is 0 or the first target is null for a couple frames after the domains reload.
             // We need to avoid exceptions while the target is not set by Unity.
             if (targets.Length == 0 || target == null)
@@ -222,7 +226,13 @@
                 return;
             }
 
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;

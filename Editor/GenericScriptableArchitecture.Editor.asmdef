@@ -10,7 +10,8 @@
         "TypeReferences",
         "ExtEvents",
         "ExtEvents.Editor",
-        "SolidUtilities.Editor"
+        "SolidUtilities.Editor",
+        "MissingScriptType.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -31,6 +32,11 @@
             "name": "com.unity.timeline",
             "expression": "",
             "define": "USE_TIMELINE"
+        },
+        {
+            "name": "com.solidalloy.missing-script-type",
+            "expression": "",
+            "define": "MISSING_SCRIPT_TYPE"
         }
     ],
     "noEngineReferences": false

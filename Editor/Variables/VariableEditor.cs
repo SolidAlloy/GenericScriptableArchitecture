@@ -5,30 +5,40 @@
     using UnityEngine;
 
     [CustomEditor(typeof(BaseVariable), true)] // both variable and variable with history
-    internal class VariableEditor : PlayModeUpdatableEditor
+    internal class VariableEditor : Editor
     {
         private GenericVariableEditor _variableEditor;
+        private InspectorGUIHelper _inspectorGUIHelper;
+        private PlayModeUpdateHelper _updateHelper;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
 
-            // determine whether variable or variable with history is drawn.
             if (target == null)
                 return;
 
             _variableEditor = target is IVariableWithHistory variableWithHistory
-                ? new VariableWithHistoryEditor(serializedObject, variableWithHistory, Repaint)
-                : new GenericVariableEditor(serializedObject, (IVariable) target, Repaint);
+                ? new VariableWithHistoryEditor(_inspectorGUIHelper, serializedObject, variableWithHistory, Repaint)
+                : new GenericVariableEditor(_inspectorGUIHelper, serializedObject, (IVariable) target, Repaint);
+
+            _updateHelper = new PlayModeUpdateHelper(this, () => _variableEditor.Update());
         }
 
-        protected override void Update()
+        private void OnDisable()
         {
-            _variableEditor.Update();
+            _updateHelper?.Dispose();
         }
 
         public override void OnInspectorGUI()
         {
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
             _variableEditor.OnInspectorGUI();
         }
     }
@@ -40,19 +50,12 @@
         protected readonly VariableHelperDrawer _variableHelperDrawer;
         protected readonly SerializedProperty _description;
         private readonly SerializedObject _serializedObject;
+        private readonly InspectorGUIHelper _inspectorGUIHelper;
 
-        public GenericVariableEditor(SerializedObject serializedObject, IVariable target, Action repaint)
+        public GenericVariableEditor(InspectorGUIHelper inspectorGUIHelper, SerializedObject serializedObject, IVariable target, Action repaint)
         {
-            try
-            {
-                _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
-            }
-            catch // SerializedObjectNotCreatableException can be thrown but it is internal, so we can't catch it directly.
-            {
-                return;
-            }
-
-            _serializedObject = serializedObject;
+            _inspectorGUIHelper = inspectorGUIHelper;
+            _initialValue = serializedObject.FindProperty(nameof(Variable<int>._initialValue));
             var variableHelper = target.VariableHelper;
             var variableHelperProperty = serializedObject.FindProperty(nameof(Variable<int>._variableHelper));
             _variableHelperDrawer = new VariableHelperDrawer(variableHelper, variableHelperProperty, repaint);
@@ -66,10 +69,12 @@
 
         public void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(_serializedObject);
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
-            if (!guiWrapper.HasMissingScript)
-                DrawGUI();
+            if (guiWrapper.HasMissingScript)
+                return;
+
+            DrawGUI();
         }
 
         protected virtual void DrawGUI()
@@ -85,7 +90,7 @@
 
         public void OnInlineGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(_serializedObject);
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;
@@ -137,7 +142,8 @@
     {
         private readonly VariableWithHistoryHelperDrawer _drawerWithHistory;
 
-        public VariableWithHistoryEditor(SerializedObject serializedObject, IVariableWithHistory target, Action repaint) : base(serializedObject, target, repaint)
+        public VariableWithHistoryEditor(InspectorGUIHelper inspectorGUIHelper, SerializedObject serializedObject, IVariableWithHistory target, Action repaint)
+            : base(inspectorGUIHelper, serializedObject, target, repaint)
         {
             var variableHelper = target.VariableHelperWithHistory;
             var variableHelperProperty = serializedObject.FindProperty(nameof(VariableWithHistory<int>._variableHelperWithHistory));

@@ -1,21 +1,30 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using System;
     using System.Collections.Generic;
+    using GenericUnityObjects.Editor;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseRuntimeSet), true)]
-    internal class RuntimeSetEditor : PlayModeUpdatableEditor
+    internal class RuntimeSetEditor : Editor
     {
         private ReorderableList _listDrawer;
         private List<FoldoutList<Object>> _eventListeners;
         private BaseRuntimeSet _typedTarget;
+        private InspectorGUIHelper _inspectorGUIHelper;
+        private PlayModeUpdateHelper _updateHelper;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
+
+            if (target == null)
+                return;
+
             _listDrawer = GetReorderableList();
 
             _typedTarget = (BaseRuntimeSet) target;
@@ -29,21 +38,37 @@
                 new FoldoutList<Object>(_typedTarget.ReplaceListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ReplaceExpanded)), "Replace Event Listeners"),
                 new FoldoutList<Object>(_typedTarget.ResetListeners, serializedObject.FindProperty(nameof(BaseRuntimeSet.ResetExpanded)), "Reset Event Listeners"),
             };
+
+            _updateHelper = new PlayModeUpdateHelper(this, () =>
+            {
+                _eventListeners[0].Update(_typedTarget.AddListeners);
+                _eventListeners[1].Update(_typedTarget.CountChangeListeners);
+                _eventListeners[2].Update(_typedTarget.MoveListeners);
+                _eventListeners[3].Update(_typedTarget.RemoveListeners);
+                _eventListeners[4].Update(_typedTarget.ReplaceListeners);
+                _eventListeners[5].Update(_typedTarget.ResetListeners);
+            });
         }
 
-        protected override void Update()
+        private void OnDisable()
         {
-            _eventListeners[0].Update(_typedTarget.AddListeners);
-            _eventListeners[1].Update(_typedTarget.CountChangeListeners);
-            _eventListeners[2].Update(_typedTarget.MoveListeners);
-            _eventListeners[3].Update(_typedTarget.RemoveListeners);
-            _eventListeners[4].Update(_typedTarget.ReplaceListeners);
-            _eventListeners[5].Update(_typedTarget.ResetListeners);
+            _updateHelper?.Dispose();
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         public override void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;

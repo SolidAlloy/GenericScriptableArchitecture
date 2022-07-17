@@ -1,20 +1,24 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
+    using GenericUnityObjects.Editor;
     using UnityEditor;
     using Object = UnityEngine.Object;
 
     [CustomEditor(typeof(BaseEventInstancer), true)]
-    internal class EventInstancerEditor : PlayModeUpdatableEditor, IInlineDrawer
+    internal class EventInstancerEditor : Editor, IInlineDrawer
     {
         private SerializedProperty _baseField;
         private SerializedProperty _argNamesProperty;
 
         private ScriptableEventHelperDrawer _helperDrawer;
+        private InspectorGUIHelper _inspectorGUIHelper;
+        private PlayModeUpdateHelper _updateHelper;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
+            try { _inspectorGUIHelper = new InspectorGUIHelper(serializedObject); }
+            catch { return; }
 
             if (target == null)
                 return;
@@ -30,13 +34,28 @@
 
             var eventHelperProperty = serializedObject.FindProperty(nameof(ScriptableEvent._scriptableEventHelper));
             _helperDrawer = new ScriptableEventHelperDrawer(eventHelperProperty, helper, Repaint, getArgNames);
+            _updateHelper = new PlayModeUpdateHelper(this, () => _helperDrawer.Update());
         }
 
-        protected override void Update() => _helperDrawer.Update();
+        private void OnDisable()
+        {
+            _updateHelper?.Dispose();
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
+        }
 
         public override void OnInspectorGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            if (_inspectorGUIHelper == null)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
             if (guiWrapper.HasMissingScript)
                 return;
@@ -60,12 +79,10 @@
 
         public void OnInlineGUI()
         {
-            using var guiWrapper = new InspectorGUIWrapper(serializedObject);
+            using var guiWrapper = _inspectorGUIHelper.Wrap();
 
-            if (guiWrapper.HasMissingScript)
-                return;
-
-            _helperDrawer.DrawMethod(targets);
+            if (!guiWrapper.HasMissingScript)
+                _helperDrawer.DrawMethod(targets);
         }
 
         private static SerializedProperty GetArgNamesProperty(Object scriptableEvent)
