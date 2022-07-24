@@ -88,20 +88,32 @@
 
         private void ChangeEvent(Object newEvent)
         {
+            Type newListenerType = GetListenerComponentType(newEvent);
+
+            if (newListenerType == null)
+            {
+                RemoveComponent(_componentProperty.objectReferenceValue);
+                _componentEditor = null;
+                return;
+            }
+
+            // No need to replace component, if it's already of a matching type. Just replace the event reference in it.
+            if (newListenerType.IsInstanceOfType(_componentProperty.objectReferenceValue))
+            {
+                _componentEditor.SetEventValue(newEvent);
+                _componentEditor.SerializedObject.ApplyModifiedProperties();
+                return;
+            }
+
             RemoveComponent(_componentProperty.objectReferenceValue);
             _componentEditor = null;
 
-            var listenerType = GetListenerComponentType(newEvent);
-
-            if (listenerType == null)
-                return;
-
-            var component = AddComponentHelper.AddComponent(_targetGameObject, listenerType, out bool reloadRequired) as BaseScriptableEventListener;
+            var component = AddComponentHelper.AddComponent(_targetGameObject, newListenerType, out bool reloadRequired) as BaseScriptableEventListener;
 
             if (reloadRequired)
             {
                 PersistentStorage.SaveData(WildcardListenerKey, (Component) target);
-                PersistentStorage.SaveData(ListenerTypeKey, new TypeReference(listenerType));
+                PersistentStorage.SaveData(ListenerTypeKey, new TypeReference(newListenerType));
                 PersistentStorage.SaveData(EventKey, newEvent);
                 PersistentStorage.ExecuteOnScriptsReload(OnAfterComponentAdded);
                 AssetDatabase.Refresh();
@@ -111,6 +123,7 @@
                 _componentProperty.objectReferenceValue = component;
                 _componentEditor = new ScriptableEventListenerEditorHelper(new SerializedObject(component), component, Repaint);
                 _componentEditor.SetEventValue(newEvent);
+                _componentEditor.SerializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
             }
         }
 
@@ -131,6 +144,7 @@
 
                 var componentEditor = new ScriptableEventListenerEditorHelper(new SerializedObject(component), component, null);
                 componentEditor.SetEventValue(newEvent);
+                componentEditor.SerializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
             }
             finally
             {

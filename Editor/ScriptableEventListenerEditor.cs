@@ -107,9 +107,6 @@
             {
                 throw new ArgumentOutOfRangeException();
             }
-
-            // this also applies the other changed properties of serialized object.
-            SerializedObject.SetHideFlagsPersistently(HideFlags.HideInInspector);
         }
 
         private static EventHolder.EventType GetEventType(SerializedProperty eventTypeProperty) => (EventHolder.EventType) eventTypeProperty.enumValueIndex;
