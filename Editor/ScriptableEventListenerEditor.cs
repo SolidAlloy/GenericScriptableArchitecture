@@ -134,12 +134,12 @@
                     return GetArgNamesFromEventInstancer(_eventInstancerProperty);
 
                 case EventHolder.EventType.Variable:
-                    return _variableProperty.type.StartsWith("VariableWithHistory")
+                    return _variableProperty.type.Contains("VariableWithHistory")
                         ? new[] { "Previous Value", "Value" }
                         : new[] { "Value" };
 
                 case EventHolder.EventType.VariableInstancer:
-                    return _variableInstancerProperty.type.StartsWith("VariableInstancerWithHistory")
+                    return _variableInstancerProperty.type.Contains("VariableInstancerWithHistory")
                         ? new[] { "Previous Value", "Value" }
                         : new[] { "Value" };
             }
