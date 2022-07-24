@@ -18,7 +18,10 @@
     {
         T InitialValue { get; }
 
-        new T Value { get; set; }
+#if UNIRX
+        new // This property is also declared in IReactiveProperty<T>
+#endif
+        T Value { get; set; }
 
         void SetValueAndForceNotify(T value);
 
