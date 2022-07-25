@@ -1,3 +1,31 @@
+# [1.4.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.3...1.4.0) (2022-07-25)
+
+
+### Bug Fixes
+
+* Added the missing enabled checkbox to ScriptableEventListener component in inspector ([c3b5b34](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/c3b5b348a82258ee8b6d7f03ffb337f9e4340b76))
+* Fixed an issue where an editor of the generated component is lost and the wildcard listener doesn't show the generated component UI even though it exists ([d782af0](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/d782af04a067c8cd8ae18a344f72a94754487c96))
+
+
+### Features
+
+* Added a toggle to show hidden generated components for ScriptableEventListener ([38cad41](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/38cad41eab9a081b0283d7ce800f8977f36a7a52))
+* Added a warning suggesting to show the generated components if the number of generated components is higher than the wildcard (visible) ones ([6285100](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/628510032d4f204b770a88c364a7079e2f015bd3))
+* Added ability to set custom argument names for ScriptableEventListeners and Invoke button in Scriptable Event Inspector ([9d80a46](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/9d80a46091af2b569f74fa404ef03cc1e52e693f))
+* Added EventInstancer support to scriptable event listeners ([3046706](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/304670647d8a05a904771aa0e9f64417dbd1eae5))
+* Added EventInstancers ([859ffb8](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/859ffb8ea7dfba4d544b6bec27297ea164814792))
+* Added EventReference class to be able to choose between Scriptable Event and Event Instancer in inspector ([b64929d](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/b64929d293724a803ae0dbfe2941fe79b9885c05))
+* Added public getters for min and max values of ClampedInt, ClampedFloat ([aca2c65](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/aca2c65fa6cc6937ff6e0ee6ca161073cb2477bb))
+* Added variable instancer with history ([2053cc3](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/2053cc30e46579a622d6823315da759fc7b7d23e))
+* Added VariableInstancer ([89da192](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/89da192b7334fa91d28fffd2dcea21c79fa14d23))
+* Added VariableInstancer as a choice in Reference ([0057915](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/00579151c0192b37d81af088e3092a96cf1bb2e6))
+* Exposed initial value of a variable as a get-only property ([4cb0324](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/4cb03243af6ceb53fce368315f5294dad21ad9df))
+* Integrated MissingScriptType into custom editors ([fff8f26](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/fff8f26100e7727b9e1769a370839d117f59f549))
+* Made so that the set up serialized response does not disappear if the changed event reference of ScriptableEventListener has the same generic arguments as the previous reference ([39c3f7d](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/39c3f7dea653c5eba9c56460b280edc4cb9f9f38))
+* Renamed ReferenceBase to Reference, made ValueType, Variable, and Constant public properties ([6798f54](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/6798f54be6ba61d51182dc0f75a31eecce313ea1))
+* Replaced deep copy of variable initial values with serializing value to binary and back using odin serializer ([411ce63](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/411ce6376ee175e824f5648771c40588934fcfd3))
+* Switched from GUID to assembly names in asmdefs ([cf9d124](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/cf9d12430e6337f5cf8a2f11059515f5d4a177e3))
+
 ## [1.3.3](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.2...1.3.3) (2022-05-08)
 
 
