@@ -465,9 +465,9 @@ private void Start()
 }
 ```
 
-You can subscribe to a variable with ScriptableEventListener. The dropdown button in the ScriptableEventListener interface lets you choose between an event and a variable:
+You can subscribe to a variable with ScriptableEventListener. Just drag-and-drop a variable onto a ScriptableEventListener event field, and you'll be able to set up a response to the variable value change:
 
-![scriptable-event-listener-dropdown](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-dropdown.png)
+![scriptable-event-listener-dropdown](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-variable.png)
 
 ### Variable With History
 
@@ -506,9 +506,9 @@ public class TestBehaviour : MonoBehaviour, IEventListener<int, int>
 }
 ```
 
-Just like you can subscribe to a variable with history using `IEventListener<T, T>`, you can do it with a ScriptableEventListener that has two generic arguments of same type:
+You can subscribe to a variable with history using ScriptableEventListener:
 
-![scriptable-event-listener-with-history](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-with-history.png)
+![scriptable-event-listener-with-history](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableArchitecture/main/.images/scriptable-event-listener-variable-history.png)
 
 You can also ask to fire the current value immediately on subscribe, like with the regular variable. However, note that the previous value might not be set at the moment of subscribe. In this case, the response will not be triggered immediately even if you set notifyCurrentValue to true. It will be triggered only once a new value is passed to the variable so that it is able to provide both previous and current values to subscribers.
 
