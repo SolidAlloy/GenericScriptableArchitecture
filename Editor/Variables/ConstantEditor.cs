@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
+    using GenericUnityObjects.Editor;
     using UnityEditor;
 
     [CustomEditor(typeof(BaseValue), true)]
@@ -22,6 +23,11 @@
             _description = serializedObject.FindProperty(nameof(BaseValue._description));
             _initialValue = serializedObject.FindProperty(nameof(Constant<int>._initialValue));
             _currentValue = serializedObject.FindProperty(nameof(Constant<int>._value));
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         public override void OnInspectorGUI()

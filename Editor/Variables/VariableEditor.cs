@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableArchitecture.Editor
 {
     using System;
+    using GenericUnityObjects.Editor;
     using UnityEditor;
     using UnityEngine;
 
@@ -29,6 +30,11 @@
         private void OnDisable()
         {
             _updateHelper?.Dispose();
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         public override void OnInspectorGUI()
