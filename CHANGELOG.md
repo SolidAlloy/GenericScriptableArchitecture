@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.4.0...1.4.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* Fixed generic header not being shown for Variable and Constant ([befc150](https://github.com/SolidAlloy/GenericScriptableArchitecture/commit/befc150941b2ebf9a18381e1c8ed2053d527ca32))
+
 # [1.4.0](https://github.com/SolidAlloy/GenericScriptableArchitecture/compare/1.3.3...1.4.0) (2022-07-25)
 
 
